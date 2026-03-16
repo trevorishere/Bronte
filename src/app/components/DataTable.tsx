@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Star, MoreHorizontal, ArrowUp, ArrowDown, File } from 'lucide-react';
+import { toast } from 'sonner';
 
 export interface Column {
   key: string;
@@ -19,8 +20,9 @@ interface DataTableProps {
   data: RowData[];
   onRowClick?: (row: RowData) => void;
   onRowDoubleClick?: (row: RowData) => void;
-  onStarClick?: (row: RowData) => void;
+  onStarClick?: (row: RowData, isStarred: boolean) => void;
   onMoreClick?: (row: RowData) => void;
+  starredItems?: Set<string>;
 }
 
 type SortConfig = {
@@ -34,7 +36,8 @@ export function DataTable({
   onRowClick,
   onRowDoubleClick,
   onStarClick,
-  onMoreClick
+  onMoreClick,
+  starredItems
 }: DataTableProps) {
   // Initialize with default sort - prioritize lastModified or created, then name
   const getDefaultSort = (): SortConfig => {
@@ -55,18 +58,39 @@ export function DataTable({
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const [selectedRow, setSelectedRow] = useState<string | null>(null);
   const [hoveredHeader, setHoveredHeader] = useState<string | null>(null);
-  const [starredItems, setStarredItems] = useState<Set<string>>(new Set());
+  const [clickedColumns, setClickedColumns] = useState<Set<string>>(new Set());
 
   const handleSort = (columnKey: string) => {
     const column = columns.find(col => col.key === columnKey);
     if (!column?.sortable) return;
 
-    let direction: 'asc' | 'desc' = 'desc';
-    // If this column is already sorted, toggle the direction
-    if (sortConfig && sortConfig.key === columnKey) {
+    let direction: 'asc' | 'desc';
+    
+    // Check if this column has been clicked before
+    const hasBeenClicked = clickedColumns.has(columnKey);
+    
+    // If this column is already sorted AND has been clicked before, toggle the direction
+    if (sortConfig && sortConfig.key === columnKey && hasBeenClicked) {
       direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+      // First click: set initial direction based on column type
+      // Date columns default to desc (newest first), other columns default to asc (A-Z)
+      direction = isDateColumn(columnKey) ? 'desc' : 'asc';
     }
+    
+    // Mark this column as clicked
+    setClickedColumns(prev => new Set(prev).add(columnKey));
     setSortConfig({ key: columnKey, direction });
+  };
+
+  const isDateColumn = (key: string) => {
+    return key === 'lastModified' || key === 'created' || key === 'dateModified' || key === 'dateCreated';
+  };
+
+  const parseDateString = (dateStr: string): Date => {
+    // Parse dates in formats like "Nov 3, 2022" or "Jan 15, 2023"
+    const date = new Date(dateStr);
+    return date;
   };
 
   const sortedData = [...data].sort((a, b) => {
@@ -77,20 +101,25 @@ export function DataTable({
 
     if (aValue === bValue) return 0;
 
-    const comparison = aValue < bValue ? -1 : 1;
+    let comparison = 0;
+
+    // Special handling for date columns
+    if (isDateColumn(sortConfig.key)) {
+      const aDate = parseDateString(aValue);
+      const bDate = parseDateString(bValue);
+      comparison = aDate.getTime() - bDate.getTime();
+    } else {
+      // String comparison for other columns
+      comparison = aValue < bValue ? -1 : 1;
+    }
+
     return sortConfig.direction === 'asc' ? comparison : -comparison;
   });
 
   const handleStarClick = (e: React.MouseEvent, row: RowData) => {
     e.stopPropagation();
-    const newStarred = new Set(starredItems);
-    if (newStarred.has(row.id)) {
-      newStarred.delete(row.id);
-    } else {
-      newStarred.add(row.id);
-    }
-    setStarredItems(newStarred);
-    onStarClick?.(row);
+    const isStarred = starredItems?.has(row.id) || false;
+    onStarClick?.(row, !isStarred);
   };
 
   const handleMoreClick = (e: React.MouseEvent, row: RowData) => {
@@ -141,7 +170,7 @@ export function DataTable({
   };
 
   return (
-    <div className="flex-1 min-h-0 px-[24px] pb-[24px] flex flex-col">
+    <div className="flex-1 flex flex-col px-[24px] pb-[24px] min-h-0">
       {/* Table Header Container - Bordered */}
       <div className="shrink-0 overflow-hidden">
         <table className="w-full" style={{ tableLayout: 'fixed' }}>
@@ -179,7 +208,12 @@ export function DataTable({
                             <ArrowDown className="size-[16px] text-primary" />
                           )
                         ) : (
-                          <ArrowDown className="size-[16px] text-muted-foreground" />
+                          // Show preview arrow based on what the initial sort direction will be
+                          isDateColumn(column.key) ? (
+                            <ArrowDown className="size-[16px] text-muted-foreground" />
+                          ) : (
+                            <ArrowUp className="size-[16px] text-muted-foreground" />
+                          )
                         )}
                       </div>
                     )}
@@ -192,8 +226,8 @@ export function DataTable({
       </div>
 
       {/* Table Rows Container - Bordered and Scrollable */}
-      <div className="flex-1 min-h-0 overflow-hidden rounded-2xl" style={{ border: '1px solid var(--border-interactive)' }}>
-        <div className="h-full overflow-y-auto" onClick={handleTableAreaClick}>
+      <div className="overflow-hidden rounded-2xl min-h-0" style={{ border: '1px solid var(--border-interactive)', maxHeight: '100%' }}>
+        <div className="overflow-y-auto" style={{ maxHeight: '100%' }} onClick={handleTableAreaClick}>
           <table className="w-full" style={{ tableLayout: 'fixed' }}>
             <colgroup>
               {columns.map((column, index) => (
@@ -201,11 +235,14 @@ export function DataTable({
               ))}
             </colgroup>
             <tbody>
-              {sortedData.map((row) => (
+              {sortedData.map((row, rowIndex) => (
                 <tr
                   key={row.id}
-                  className="last:border-b-0 cursor-pointer transition-colors"
-                  style={{ borderBottom: '1px solid var(--border-interactive)', backgroundColor: getRowBackgroundColor(row.id) }}
+                  className="cursor-pointer transition-colors"
+                  style={{ 
+                    borderBottom: rowIndex === sortedData.length - 1 ? 'none' : '1px solid var(--border-interactive)', 
+                    backgroundColor: getRowBackgroundColor(row.id) 
+                  }}
                   onClick={() => handleRowClick(row)}
                   onDoubleClick={() => handleRowDoubleClick(row)}
                   onMouseEnter={() => setHoveredRow(row.id)}
@@ -257,7 +294,7 @@ export function DataTable({
                                 className="size-[16px]" 
                                 style={{ color: 'var(--icon)' }} 
                                 strokeWidth={1.5}
-                                fill={starredItems.has(row.id) ? 'currentColor' : 'none'}
+                                fill={starredItems?.has(row.id) ? 'currentColor' : 'none'}
                               />
                             </button>
                             <button
