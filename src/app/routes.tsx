@@ -19,4 +19,6 @@ export const router = createBrowserRouter([
       { path: "workspace/:workspaceId", Component: WorkspacePage },
     ],
   },
-]);
+], {
+  basename: import.meta.env.BASE_URL,
+});
