@@ -40,7 +40,7 @@ export function Sidebar({
             <div className="h-[26px] shrink-0">
               <div className="flex gap-[8px] h-full items-center">
                 <div className="flex items-center justify-center">
-                  <div className="flex flex-col font-['Aleo:Bold',sans-serif] font-bold justify-center leading-[0] text-[22px] tracking-[0.3px] whitespace-nowrap text-primary">
+                  <div className="flex flex-col justify-center leading-[0] text-[22px] tracking-[0.3px] whitespace-nowrap text-primary" style={{ fontFamily: 'Aleo, serif', fontWeight: 700 }}>
                     <p className="leading-[normal]">Bronte</p>
                   </div>
                 </div>
@@ -64,7 +64,7 @@ export function Sidebar({
                 onClick={() => onItemClick?.(item.id)}
                 onMouseEnter={() => setHoveredItem(item.id)}
                 onMouseLeave={() => setHoveredItem(null)}
-                className={`h-[40px] w-full rounded-xl transition-all duration-150 ease-in-out ${activeItem === item.id ? 'bg-accent' : ''}`}
+                className={`h-[36px] w-full rounded-xl transition-all duration-150 ease-in-out ${activeItem === item.id ? 'bg-accent' : ''}`}
                 style={{
                   backgroundColor: activeItem === item.id ? 'var(--accent)' : (hoveredItem === item.id ? 'var(--bg-nav-hover)' : 'transparent')
                 }}
@@ -130,7 +130,7 @@ export function Sidebar({
                     onClick={() => onItemClick?.(workspace.id)}
                     onMouseEnter={() => setHoveredItem(workspace.id)}
                     onMouseLeave={() => setHoveredItem(null)}
-                    className={`h-[40px] w-full rounded-xl transition-all duration-150 ease-in-out ${
+                    className={`h-[36px] w-full rounded-xl transition-all duration-150 ease-in-out ${
                       activeItem === workspace.id ? 'bg-accent' : ''
                     }`}
                     style={{

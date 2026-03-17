@@ -6,7 +6,7 @@
   --background: #fcfcfc; /* Content area - neutral light gray, lighter than sidebar */
   --foreground: #525A70; /* Default text color */
   
-  /* Card */
+  /** Card **/
   --card: #fcfcfc;
   --card-foreground: #525A70;
   
@@ -197,6 +197,15 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
   }
 
   body {

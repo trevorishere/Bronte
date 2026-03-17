@@ -11,7 +11,7 @@ export interface Column {
 
 export interface RowData {
   id: string;
-  iconType?: string; // Type of icon (e.g., 'project', 'document', 'folder', etc.)
+  iconType?: string; // * Type of icon (e.g., 'project', 'document', 'folder', etc.)
   [key: string]: any;
 }
 
