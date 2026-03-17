@@ -262,4 +262,15 @@
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
   }
+
+  /* Lighten text selection highlight */
+  ::selection {
+    background-color: rgba(82, 90, 112, 0.2); /* --foreground at 20% opacity */
+    color: inherit;
+  }
+
+  input::selection {
+    background-color: rgba(82, 90, 112, 0.2); /* --foreground at 20% opacity */
+    color: inherit;
+  }
 }

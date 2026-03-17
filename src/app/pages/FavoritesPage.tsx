@@ -22,6 +22,8 @@ const tableColumns: Column[] = [
 export function FavoritesPage() {
   const { isDarkMode, onThemeToggle } = useOutletContext<OutletContext>();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
+  const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   // Filter projects to only show favorited ones
@@ -34,6 +36,45 @@ export function FavoritesPage() {
       lastModified: project.lastModified,
       iconType: 'project'
     }));
+
+  // Get unique owners for filter options
+  const uniqueOwners = Array.from(new Set(tableData.map(p => p.owner))).sort();
+
+  // Apply filters to table data
+  const filteredData = tableData.filter(row => {
+    // Filter by Owner
+    if (selectedFilters['Owner'] && selectedFilters['Owner'].length > 0) {
+      if (!selectedFilters['Owner'].includes(row.owner)) {
+        return false;
+      }
+    }
+    
+    // Filter by Last Modified date range
+    if (dateFilters['Last Modified']) {
+      const { start, end } = dateFilters['Last Modified'];
+      if (start || end) {
+        const rowDate = new Date(row.lastModified);
+        if (start && rowDate < start) return false;
+        if (end && rowDate > end) return false;
+      }
+    }
+    
+    return true;
+  });
+
+  const handleFilterChange = (filterLabel: string, values: string[]) => {
+    setSelectedFilters(prev => ({
+      ...prev,
+      [filterLabel]: values
+    }));
+  };
+
+  const handleDateFilterChange = (filterLabel: string, start: Date | null, end: Date | null) => {
+    setDateFilters(prev => ({
+      ...prev,
+      [filterLabel]: { start, end }
+    }));
+  };
 
   const handleRowClick = (row: RowData) => {
     console.log('Row clicked (selected):', row);
@@ -72,10 +113,18 @@ export function FavoritesPage() {
           <Toolbar
             viewMode={viewMode}
             onViewModeChange={setViewMode}
+            filters={[
+              { label: 'Owner', options: uniqueOwners },
+              { label: 'Last Modified', type: 'date' as const }
+            ]}
+            selectedFilters={selectedFilters}
+            onFilterChange={handleFilterChange}
+            dateFilters={dateFilters}
+            onDateFilterChange={handleDateFilterChange}
           />
           <DataTable
             columns={tableColumns}
-            data={tableData}
+            data={filteredData}
             onRowClick={handleRowClick}
             onRowDoubleClick={handleRowDoubleClick}
             onStarClick={handleStarClick}

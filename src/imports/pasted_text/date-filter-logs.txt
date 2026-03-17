@@ -1,0 +1,156 @@
+[vite] connecting...
+[vite] connected.
+DateRangePicker handleDateClick called: "2026-02-02T08:00:00.000Z"
+Setting start date: "2026-02-02T08:00:00.000Z"
+Toolbar handleDateFilterChange called: {
+  "label": "Last Modified",
+  "start": "2026-02-02T08:00:00.000Z",
+  "end": null
+}
+WorkspacePage handleDateFilterChange called: {
+  "filterLabel": "Last Modified",
+  "start": "2026-02-02T08:00:00.000Z",
+  "end": null
+}
+Toolbar handleDateFilterChange called: {
+  "label": "Last Modified",
+  "start": null,
+  "end": null
+}
+WorkspacePage handleDateFilterChange called: {
+  "filterLabel": "Last Modified",
+  "start": null,
+  "end": null
+}
+DateRangePicker handleDateClick called: "2026-02-11T08:00:00.000Z"
+Setting start date: "2026-02-11T08:00:00.000Z"
+Toolbar handleDateFilterChange called: {
+  "label": "Last Modified",
+  "start": "2026-02-11T08:00:00.000Z",
+  "end": null
+}
+WorkspacePage handleDateFilterChange called: {
+  "filterLabel": "Last Modified",
+  "start": "2026-02-11T08:00:00.000Z",
+  "end": null
+}
+Toolbar handleDateFilterChange called: {
+  "label": "Last Modified",
+  "start": null,
+  "end": null
+}
+WorkspacePage handleDateFilterChange called: {
+  "filterLabel": "Last Modified",
+  "start": null,
+  "end": null
+}
+DateRangePicker handleDateClick called: "2026-02-19T08:00:00.000Z"
+Setting start date: "2026-02-19T08:00:00.000Z"
+Toolbar handleDateFilterChange called: {
+  "label": "Last Modified",
+  "start": "2026-02-19T08:00:00.000Z",
+  "end": null
+}
+WorkspacePage handleDateFilterChange called: {
+  "filterLabel": "Last Modified",
+  "start": "2026-02-19T08:00:00.000Z",
+  "end": null
+}
+Toolbar handleDateFilterChange called: {
+  "label": "Last Modified",
+  "start": null,
+  "end": null
+}
+WorkspacePage handleDateFilterChange called: {
+  "filterLabel": "Last Modified",
+  "start": null,
+  "end": null
+}
+DateRangePicker handleDateClick called: "2026-02-12T08:00:00.000Z"
+Setting start date: "2026-02-12T08:00:00.000Z"
+Toolbar handleDateFilterChange called: {
+  "label": "Last Modified",
+  "start": "2026-02-12T08:00:00.000Z",
+  "end": null
+}
+WorkspacePage handleDateFilterChange called: {
+  "filterLabel": "Last Modified",
+  "start": "2026-02-12T08:00:00.000Z",
+  "end": null
+}
+Toolbar handleDateFilterChange called: {
+  "label": "Last Modified",
+  "start": null,
+  "end": null
+}
+WorkspacePage handleDateFilterChange called: {
+  "filterLabel": "Last Modified",
+  "start": null,
+  "end": null
+}
+DateRangePicker handleDateClick called: "2026-02-13T08:00:00.000Z"
+Setting start date: "2026-02-13T08:00:00.000Z"
+Toolbar handleDateFilterChange called: {
+  "label": "Last Modified",
+  "start": "2026-02-13T08:00:00.000Z",
+  "end": null
+}
+WorkspacePage handleDateFilterChange called: {
+  "filterLabel": "Last Modified",
+  "start": "2026-02-13T08:00:00.000Z",
+  "end": null
+}
+Toolbar handleDateFilterChange called: {
+  "label": "Last Modified",
+  "start": null,
+  "end": null
+}
+WorkspacePage handleDateFilterChange called: {
+  "filterLabel": "Last Modified",
+  "start": null,
+  "end": null
+}
+DateRangePicker handleDateClick called: "2026-02-02T08:00:00.000Z"
+Setting start date: "2026-02-02T08:00:00.000Z"
+Toolbar handleDateFilterChange called: {
+  "label": "Last Modified",
+  "start": "2026-02-02T08:00:00.000Z",
+  "end": null
+}
+WorkspacePage handleDateFilterChange called: {
+  "filterLabel": "Last Modified",
+  "start": "2026-02-02T08:00:00.000Z",
+  "end": null
+}
+Toolbar handleDateFilterChange called: {
+  "label": "Last Modified",
+  "start": null,
+  "end": null
+}
+WorkspacePage handleDateFilterChange called: {
+  "filterLabel": "Last Modified",
+  "start": null,
+  "end": null
+}
+DateRangePicker handleDateClick called: "2026-02-11T08:00:00.000Z"
+Setting start date: "2026-02-11T08:00:00.000Z"
+Toolbar handleDateFilterChange called: {
+  "label": "Last Modified",
+  "start": "2026-02-11T08:00:00.000Z",
+  "end": null
+}
+WorkspacePage handleDateFilterChange called: {
+  "filterLabel": "Last Modified",
+  "start": "2026-02-11T08:00:00.000Z",
+  "end": null
+}
+Toolbar handleDateFilterChange called: {
+  "label": "Last Modified",
+  "start": null,
+  "end": null
+}
+WorkspacePage handleDateFilterChange called: {
+  "filterLabel": "Last Modified",
+  "start": null,
+  "end": null
+}

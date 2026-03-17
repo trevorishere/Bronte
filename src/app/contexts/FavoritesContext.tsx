@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 interface FavoritesContextType {
   favorites: Set<string>;
@@ -9,8 +9,32 @@ interface FavoritesContextType {
 
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
 
+const STORAGE_KEY = 'figma-make-favorites';
+
 export function FavoritesProvider({ children }: { children: ReactNode }) {
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  // Initialize from localStorage
+  const [favorites, setFavorites] = useState<Set<string>>(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const array = JSON.parse(stored);
+        return new Set(array);
+      }
+    } catch (error) {
+      console.error('Failed to load favorites from localStorage:', error);
+    }
+    return new Set();
+  });
+
+  // Save to localStorage whenever favorites change
+  useEffect(() => {
+    try {
+      const array = Array.from(favorites);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(array));
+    } catch (error) {
+      console.error('Failed to save favorites to localStorage:', error);
+    }
+  }, [favorites]);
 
   const addFavorite = (id: string) => {
     setFavorites(prev => new Set(prev).add(id));

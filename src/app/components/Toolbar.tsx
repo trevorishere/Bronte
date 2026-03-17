@@ -1,28 +1,42 @@
 import { Grid3x3, List, ChevronDown } from 'lucide-react';
 import svgPaths from "../../imports/svg-2hg6thd8pt";
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { FilterDropdown } from './FilterDropdown';
+import { DateFilterDropdown } from './DateFilterDropdown';
+
+interface FilterConfig {
+  label: string;
+  options: string[];
+}
+
+interface DateFilterConfig {
+  label: string;
+  type: 'date';
+}
 
 interface ToolbarProps {
   viewMode?: 'grid' | 'list';
   onViewModeChange?: (mode: 'grid' | 'list') => void;
-  filters?: Array<{
-    label: string;
-    value: string;
-    options: string[];
-  }>;
-  onFilterChange?: (filterLabel: string, value: string) => void;
+  filters?: (FilterConfig | DateFilterConfig)[];
+  selectedFilters?: Record<string, string[]>;
+  onFilterChange?: (filterLabel: string, values: string[]) => void;
+  dateFilters?: Record<string, { start: Date | null; end: Date | null }>;
+  onDateFilterChange?: (filterLabel: string, start: Date | null, end: Date | null) => void;
 }
 
 export function Toolbar({ 
   viewMode = 'list',
   onViewModeChange,
   filters = [
-    { label: 'Owner', value: '', options: ['All Owners', 'Me', 'Others'] },
-    { label: 'Workspace', value: '', options: ['All Workspaces', 'Chemistry', 'Math'] }
+    { label: 'Owner', options: ['Alice Johnson', 'Bob Smith', 'Carol Davis', 'David Wilson', 'Emma Brown'] },
+    { label: 'Workspace', options: ['Chemistry', 'Math', 'Physics', 'Biology'] },
+    { label: 'Last Modified', type: 'date' as const }
   ],
-  onFilterChange
+  selectedFilters = {},
+  onFilterChange,
+  dateFilters = {},
+  onDateFilterChange
 }: ToolbarProps) {
-  const [hoveredFilter, setHoveredFilter] = useState<number | null>(null);
   const [isToggleHovered, setIsToggleHovered] = useState(false);
   const [hoveredToggle, setHoveredToggle] = useState<'list' | 'grid' | null>(null);
 
@@ -32,55 +46,44 @@ export function Toolbar({
     return 'var(--icon-toggle-inactive)';
   };
 
+  const handleFilterChange = (label: string, values: string[]) => {
+    onFilterChange?.(label, values);
+  };
+
+  const handleDateFilterChange = (label: string, start: Date | null, end: Date | null) => {
+    onDateFilterChange?.(label, start, end);
+  };
+
   return (
     <div className="h-[104px] shrink-0 w-full px-[24px] flex items-center justify-between">
       {/* Filters */}
       <div className="flex gap-[16px] items-center">
-        {filters.map((filter, index) => (
-          <div key={index} className="relative">
-            <button 
-              className="flex h-[40px] items-center justify-between pl-[16px] pr-[12px] w-[240px] transition-colors bg-background group"
-              style={{
-                border: '1px solid var(--border-interactive)',
-                borderRadius: 'var(--radius-16)'
-              }}
-              onMouseEnter={() => setHoveredFilter(index)}
-              onMouseLeave={() => setHoveredFilter(null)}
-              onMouseOver={(e) => {
-                e.currentTarget.style.borderColor = 'var(--border-interactive-hover)';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.borderColor = 'var(--border-interactive)';
-              }}
-            >
-              <div className="flex-1 h-[20px]">
-                <div className="flex items-center size-full">
-                  <div 
-                    className={`${hoveredFilter === index ? 'text-primary' : 'text-foreground'}`}
-                    style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-20)', fontSize: 'var(--font-size-14)', whiteSpace: 'nowrap' }}
-                  >
-                    {filter.label}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center justify-center px-[4px] shrink-0 size-[20px]">
-                <div className="shrink-0 size-[16px]">
-                  <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16">
-                    <g>
-                      <path 
-                        d="M4 6L8 10L12 6" 
-                        stroke={hoveredFilter === index ? 'var(--primary)' : 'var(--foreground)'} 
-                        strokeLinecap="square" 
-                        strokeLinejoin="round" 
-                        strokeWidth="1.5" 
-                      />
-                    </g>
-                  </svg>
-                </div>
-              </div>
-            </button>
-          </div>
-        ))}
+        {filters.map((filter) => {
+          if ('type' in filter && filter.type === 'date') {
+            const dateFilter = dateFilters[filter.label] || { start: null, end: null };
+            return (
+              <DateFilterDropdown
+                key={filter.label}
+                label={filter.label}
+                startDate={dateFilter.start}
+                endDate={dateFilter.end}
+                onDateChange={(start, end) => {
+                  handleDateFilterChange(filter.label, start, end);
+                }}
+              />
+            );
+          } else {
+            return (
+              <FilterDropdown
+                key={filter.label}
+                label={filter.label}
+                options={(filter as FilterConfig).options}
+                selectedValues={selectedFilters[filter.label] || []}
+                onSelectionChange={(values) => handleFilterChange(filter.label, values)}
+              />
+            );
+          }
+        })}
       </div>
 
       {/* View Toggle */}
