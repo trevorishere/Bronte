@@ -60,7 +60,7 @@ export function FavoritesPage() {
   const hasData = tableData.length > 0;
 
   return (
-    <>
+    <div className="flex flex-col h-full overflow-hidden">
       <TopBar
         title="Favorites"
         userInitials="LD"
@@ -86,6 +86,6 @@ export function FavoritesPage() {
       ) : (
         <EmptyState message="You currently have no favorite projects yet." />
       )}
-    </>
+    </div>
   );
 }

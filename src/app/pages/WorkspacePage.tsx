@@ -61,7 +61,7 @@ export function WorkspacePage() {
   };
 
   return (
-    <>
+    <div className="flex flex-col h-full overflow-hidden">
       <TopBar
         title={workspace?.name || 'Workspace'}
         userInitials="LD"
@@ -81,6 +81,6 @@ export function WorkspacePage() {
         onMoreClick={handleMoreClick}
         starredItems={favorites}
       />
-    </>
+    </div>
   );
 }

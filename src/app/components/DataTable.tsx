@@ -170,7 +170,7 @@ export function DataTable({
   };
 
   return (
-    <div className="flex-1 flex flex-col px-[24px] pb-[24px] min-h-0">
+    <div className="flex-1 flex flex-col px-[24px] pb-[24px] min-h-0 overflow-hidden">
       {/* Table Header Container - Bordered */}
       <div className="shrink-0 overflow-hidden">
         <table className="w-full" style={{ tableLayout: 'fixed' }}>
@@ -226,8 +226,8 @@ export function DataTable({
       </div>
 
       {/* Table Rows Container - Bordered and Scrollable */}
-      <div className="overflow-hidden rounded-2xl min-h-0" style={{ border: '1px solid var(--border-interactive)', maxHeight: '100%' }}>
-        <div className="overflow-y-auto" style={{ maxHeight: '100%' }} onClick={handleTableAreaClick}>
+      <div className="flex-1 overflow-hidden rounded-2xl min-h-0" style={{ border: '1px solid var(--border-interactive)' }}>
+        <div className="h-full overflow-y-auto" onClick={handleTableAreaClick}>
           <table className="w-full" style={{ tableLayout: 'fixed' }}>
             <colgroup>
               {columns.map((column, index) => (

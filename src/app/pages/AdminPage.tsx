@@ -14,7 +14,7 @@ export function AdminPage() {
   const { isDarkMode, onThemeToggle } = useOutletContext<OutletContext>();
 
   return (
-    <>
+    <div className="flex flex-col h-full overflow-hidden">
       <TopBar
         title="Admin"
         userInitials="LD"
@@ -22,6 +22,6 @@ export function AdminPage() {
         onThemeToggle={onThemeToggle}
       />
       <EmptyState message="You currently have no projects in here yet." />
-    </>
+    </div>
   );
 }

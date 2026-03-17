@@ -62,7 +62,7 @@ export function RecentPage() {
   };
 
   return (
-    <>
+    <div className="flex flex-col h-full overflow-hidden">
       <TopBar
         title="Recent"
         userInitials="LD"
@@ -82,6 +82,6 @@ export function RecentPage() {
         onMoreClick={handleMoreClick}
         starredItems={favorites}
       />
-    </>
+    </div>
   );
 }
