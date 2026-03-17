@@ -227,7 +227,7 @@ export function DataTable({
 
       {/* Table Rows Container - Bordered and Scrollable */}
       <div className="overflow-hidden rounded-2xl" style={{ border: '1px solid var(--border-interactive)' }}>
-        <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 280px)' }} onClick={handleTableAreaClick}>
+        <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 240px)' }} onClick={handleTableAreaClick}>
           <table className="w-full" style={{ tableLayout: 'fixed' }}>
             <colgroup>
               {columns.map((column, index) => (
