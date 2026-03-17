@@ -1,7 +1,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /** Base */
+  /* Base */
   --font-size: 16px;
   --background: #fcfcfc; /* Content area - neutral light gray, lighter than sidebar */
   --foreground: #525A70; /* Default text color */
