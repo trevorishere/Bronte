@@ -55,7 +55,7 @@ export function MobileSortHeader({
   };
 
   return (
-    <div ref={menuRef} className="relative shrink-0 px-4 pb-2 h-[40px] flex items-center">
+    <div ref={menuRef} className="relative shrink-0 px-4 pb-4 h-[40px] flex items-center">
       <div className="flex items-center justify-between w-full">
         {/* Active Sort Column - Opens dropdown when clicked */}
         <button
@@ -97,16 +97,16 @@ export function MobileSortHeader({
             className="absolute top-full left-4 mt-1 bg-background shadow-lg z-50 overflow-hidden p-[8px]"
             style={{
               border: '1px solid var(--border-interactive-hover)',
-              borderRadius: 'var(--radius-16)',
-              minWidth: '144px',
-              transformOrigin: 'top center'
+              borderRadius: 'var(--radius-24)',
+              minWidth: '124px',
+              transformOrigin: 'top left'
             }}
           >
             {sortOptions.map((option) => (
               <button
                 key={option.key}
                 onClick={() => handleSortOptionClick(option.key)}
-                className="w-full px-[12px] py-[10px] transition-colors rounded-xl text-left"
+                className="w-full px-[12px] py-[12px] transition-colors rounded-xl text-left"
                 style={{
                   backgroundColor: sortColumn === option.key ? 'var(--muted)' : 'transparent',
                   fontFamily: 'var(--font-family)',
