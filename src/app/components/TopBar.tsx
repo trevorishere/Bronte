@@ -79,9 +79,9 @@ export function TopBar({
             onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             {viewMode === 'grid' ? (
-              <List className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
+              <List className="size-[24px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
             ) : (
-              <Grid3x3 className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
+              <Grid3x3 className="size-[24px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
             )}
           </button>
         )}
@@ -109,7 +109,7 @@ export function TopBar({
               </button>
             )}
             <h1 
-              className={`truncate ${backButtonLabel && showBackButton ? 'text-[24px]' : 'text-[28px]'}`}
+              className={`truncate ${backButtonLabel && showBackButton ? 'text-[26px]' : 'text-[28px]'}`}
               style={{ 
                 fontFamily: 'var(--font-family)', 
                 fontWeight: 'bold',
