@@ -91,6 +91,7 @@ export function MobileCardView({
                   fontWeight: 'var(--font-weight-medium)',
                   fontSize: '12px',
                   lineHeight: '16px',
+                  letterSpacing: 'var(--letter-spacing-md)'
                   color: 'var(--primary)',
                 }}
               >
@@ -131,7 +132,8 @@ export function MobileCardView({
                     fontFamily: 'var(--font-family)',
                     fontWeight: 'var(--font-weight-medium)',
                     fontSize: '15px',
-                    lineHeight: '22px',
+                    lineHeight: '21px',
+                    letterSpacing: 'var(--letter-spacing-md)'
                     color: 'var(--primary)',
                   }}
                 >
