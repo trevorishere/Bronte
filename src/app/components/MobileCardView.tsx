@@ -130,8 +130,8 @@ export function MobileCardView({
                   style={{
                     fontFamily: 'var(--font-family)',
                     fontWeight: 'var(--font-weight-medium)',
-                    fontSize: '14px',
-                    lineHeight: '20px',
+                    fontSize: '15px',
+                    lineHeight: '22px',
                     color: 'var(--primary)',
                   }}
                 >
