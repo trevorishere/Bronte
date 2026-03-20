@@ -47,6 +47,7 @@ export function ActionButtons({
       onClick: () => onThemeToggle?.(),
     },
   ];
+  // Note: theme toggle kept in desktop dropdown for desktop convenience; also available in AccountPage
 
   return (
     <>

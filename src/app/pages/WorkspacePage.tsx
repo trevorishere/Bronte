@@ -1,17 +1,15 @@
 import { useState } from 'react';
 import { useParams, useOutletContext, useNavigate, useLocation } from 'react-router';
 import { toast } from 'sonner';
-import { ChevronLeft } from 'lucide-react';
+import { Plus, UserRoundPlus } from 'lucide-react';
 import { TopBar } from '../components/TopBar';
 import { Toolbar } from '../components/Toolbar';
 import { DataTable, Column, RowData } from '../components/DataTable';
 import { GridView, GridItemData } from '../components/GridView';
-import { WorkspaceIcon } from '../components/WorkspaceIcon';
-import { ActionButtons } from '../components/ActionButtons';
+import { DetailPageHeader } from '../components/DetailPageHeader';
 import { projects, workspaces } from '../data/workspaces';
+import { accounts } from '../data/accounts';
 import { useFavorites } from '../contexts/FavoritesContext';
-import { useMobileNav } from '../hooks/useMobileNav';
-import svgPaths from '../../imports/svg-2hg6thd8pt';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -33,17 +31,19 @@ export function WorkspacePage() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const { favorites, addFavorite, removeFavorite } = useFavorites();
-  const { toggleSidebar } = useMobileNav();
 
   // Check if we're in Admin context (from /admin/workspace/:id route)
   const isAdminRoute = location.pathname.startsWith('/admin');
 
   // Find the workspace
   const workspace = workspaces.find(w => w.id === workspaceId);
-  
+
   // Filter projects for this workspace
   const workspaceProjects = projects.filter(p => p.workspace === workspaceId);
-  
+
+  // Count members for this workspace
+  const memberCount = accounts.filter(a => a.workspaceIds.includes(workspaceId || '')).length;
+
   // Get unique owners for filter options
   const uniqueOwners = Array.from(new Set(workspaceProjects.map(p => p.owner))).sort();
   
@@ -114,9 +114,30 @@ export function WorkspacePage() {
     console.log('More clicked:', row);
   };
 
+  const mobileTopBarActions = !isAdminRoute ? (
+    <>
+      <button
+        className="size-[40px] flex items-center justify-center rounded-full transition-colors"
+        style={{ backgroundColor: 'transparent' }}
+        onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
+        onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+      >
+        <Plus className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
+      </button>
+      <button
+        className="size-[40px] flex items-center justify-center rounded-full transition-colors"
+        style={{ backgroundColor: 'transparent' }}
+        onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
+        onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+      >
+        <UserRoundPlus className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
+      </button>
+    </>
+  ) : undefined;
+
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ backgroundColor: 'var(--background)' }}>
-      {/* Top bar - Show workspace name title in non-admin context, Admin with back button in admin context */}
+      {/* Top bar */}
       {isAdminRoute ? (
         <TopBar
           title="Admin"
@@ -134,8 +155,23 @@ export function WorkspacePage() {
           userInitials="LD"
           onThemeToggle={onThemeToggle}
           isDarkMode={isDarkMode}
+          showBackButton={true}
+          backButtonLabel="Workspaces"
+          onBackClick={() => navigate('/workspaces')}
+          mobileActions={mobileTopBarActions}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
+        />
+      )}
+
+      {/* Detail header with large title + metadata (shows on both mobile and desktop for non-admin) */}
+      {!isAdminRoute && workspace && (
+        <DetailPageHeader
+          title={workspace.name}
+          metadata={[
+            { icon: 'users', label: `${memberCount} ${memberCount === 1 ? 'Member' : 'Members'}` },
+            { icon: 'book', label: `${workspaceProjects.length} ${workspaceProjects.length === 1 ? 'Project' : 'Projects'}` },
+          ]}
         />
       )}
 

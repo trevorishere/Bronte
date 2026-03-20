@@ -168,7 +168,7 @@ export function GridView({
   };
 
   return (
-    <div className="w-full h-full overflow-y-auto px-4 md:px-[40px] pb-2" style={{ backgroundColor: 'var(--background)' }}>
+    <div className="w-full h-full overflow-y-auto px-4 md:px-[40px] pb-[80px] md:pb-4" style={{ backgroundColor: 'var(--background)' }}>
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 pt-8">
         {data.map((item) => {
           const isStarred = favorites.has(item.id);

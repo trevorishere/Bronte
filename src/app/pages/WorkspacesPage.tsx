@@ -105,10 +105,8 @@ export function WorkspacesPage() {
 
   return (
     <div className="flex flex-col h-screen" style={{ backgroundColor: 'var(--background-content)' }}>
-      <TopBar 
-        title="Workspaces" 
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
+      <TopBar
+        title="Workspaces"
       />
       <Toolbar 
         viewMode={viewMode}

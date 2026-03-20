@@ -52,7 +52,7 @@ function TableSkeleton({ rowCount = 8 }: { rowCount?: number }) {
 // Mobile list skeleton
 function MobileListSkeleton({ rowCount = 8 }: { rowCount?: number }) {
   return (
-    <div className="md:hidden flex-1 flex flex-col overflow-hidden pb-[72px]">
+    <div className="md:hidden flex-1 overflow-auto pb-[72px]">
       <div className="flex flex-col">
         {Array.from({ length: rowCount }).map((_, i) => (
           <div
@@ -75,7 +75,7 @@ function MobileListSkeleton({ rowCount = 8 }: { rowCount?: number }) {
 // Grid skeleton for desktop GridView
 export function GridSkeleton({ itemCount = 8 }: { itemCount?: number }) {
   return (
-    <div className="w-full h-full overflow-y-auto px-4 md:px-[40px] pb-2" style={{ backgroundColor: 'var(--background)' }}>
+    <div className="w-full h-full overflow-y-auto px-4 md:px-[40px] pb-[80px] md:pb-4" style={{ backgroundColor: 'var(--background)' }}>
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 pt-8">
         {Array.from({ length: itemCount }).map((_, i) => (
           <div

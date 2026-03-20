@@ -61,7 +61,7 @@ export function DetailPageHeader({ title, badge, metadata }: DetailPageHeaderPro
   };
 
   return (
-    <div className="hidden md:block shrink-0 px-4 md:pl-[40px] md:pr-[48px] pt-8 md:pt-[16px] pb-4 md:pb-[40px]">
+    <div className="shrink-0 px-4 md:pl-[40px] md:pr-[48px] pt-6 md:pt-[16px] pb-4 md:pb-[40px]">
       <div className="flex flex-col items-start gap-2">
         {/* Title and optional badge */}
         <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-[16px]">
