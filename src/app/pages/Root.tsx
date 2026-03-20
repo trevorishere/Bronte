@@ -3,7 +3,6 @@ import { Outlet, useNavigate, useLocation } from 'react-router';
 import { Toaster } from 'sonner';
 import { Sidebar } from '../components/Sidebar';
 import { BottomNav } from '../components/BottomNav';
-import StatusBar from '../../imports/StatusBar';
 import { myWorkspaces, teamWorkspaces } from '../data/workspaces';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
 import { useMobileNav } from '../hooks/useMobileNav';
@@ -63,11 +62,6 @@ export function Root() {
   return (
     <FavoritesProvider>
       <div className="size-full flex bg-background overflow-hidden">
-        {/* Status Bar - Mobile Only */}
-        <div className="md:hidden fixed top-0 left-0 right-0 h-[44px] z-50">
-          <StatusBar />
-        </div>
-
         {/* Sidebar */}
         <Sidebar
           myWorkspaces={myWorkspaces}
@@ -79,7 +73,7 @@ export function Root() {
         />
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden pt-[44px] md:pt-0">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           <Outlet context={{ isDarkMode, onThemeToggle: handleThemeToggle }} />
         </div>
         
