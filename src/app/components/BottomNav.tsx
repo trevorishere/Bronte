@@ -175,7 +175,7 @@ export function BottomNav({ activeItem = 'recent', onItemClick, workspaces = [] 
           borderTop: '1px solid var(--border-interactive)',
           boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.1)',
           paddingTop: '8px',
-          height: '52px'
+      
         }}
       >
         {navItems.map((item) => {
