@@ -36,7 +36,7 @@ export function TopBar({
       {/* Padding: 16px horizontal                                        */}
       {/* Layout: Title (left) + View Toggle (right, if provided)         */}
       {/* ================================================================ */}
-      <div className="md:hidden flex items-center justify-between pt-1 px-[16px] size-full">
+      <div className="md:hidden flex items-center pt-1 px-[16px] size-full">
         {/* Title with optional back button - Mobile */}
         {title && (
           <div className="flex gap-[8px] items-center flex-1 min-w-0">
