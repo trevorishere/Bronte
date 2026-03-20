@@ -40,7 +40,7 @@ export function TopBar({
       {/* Padding: 16px horizontal                                        */}
       {/* Layout: Title (left) + View Toggle (right, if provided)         */}
       {/* ================================================================ */}
-      <div className="md:hidden flex items-center justify-between pt-1 px-[16px] size-full">
+      <div className="md:hidden flex items-center pt-1 px-[16px] size-full">
         {/* Title with optional back button - Mobile */}
         {title && (
           <div className="flex gap-[8px] items-center flex-1 min-w-0">
@@ -87,9 +87,9 @@ export function TopBar({
             onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             {viewMode === 'grid' ? (
-              <List className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
+              <List className="size-[24px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
             ) : (
-              <Grid3x3 className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
+              <Grid3x3 className="size-[24px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
             )}
           </button>
         ) : null}
@@ -117,7 +117,7 @@ export function TopBar({
               </button>
             )}
             <h1 
-              className={`truncate ${backButtonLabel && showBackButton ? 'text-[24px]' : 'text-[28px]'}`}
+              className={`truncate ${backButtonLabel && showBackButton ? 'text-[26px]' : 'text-[28px]'}`}
               style={{ 
                 fontFamily: 'var(--font-family)', 
                 fontWeight: 'bold',
