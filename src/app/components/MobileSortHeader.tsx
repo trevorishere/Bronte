@@ -55,7 +55,7 @@ export function MobileSortHeader({
   };
 
   return (
-    <div ref={menuRef} className="relative shrink-0 px-2 h-[40px] flex items-center">
+    <div ref={menuRef} className="relative shrink-0 px-4 h-[40px] flex items-center">
       <div className="flex items-center justify-between w-full">
         {/* Active Sort Column - Opens dropdown when clicked */}
         <button
@@ -65,8 +65,8 @@ export function MobileSortHeader({
           <span
             style={{
               fontFamily: 'var(--font-family)',
-              fontWeight: 'var(--font-weight-semibold)',
-              fontSize: '13px',
+              fontWeight: 'var(--font-weight-medium)',
+              fontSize: '14px',
               color: 'var(--primary)',
               letterSpacing: '0.13px'
             }}
