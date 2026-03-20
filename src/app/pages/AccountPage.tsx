@@ -85,11 +85,6 @@ function SectionRow({ icon, label, description, onClick, destructive = false }: 
   );
 }
 
-interface SectionProps {
-  title?: string;
-  children: React.ReactNode;
-}
-
 interface SectionToggleRowProps {
   icon: React.ReactNode;
   label: string;
@@ -169,35 +164,79 @@ function SectionToggleRow({ icon, label, description, checked, onToggle }: Secti
   );
 }
 
-function Section({ title, children }: SectionProps) {
+interface HelpCardProps {
+  icon: React.ReactNode;
+  label: string;
+  description?: string;
+  onClick?: () => void;
+}
+
+function HelpCard({ icon, label, description, onClick }: HelpCardProps) {
   return (
-    <div className="mb-6">
-      {title && (
+    <button
+      onClick={onClick}
+      className="flex-1 flex flex-col items-start gap-2 p-4 transition-colors text-left rounded-2xl"
+      style={{
+        backgroundColor: 'var(--card)',
+        border: '1px solid var(--border-interactive)',
+      }}
+      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
+      onMouseOut={(e) => {
+        e.currentTarget.style.backgroundColor = 'var(--card)';
+      }}
+    >
+      <div
+        className="size-[36px] rounded-xl flex items-center justify-center"
+        style={{ backgroundColor: 'var(--muted)' }}
+      >
+        <div style={{ color: 'var(--muted-foreground)' }}>{icon}</div>
+      </div>
+      <div>
         <p
-          className="px-5 pb-2 pt-1"
           style={{
             fontFamily: 'var(--font-family)',
             fontWeight: 'var(--font-weight-medium)',
-            fontSize: '11px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.8px',
-            color: 'var(--muted-foreground)',
+            fontSize: '14px',
+            color: 'var(--primary)',
+            letterSpacing: 'var(--letter-spacing-md)',
           }}
         >
-          {title}
+          {label}
         </p>
-      )}
-      <div
-        style={{
-          backgroundColor: 'var(--card)',
-          borderRadius: 'var(--radius-16)',
-          border: '1px solid var(--border-interactive)',
-          overflow: 'hidden',
-        }}
-      >
-        {children}
+        {description && (
+          <p
+            style={{
+              fontFamily: 'var(--font-family)',
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: '12px',
+              color: 'var(--muted-foreground)',
+              letterSpacing: 'var(--letter-spacing-md)',
+              marginTop: '2px',
+            }}
+          >
+            {description}
+          </p>
+        )}
       </div>
-    </div>
+    </button>
+  );
+}
+
+function SectionLabel({ title }: { title: string }) {
+  return (
+    <p
+      className="px-1 pb-2 pt-1"
+      style={{
+        fontFamily: 'var(--font-family)',
+        fontWeight: 'var(--font-weight-medium)',
+        fontSize: '11px',
+        textTransform: 'uppercase',
+        letterSpacing: '0.8px',
+        color: 'var(--muted-foreground)',
+      }}
+    >
+      {title}
+    </p>
   );
 }
 
@@ -217,8 +256,8 @@ export function AccountPage() {
         className="flex-1 overflow-y-auto pb-[72px] md:pb-8"
         style={{ backgroundColor: 'var(--background)' }}
       >
-        {/* Profile Card */}
         <div className="px-4 pt-6 pb-2 md:px-10 md:pt-10">
+          {/* Profile Card — avatar + info + sign out all in one row */}
           <div
             className="flex items-center gap-5 p-5 rounded-2xl"
             style={{
@@ -286,63 +325,104 @@ export function AccountPage() {
                 </span>
               </div>
             </div>
+
+            {/* Sign Out — right side of profile card */}
+            <button
+              className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: '1px solid var(--border-interactive)',
+                color: 'var(--destructive)',
+                cursor: 'pointer',
+              }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            >
+              <LogOut className="size-[16px]" strokeWidth={2} />
+              <span
+                style={{
+                  fontFamily: 'var(--font-family)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontSize: '13px',
+                  letterSpacing: 'var(--letter-spacing-md)',
+                }}
+              >
+                Sign Out
+              </span>
+            </button>
           </div>
         </div>
 
         <div className="px-4 pt-4 md:px-10">
 
-          {/* Admin Section */}
-          {currentUser.role === 'Admin' || currentUser.role === 'Owner' ? (
-            <Section title="Administration">
-              <SectionRow
-                icon={<ShieldUser className="size-[20px]" strokeWidth={2} />}
-                label="Admin Panel"
-                description="Manage projects, accounts, teams & workspaces"
-                onClick={() => navigate('/admin')}
+          {/* Admin + Appearance — side by side on desktop */}
+          <div className="flex flex-col md:flex-row gap-4 mb-4">
+
+            {/* Admin Section */}
+            {(currentUser.role === 'Admin' || currentUser.role === 'Owner') && (
+              <div className="flex-1 min-w-0">
+                <SectionLabel title="Administration" />
+                <div
+                  style={{
+                    backgroundColor: 'var(--card)',
+                    borderRadius: 'var(--radius-16)',
+                    border: '1px solid var(--border-interactive)',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <SectionRow
+                    icon={<ShieldUser className="size-[20px]" strokeWidth={2} />}
+                    label="Admin Panel"
+                    description="Manage projects, accounts, teams & workspaces"
+                    onClick={() => navigate('/admin')}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Appearance Section */}
+            <div className="flex-1 min-w-0">
+              <SectionLabel title="Appearance" />
+              <div
+                style={{
+                  backgroundColor: 'var(--card)',
+                  borderRadius: 'var(--radius-16)',
+                  border: '1px solid var(--border-interactive)',
+                  overflow: 'hidden',
+                }}
+              >
+                <SectionToggleRow
+                  icon={isDarkMode ? <Moon className="size-[20px]" strokeWidth={2} /> : <Sun className="size-[20px]" strokeWidth={2} />}
+                  label="Dark Mode"
+                  description="Switch between light and dark theme"
+                  checked={isDarkMode}
+                  onToggle={() => onThemeToggle()}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Help & Resources — 3 cards side by side */}
+          <div className="mb-4">
+            <SectionLabel title="Help & Resources" />
+            <div className="flex gap-3">
+              <HelpCard
+                icon={<BookOpen className="size-[18px]" strokeWidth={2} />}
+                label="Documentation"
+                description="Guides & tutorials"
               />
-            </Section>
-          ) : null}
-
-          {/* Appearance Section */}
-          <Section title="Appearance">
-            <SectionToggleRow
-              icon={isDarkMode ? <Moon className="size-[20px]" strokeWidth={2} /> : <Sun className="size-[20px]" strokeWidth={2} />}
-              label="Dark Mode"
-              description="Switch between light and dark theme"
-              checked={isDarkMode}
-              onToggle={() => onThemeToggle()}
-            />
-          </Section>
-
-          {/* Help Section */}
-          <Section title="Help & Resources">
-            <SectionRow
-              icon={<BookOpen className="size-[20px]" strokeWidth={2} />}
-              label="Documentation"
-              description="Guides, tutorials, and reference"
-            />
-            <div style={{ height: '1px', backgroundColor: 'var(--border-interactive)', margin: '0 20px' }} />
-            <SectionRow
-              icon={<MessageSquare className="size-[20px]" strokeWidth={2} />}
-              label="Contact Support"
-              description="Get help from our team"
-            />
-            <div style={{ height: '1px', backgroundColor: 'var(--border-interactive)', margin: '0 20px' }} />
-            <SectionRow
-              icon={<HelpCircle className="size-[20px]" strokeWidth={2} />}
-              label="About Bronte"
-              description="Version, licenses, and credits"
-            />
-          </Section>
-
-          {/* Sign Out */}
-          <Section>
-            <SectionRow
-              icon={<LogOut className="size-[20px]" strokeWidth={2} />}
-              label="Sign Out"
-              destructive
-            />
-          </Section>
+              <HelpCard
+                icon={<MessageSquare className="size-[18px]" strokeWidth={2} />}
+                label="Contact Support"
+                description="Get help from our team"
+              />
+              <HelpCard
+                icon={<HelpCircle className="size-[18px]" strokeWidth={2} />}
+                label="About Bronte"
+                description="Version & licenses"
+              />
+            </div>
+          </div>
 
         </div>
       </div>

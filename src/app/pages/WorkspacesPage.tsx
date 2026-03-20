@@ -124,6 +124,7 @@ export function WorkspacesPage() {
           onItemDoubleClick={handleRowClick}
           onStarClick={handleStarClick}
           favorites={starredItems}
+          onViewModeChange={setViewMode}
         />
       ) : (
         <DataTable 

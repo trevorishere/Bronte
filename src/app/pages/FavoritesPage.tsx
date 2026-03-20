@@ -136,6 +136,7 @@ export function FavoritesPage() {
             onItemDoubleClick={handleRowDoubleClick}
             onStarClick={handleStarClick}
             favorites={favorites}
+          onViewModeChange={setViewMode}
           />
         ) : (
           <DataTable
@@ -146,6 +147,8 @@ export function FavoritesPage() {
             onStarClick={handleStarClick}
             onMoreClick={handleMoreClick}
             starredItems={favorites}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
           />
         )
       ) : (

@@ -356,6 +356,7 @@ export function DataTable({
           <MobileCardView
             data={sortedData}
             onRowClick={onRowClick}
+            onRowDoubleClick={onRowDoubleClick}
             onStarClick={onStarClick}
             onMoreClick={onMoreClick}
             starredItems={starredItems}
@@ -383,22 +384,23 @@ export function DataTable({
               // ========================================
               // COLUMN WIDTH CALCULATION LOGIC
               // ========================================
-              // Last column: Fixed 200px width
-              // 3-column tables: First gets flex 2, second gets flex 1
-              // 4+ column tables: All equal flex (except last)
-              if (index === columns.length - 1) {
-                // Last data column: fixed width
-                flexStyle = { flex: '0 0 200px', minWidth: '200px', maxWidth: '200px' };
-              } else if (totalColumns === 3) {
-                // For 3-column tables: first gets flex 2, second gets flex 1
-                if (index === 0) {
-                  flexStyle = { flex: '2 1 0px', minWidth: '300px' };
-                } else if (index === 1) {
-                  flexStyle = { flex: '1 1 0px', minWidth: '150px' };
-                }
+              // Name column (index 0): Always gets the largest flex share (priority)
+              // Middle columns: Equal smaller shares
+              // Last column: Compact fixed width — extra tight for right-aligned numeric columns
+              const isLastColumn = index === columns.length - 1;
+              const lastColIsNumeric = columns[columns.length - 1]?.align === 'right';
+
+              if (isLastColumn) {
+                // Numeric right-aligned (e.g. Members, Projects): tight fixed width
+                // Text last column (e.g. Created On): standard fixed width
+                const lastW = lastColIsNumeric ? 90 : 180;
+                flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
+              } else if (index === 0) {
+                // Name column always gets 3x share so it survives narrowing
+                flexStyle = { flex: '3 1 0px', minWidth: '160px' };
               } else {
-                // For 4+ column tables: equal flex for all non-last columns
-                flexStyle = { flex: '1 1 0px', minWidth: '200px' };
+                // Middle columns share equally
+                flexStyle = { flex: '1 1 0px', minWidth: '100px' };
               }
 
               return (
@@ -408,15 +410,18 @@ export function DataTable({
                   style={{
                     ...flexStyle,
                     fontFamily: 'var(--font-family)',
-                    fontWeight: 'var(--font-weight-medium)',
-                    color: sortConfig?.key === column.key || hoveredHeader === column.key ? 'var(--primary)' : 'var(--foreground)',
-                    fontSize: 'var(--font-size-14)',
-                    letterSpacing: 'var(--letter-spacing-md)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: sortConfig?.key === column.key || hoveredHeader === column.key ? 'var(--primary)' : 'var(--muted-foreground)',
+                    fontSize: '11px',
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
                     textAlign: column.align || 'left',
                     paddingLeft: index === 0 ? '20px' : column.align === 'right' ? '12px' : '24px',
                     paddingRight: column.align === 'right' ? '12px' : '24px',
                     position: 'relative',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden'
                   }}
                   onClick={() => handleSort(column.key)}
                   onMouseEnter={() => column.sortable && setHoveredHeader(column.key)}
@@ -447,12 +452,12 @@ export function DataTable({
                           )}
                         </div>
                       )}
-                      <span className={sortConfig?.key === column.key || hoveredHeader === column.key ? 'text-primary' : 'text-foreground'}>{column.label}</span>
+                      <span>{column.label}</span>
                     </div>
                   ) : (
                     // Left-aligned columns: text on left, arrow on right
                     <div className="flex items-center gap-[8px]">
-                      <span className={sortConfig?.key === column.key || hoveredHeader === column.key ? 'text-primary' : 'text-foreground'}>{column.label}</span>
+                      <span>{column.label}</span>
                       {column.sortable && (
                         <div className="flex flex-col w-[16px]">
                           {(sortConfig?.key === column.key || hoveredHeader === column.key) && (
@@ -482,7 +487,7 @@ export function DataTable({
             })}
           </div>
           {/* Icons column header */}
-          <div style={{ flex: '0 0 150px', minWidth: '150px', maxWidth: '150px', paddingLeft: '24px', paddingRight: '20px' }}></div>
+          <div style={{ flex: '0 0 96px', minWidth: '96px', maxWidth: '96px', paddingLeft: '16px', paddingRight: '16px' }}></div>
         </div>
       </div>
 
@@ -522,21 +527,18 @@ export function DataTable({
                   <div className="flex flex-1 min-w-0">
                     {columns.map((column, index) => {
                       let flexStyle: React.CSSProperties = {};
-                      
-                      // Determine flex properties based on column position and table size
-                      if (index === columns.length - 1) {
-                        // Last data column: fixed width
-                        flexStyle = { flex: '0 0 200px', minWidth: '200px', maxWidth: '200px' };
-                      } else if (totalColumns === 3) {
-                        // For 3-column tables: first gets flex 2, second gets flex 1
-                        if (index === 0) {
-                          flexStyle = { flex: '2 1 0px', minWidth: '300px' };
-                        } else if (index === 1) {
-                          flexStyle = { flex: '1 1 0px', minWidth: '150px' };
-                        }
+
+                      // Mirror the header column width logic
+                      const isLastColumn = index === columns.length - 1;
+                      const lastColIsNumeric = columns[columns.length - 1]?.align === 'right';
+
+                      if (isLastColumn) {
+                        const lastW = lastColIsNumeric ? 90 : 180;
+                        flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
+                      } else if (index === 0) {
+                        flexStyle = { flex: '3 1 0px', minWidth: '160px' };
                       } else {
-                        // For 4+ column tables: equal flex for all non-last columns
-                        flexStyle = { flex: '1 1 0px', minWidth: '200px' };
+                        flexStyle = { flex: '1 1 0px', minWidth: '100px' };
                       }
 
                       return (
@@ -681,7 +683,7 @@ export function DataTable({
                   </div>
                   
                   {/* Separate icons column */}
-                  <div className="py-[16px]" style={{ flex: '0 0 150px', minWidth: '150px', maxWidth: '150px', paddingLeft: '24px', paddingRight: '20px' }}>
+                  <div className="py-[16px]" style={{ flex: '0 0 96px', minWidth: '96px', maxWidth: '96px', paddingLeft: '16px', paddingRight: '16px' }}>
                     <div className={`flex items-center justify-end gap-[0px] ${(hoveredRow === row.id || openMenuRowId === row.id) ? 'opacity-100' : 'opacity-0'}`} style={{ transition: `opacity var(--transition-duration) var(--transition-timing)` }}>
                       {/* ========================================
                           STAR BUTTON - Uses theme variables

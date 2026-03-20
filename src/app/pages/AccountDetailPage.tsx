@@ -13,8 +13,6 @@ import { DetailPageHeader } from '../components/DetailPageHeader';
 import { TabNav, Tab } from '../components/TabNav';
 import { TopBar } from '../components/TopBar';
 import { useState } from 'react';
-import { useMobileNav } from '../hooks/useMobileNav';
-import svgPaths from '../../imports/svg-2hg6thd8pt';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -25,7 +23,6 @@ export function AccountDetailPage() {
   const { accountId } = useParams<{ accountId: string }>();
   const navigate = useNavigate();
   const { isDarkMode, onThemeToggle } = useOutletContext<OutletContext>();
-  const { toggleSidebar } = useMobileNav();
   const [activeTab, setActiveTab] = useState('Projects');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
@@ -75,15 +72,16 @@ export function AccountDetailPage() {
             lastModified: project.lastModified,
             workspace: project.workspace,
             iconType: 'project' as const,
+            accountCount: accounts.filter(a => a.projectIds.includes(project.id)).length,
           }))
         };
       case 'Teams':
         return {
           columns: [
             { key: 'name', label: 'Team Name', sortable: true, width: 'w-[400px]' },
-            { key: 'membersCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
             { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
             { key: 'created', label: 'Created On', sortable: true, width: 'w-[200px]' },
+            { key: 'membersCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
           ] as Column[],
           data: accountTeams.map(team => ({
             id: team.id,
@@ -93,6 +91,9 @@ export function AccountDetailPage() {
             members: team.membersCount,
             created: team.created,
             iconType: 'team' as const,
+            teamProjectCount: projects.filter(p =>
+              accounts.filter(a => a.teamIds.includes(team.id)).some(a => a.projectIds.includes(p.id))
+            ).length,
           }))
         };
       case 'Workspaces':
@@ -110,6 +111,8 @@ export function AccountDetailPage() {
             created: workspace.created,
             dateCreated: workspace.created,
             iconType: 'workspace' as const,
+            workspaceProjectCount: projects.filter(p => p.workspace === workspace.id).length,
+            workspaceMemberCount: accounts.filter(a => a.workspaceIds.includes(workspace.id)).length,
           }))
         };
       case 'Permissions':
@@ -232,12 +235,16 @@ export function AccountDetailPage() {
         isDarkMode={isDarkMode}
         showBackButton={true}
         onBackClick={() => navigate('/admin')}
+        backButtonLabel="Admin"
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
 
       {/* Account header - Figma layout */}
       <DetailPageHeader
         title={account.name}
         badge={<RoleBadge role={account.role} />}
+        icon={(size) => <Avatar size={size} name={account.name} role={account.role} />}
         metadata={[
           { icon: 'email', label: account.email },
           { icon: 'users', label: `${accountTeams.length} team${accountTeams.length !== 1 ? 's' : ''}` },
@@ -268,12 +275,12 @@ export function AccountDetailPage() {
 
       {/* Content area */}
       {activeTab === 'Permissions' ? (
-        <EmptyState 
-          title="No permissions configured" 
+        <EmptyState
+          title="No permissions configured"
           description="This account doesn't have any specific permissions set yet."
         />
       ) : data.length === 0 ? (
-        <EmptyState 
+        <EmptyState
           title={`No ${activeTab.toLowerCase()} found`}
           description={`This account is not associated with any ${activeTab.toLowerCase()}.`}
         />
@@ -281,14 +288,27 @@ export function AccountDetailPage() {
         viewMode === 'grid' ? (
           <GridView
             data={filteredData as GridItemData[]}
-            onItemClick={(item) => console.log('Item clicked:', item)}
-            onItemDoubleClick={(item) => console.log('Item double-clicked:', item)}
+            onItemClick={(item) => {
+              if (activeTab === 'Teams') navigate(`/admin/team/${item.id}`);
+              else if (activeTab === 'Workspaces') navigate(`/admin/workspace/${item.id}`);
+            }}
+            onItemDoubleClick={(item) => {
+              if (activeTab === 'Teams') navigate(`/admin/team/${item.id}`);
+              else if (activeTab === 'Workspaces') navigate(`/admin/workspace/${item.id}`);
+            }}
             favorites={new Set()}
+            onViewModeChange={setViewMode}
           />
         ) : (
           <DataTable
             columns={columns}
             data={filteredData}
+            onRowClick={(row) => {
+              if (activeTab === 'Teams') navigate(`/admin/team/${row.id}`);
+              else if (activeTab === 'Workspaces') navigate(`/admin/workspace/${row.id}`);
+            }}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
           />
         )
       )}

@@ -1,4 +1,4 @@
-import { ChevronLeft, Grid3x3, List } from 'lucide-react';
+import { ChevronLeft, Grid3x3, List, Search, Bell } from 'lucide-react';
 import { ReactNode } from 'react';
 import { ActionButtons } from './ActionButtons';
 import { useMobileNav } from '../hooks/useMobileNav';
@@ -11,9 +11,9 @@ interface TopBarProps {
   showBackButton?: boolean;
   onBackClick?: () => void;
   backButtonLabel?: string;
+  pageIcon?: ReactNode;
   viewMode?: 'grid' | 'list';
   onViewModeChange?: (mode: 'grid' | 'list') => void;
-  /** Action buttons shown on the right side of the mobile TopBar */
   mobileActions?: ReactNode;
 }
 
@@ -24,118 +24,117 @@ export function TopBar({
   isDarkMode = false,
   showBackButton = false,
   onBackClick,
-  backButtonLabel = 'Back',
   viewMode,
   onViewModeChange,
   mobileActions,
 }: TopBarProps) {
   const { toggleSidebar } = useMobileNav();
 
+  const backBtn = (extraClass = '') => (
+    <button
+      onClick={onBackClick}
+      className={`flex items-center gap-[3px] rounded-lg transition-colors group ${extraClass}`}
+      style={{ backgroundColor: 'transparent' }}
+    >
+      <ChevronLeft
+        className="size-[18px] shrink-0 transition-colors group-hover:text-[color:var(--primary)]"
+        style={{ color: 'var(--muted-foreground)' }}
+        strokeWidth={2.5}
+      />
+      <span
+        className="transition-colors group-hover:text-[color:var(--primary)]"
+        style={{
+          fontFamily: 'var(--font-family)',
+          fontWeight: 'var(--font-weight-medium)',
+          fontSize: '14px',
+          color: 'var(--muted-foreground)',
+          letterSpacing: 'var(--letter-spacing-md)',
+          lineHeight: 'normal',
+        }}
+      >
+        Back
+      </span>
+    </button>
+  );
+
   return (
-    <div className="h-[72px] shrink-0 w-full masthead-texture">
-      
+    <div className="h-[72px] shrink-0 w-full" style={{ backgroundColor: 'var(--background)' }}>
+
       {/* ================================================================ */}
-      {/* MOBILE LAYOUT: TopBar for Mobile Devices                        */}
-      {/* Height: 72px                                                    */}
-      {/* Padding: 16px horizontal                                        */}
-      {/* Layout: Title (left) + View Toggle (right, if provided)         */}
+      {/* MOBILE LAYOUT                                                    */}
       {/* ================================================================ */}
-      <div className="md:hidden flex items-center pt-1 px-[16px] size-full">
-        {/* Title with optional back button - Mobile */}
-        {title && (
-          <div className="flex gap-[8px] items-center flex-1 min-w-0">
-            {showBackButton && (
-              <button
-                onClick={onBackClick}
-                className="size-[32px] flex items-center justify-center pr-[2px] rounded-full transition-colors shrink-0"
-                style={{ backgroundColor: 'transparent' }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-              >
-                <ChevronLeft className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={3} />
-              </button>
-            )}
-            <h1 
-              className={`truncate ${backButtonLabel && showBackButton ? 'text-[16px]' : 'text-[24px]'}`}
-              style={{ 
-                fontFamily: 'var(--font-family)', 
+      <div className="md:hidden flex items-center gap-1 pt-1 px-[16px] size-full">
+
+        {/* Back or root title */}
+        <div className="flex items-center flex-1 min-w-0">
+          {showBackButton ? (
+            backBtn()
+          ) : title ? (
+            <h1
+              className="truncate text-[24px]"
+              style={{
+                fontFamily: 'var(--font-family)',
                 fontWeight: 'bold',
                 lineHeight: 'normal',
                 color: 'var(--primary)',
-                letterSpacing: 'var(--letter-spacing-md)'
+                letterSpacing: 'var(--letter-spacing-md)',
               }}
             >
-              {backButtonLabel && showBackButton ? backButtonLabel : title}
+              {title}
             </h1>
-          </div>
-        )}
+          ) : null}
+        </div>
 
-        {/* Spacer when no title */}
-        {!title && <div className="flex-1" />}
+        {/* Search + Bell */}
+        <button
+          className="flex items-center justify-center size-[40px] rounded-full transition-colors shrink-0"
+          style={{ backgroundColor: 'transparent' }}
+          onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
+          onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+        >
+          <Search className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
+        </button>
+        <button
+          className="flex items-center justify-center size-[40px] rounded-full transition-colors shrink-0"
+          style={{ backgroundColor: 'transparent' }}
+          onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
+          onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+        >
+          <Bell className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={1.875} />
+        </button>
 
-        {/* Mobile right side: custom actions OR view toggle */}
-        {mobileActions ? (
+        {/* Custom actions only — view toggle lives in MobileSortHeader (list) or GridView header (grid) */}
+        {mobileActions && (
           <div className="flex items-center gap-1 shrink-0">
             {mobileActions}
           </div>
-        ) : viewMode && onViewModeChange ? (
-          <button
-            onClick={() => onViewModeChange(viewMode === 'grid' ? 'list' : 'grid')}
-            className="flex items-center justify-center size-[40px] rounded-full transition-colors shrink-0"
-            style={{ backgroundColor: 'transparent' }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-          >
-            {viewMode === 'grid' ? (
-              <List className="size-[24px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
-            ) : (
-              <Grid3x3 className="size-[24px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
-            )}
-          </button>
-        ) : null}
+        )}
       </div>
 
       {/* ================================================================ */}
-      {/* DESKTOP LAYOUT: TopBar for Desktop Devices                      */}
-      {/* Height: 72px                                                    */}
-      {/* Padding: 32px left, 32px right                                  */}
-      {/* Layout: Title (left) + Action Buttons (right)                   */}
+      {/* DESKTOP LAYOUT                                                   */}
       {/* ================================================================ */}
       <div className="hidden md:flex items-center justify-between pt-1 pl-[32px] pr-[32px] size-full">
-        {/* Title with optional back button - Desktop */}
-        {title && (
-          <div className="flex gap-[8px] items-center flex-1 min-w-0">
-            {showBackButton && (
-              <button
-                onClick={onBackClick}
-                className="size-[32px] flex items-center justify-center pr-[2px] rounded-full transition-colors shrink-0"
-                style={{ backgroundColor: 'transparent' }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-              >
-                <ChevronLeft className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={3} />
-              </button>
-            )}
-            <h1 
-              className={`truncate ${backButtonLabel && showBackButton ? 'text-[26px]' : 'text-[28px]'}`}
-              style={{ 
-                fontFamily: 'var(--font-family)', 
+        <div className="flex items-center flex-1 min-w-0">
+          {showBackButton ? (
+            backBtn()
+          ) : title ? (
+            <h1
+              className="truncate text-[28px]"
+              style={{
+                fontFamily: 'var(--font-family)',
                 fontWeight: 'bold',
                 lineHeight: 'normal',
                 color: 'var(--primary)',
-                letterSpacing: 'var(--letter-spacing-md)'
+                letterSpacing: 'var(--letter-spacing-md)',
               }}
             >
-              {backButtonLabel && showBackButton ? backButtonLabel : title}
+              {title}
             </h1>
-          </div>
-        )}
+          ) : null}
+        </div>
 
-        {/* Spacer when no title */}
-        {!title && <div className="flex-1" />}
-
-        {/* Desktop Action Buttons - Help, Notifications, Theme, User Menu */}
-        <ActionButtons 
+        <ActionButtons
           userInitials={userInitials}
           onThemeToggle={onThemeToggle}
           isDarkMode={isDarkMode}

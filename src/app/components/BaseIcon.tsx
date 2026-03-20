@@ -25,10 +25,10 @@ export const iconSizeConfig = {
     iconSize: 16,
   },
   large: {
-    containerSize: 'size-[56px]',
-    fontSize: '28px',
+    containerSize: 'size-[72px]',
+    fontSize: '32px',
     letterSpacing: '0.5px',
-    iconSize: 28,
+    iconSize: 32,
   },
   'x-large': {
     containerSize: 'size-[104px]',
