@@ -3,6 +3,7 @@ import { useParams, useOutletContext, useNavigate, useLocation } from 'react-rou
 import { toast } from 'sonner';
 import { Plus, UserRoundPlus } from 'lucide-react';
 import { TopBar } from '../components/TopBar';
+import { WorkspaceIcon } from '../components/WorkspaceIcon';
 import { Toolbar } from '../components/Toolbar';
 import { DataTable, Column, RowData } from '../components/DataTable';
 import { GridView, GridItemData } from '../components/GridView';
@@ -146,6 +147,8 @@ export function WorkspacePage() {
           isDarkMode={isDarkMode}
           showBackButton={true}
           onBackClick={() => navigate('/admin')}
+          backButtonLabel={workspace?.name || 'Workspace'}
+          pageIcon={workspace ? <WorkspaceIcon size="small" name={workspace.name} /> : undefined}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
         />
@@ -156,7 +159,8 @@ export function WorkspacePage() {
           onThemeToggle={onThemeToggle}
           isDarkMode={isDarkMode}
           showBackButton={true}
-          backButtonLabel="Workspaces"
+          backButtonLabel={workspace?.name || 'Workspace'}
+          pageIcon={workspace ? <WorkspaceIcon size="small" name={workspace.name} /> : undefined}
           onBackClick={() => navigate('/workspaces')}
           mobileActions={mobileTopBarActions}
           viewMode={viewMode}

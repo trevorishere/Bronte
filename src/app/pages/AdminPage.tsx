@@ -74,6 +74,7 @@ export function AdminPage() {
             lastModified: project.lastModified,
             workspace: project.workspace,
             iconType: 'project' as const,
+            accountCount: accounts.filter(a => a.projectIds.includes(project.id)).length,
           })),
           filters: [
             { label: 'Owner', options: uniqueOwners },
@@ -89,8 +90,9 @@ export function AdminPage() {
             id: account.id,
             name: account.name,
             role: account.role,
+            accessLevel: account.accessLevel,
             created: account.created,
-            projectCount: account.projects,
+            projectCount: account.projectIds.length,
             iconType: 'account' as const,
           })),
           filters: [
@@ -109,6 +111,7 @@ export function AdminPage() {
             owner: team.owner,
             membersCount: team.membersCount.toString(),
             members: team.membersCount,
+            teamProjectCount: projects.filter(p => accounts.filter(a => a.teamIds.includes(team.id)).some(a => a.projectIds.includes(p.id))).length,
             created: team.created,
             iconType: 'team' as const,
           })),
@@ -121,11 +124,14 @@ export function AdminPage() {
       case 'workspaces': {
         const workspaceData = workspaces.map(workspace => {
           const projectCount = projects.filter(p => p.workspace === workspace.id).length;
+          const memberCount = accounts.filter(a => a.workspaceIds.includes(workspace.id)).length;
           return {
             id: workspace.id,
             name: workspace.name,
             owner: workspace.owner,
             projectsCount: projectCount.toString(),
+            workspaceProjectCount: projectCount,
+            workspaceMemberCount: memberCount,
             created: workspace.created,
             dateCreated: workspace.created,
             iconType: 'workspace' as const,

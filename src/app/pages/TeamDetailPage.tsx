@@ -205,6 +205,8 @@ export function TeamDetailPage() {
         isDarkMode={isDarkMode}
         showBackButton={true}
         onBackClick={() => navigate('/admin')}
+        backButtonLabel={team.name}
+        pageIcon={<TeamIcon size="small" />}
       />
 
       {/* Team header */}

@@ -110,8 +110,36 @@ export function MobileCardView({
       <div className="flex flex-col">
         {data.map((row) => {
           const primaryName = row.name || row.projectName || row.accountName || row.teamName || row.workspaceName;
-          const owner = row.owner || row.sharedBy;
-          const memberCount = row.members || (row.teamName && '6 Members');
+
+          // Build type-aware metadata string
+          const getMetaLine = () => {
+            const iconType = row.iconType || 'project';
+            if (iconType === 'account') {
+              const role = row.role || '';
+              const accessLevel = row.accessLevel || '';
+              return role && accessLevel ? `${role} • ${accessLevel}` : role || accessLevel || null;
+            }
+            if (iconType === 'team') {
+              const members = row.members ?? row.membersCount;
+              const memberStr = members !== undefined ? `${members} Account${members !== 1 ? 's' : ''}` : null;
+              const projCount = row.teamProjectCount;
+              const projStr = projCount !== undefined ? `${projCount} Project${projCount !== 1 ? 's' : ''}` : null;
+              return [memberStr, projStr].filter(Boolean).join(' • ') || null;
+            }
+            if (iconType === 'workspace') {
+              const projCount = row.workspaceProjectCount;
+              const memberCount = row.workspaceMemberCount;
+              const projStr = projCount !== undefined ? `${projCount} Project${projCount !== 1 ? 's' : ''}` : null;
+              const memberStr = memberCount !== undefined ? `${memberCount} Account${memberCount !== 1 ? 's' : ''}` : null;
+              return [projStr, memberStr].filter(Boolean).join(' • ') || null;
+            }
+            // project (default)
+            const accCount = row.accountCount;
+            const accStr = accCount !== undefined ? `${accCount} Account${accCount !== 1 ? 's' : ''}` : null;
+            const owner = row.owner || row.sharedBy || null;
+            return [accStr, owner].filter(Boolean).join(' • ') || null;
+          };
+          const metaLine = getMetaLine();
 
           return (
             <div
@@ -139,7 +167,7 @@ export function MobileCardView({
                 >
                   {primaryName}
                 </p>
-                {(owner || memberCount) && (
+                {metaLine && (
                   <p
                     className="truncate"
                     style={{
@@ -151,7 +179,7 @@ export function MobileCardView({
                       color: 'var(--muted-foreground)',
                     }}
                   >
-                    {owner && memberCount ? `${owner} · ${memberCount}` : owner || memberCount}
+                    {metaLine}
                   </p>
                 )}
               </div>

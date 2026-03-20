@@ -232,6 +232,8 @@ export function AccountDetailPage() {
         isDarkMode={isDarkMode}
         showBackButton={true}
         onBackClick={() => navigate('/admin')}
+        backButtonLabel={account.name}
+        pageIcon={<Avatar size="small" name={account.name} role={account.role} />}
       />
 
       {/* Account header - Figma layout */}

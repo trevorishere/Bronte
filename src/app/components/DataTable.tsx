@@ -408,10 +408,12 @@ export function DataTable({
                   style={{
                     ...flexStyle,
                     fontFamily: 'var(--font-family)',
-                    fontWeight: 'var(--font-weight-medium)',
+                    fontWeight: 'var(--font-weight-semibold)',
                     color: sortConfig?.key === column.key || hoveredHeader === column.key ? 'var(--primary)' : 'var(--foreground)',
-                    fontSize: 'var(--font-size-14)',
-                    letterSpacing: 'var(--letter-spacing-md)',
+                    fontSize: '11px',
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                    opacity: sortConfig?.key === column.key || hoveredHeader === column.key ? 1 : 0.45,
                     textAlign: column.align || 'left',
                     paddingLeft: index === 0 ? '20px' : column.align === 'right' ? '12px' : '24px',
                     paddingRight: column.align === 'right' ? '12px' : '24px',
@@ -447,12 +449,12 @@ export function DataTable({
                           )}
                         </div>
                       )}
-                      <span className={sortConfig?.key === column.key || hoveredHeader === column.key ? 'text-primary' : 'text-foreground'}>{column.label}</span>
+                      <span>{column.label}</span>
                     </div>
                   ) : (
                     // Left-aligned columns: text on left, arrow on right
                     <div className="flex items-center gap-[8px]">
-                      <span className={sortConfig?.key === column.key || hoveredHeader === column.key ? 'text-primary' : 'text-foreground'}>{column.label}</span>
+                      <span>{column.label}</span>
                       {column.sortable && (
                         <div className="flex flex-col w-[16px]">
                           {(sortConfig?.key === column.key || hoveredHeader === column.key) && (

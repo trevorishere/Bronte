@@ -1,4 +1,4 @@
-import { Star, MoreHorizontal, Users, Calendar, Briefcase, Book } from 'lucide-react';
+import { Star, MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 import { WorkspaceIcon } from './WorkspaceIcon';
 import { TeamIcon } from './TeamIcon';
@@ -19,7 +19,13 @@ export interface GridItemData {
   dateCreated?: string;
   lastModified?: string;
   role?: string;
+  accessLevel?: string;
   projectCount?: number;
+  // Computed counts for metadata display
+  accountCount?: number;
+  teamProjectCount?: number;
+  workspaceProjectCount?: number;
+  workspaceMemberCount?: number;
 }
 
 interface GridViewProps {
@@ -86,81 +92,56 @@ export function GridView({
     );
   };
 
+  const metaTextStyle = {
+    fontFamily: 'var(--font-family)',
+    fontSize: '13px',
+    fontWeight: 'var(--font-weight-medium)',
+    color: 'var(--muted-foreground)',
+    letterSpacing: 'var(--letter-spacing-md)',
+  };
+
   const renderMetadata = (item: GridItemData) => {
-    // For projects: show members
+    // Projects: "X Accounts • Owner Name"
     if (item.iconType === 'project') {
-      const members = item.members || getRandomMembers(item.id);
+      const accCount = item.accountCount ?? 0;
+      const accStr = `${accCount} Account${accCount !== 1 ? 's' : ''}`;
       return (
-        <div className="flex gap-[8px] items-center">
-          <Users size={16} className="shrink-0" style={{ color: 'var(--muted-foreground)' }} />
-          <span className="text-[14px] font-medium" style={{ color: 'var(--muted-foreground)' }}>
-            {members} members
-          </span>
-        </div>
+        <span style={metaTextStyle}>
+          {accStr}{item.owner ? ` • ${item.owner}` : ''}
+        </span>
       );
     }
 
-    // For workspaces: show members and date created
-    if (item.iconType === 'workspace') {
-      const members = item.members || getRandomMembers(item.id);
-      return (
-        <div className="flex gap-[12px] items-center">
-          <div className="flex gap-[8px] items-center">
-            <Users size={16} className="shrink-0" style={{ color: 'var(--muted-foreground)' }} />
-            <span className="text-[14px] font-medium" style={{ color: 'var(--muted-foreground)' }}>
-              {members} members
-            </span>
-          </div>
-          {item.dateCreated && (
-            <div className="flex gap-[8px] items-center">
-              <Calendar size={16} className="shrink-0" style={{ color: 'var(--muted-foreground)' }} />
-              <span className="text-[14px] font-medium" style={{ color: 'var(--muted-foreground)' }}>
-                {item.dateCreated}
-              </span>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    // For teams: show members and role
+    // Teams: "X Accounts • Y Projects"
     if (item.iconType === 'team') {
-      const members = item.members || getRandomMembers(item.id);
+      const members = item.members ?? 0;
+      const projCount = item.teamProjectCount ?? 0;
       return (
-        <div className="flex gap-[12px] items-center">
-          <div className="flex gap-[8px] items-center">
-            <Users size={16} className="shrink-0" style={{ color: 'var(--muted-foreground)' }} />
-            <span className="text-[14px] font-medium" style={{ color: 'var(--muted-foreground)' }}>
-              {members} members
-            </span>
-          </div>
-          {item.role && (
-            <span className="text-[14px] font-medium" style={{ color: 'var(--muted-foreground)' }}>
-              {item.role}
-            </span>
-          )}
-        </div>
+        <span style={metaTextStyle}>
+          {members} Account{members !== 1 ? 's' : ''} • {projCount} Project{projCount !== 1 ? 's' : ''}
+        </span>
       );
     }
 
-    // For accounts: show role and project count
-    if (item.iconType === 'account') {
+    // Workspaces: "X Projects • Y Accounts"
+    if (item.iconType === 'workspace') {
+      const projCount = item.workspaceProjectCount ?? 0;
+      const memberCount = item.workspaceMemberCount ?? 0;
       return (
-        <div className="flex gap-[12px] items-center">
-          {item.role && (
-            <span className="text-[14px] font-medium" style={{ color: 'var(--muted-foreground)' }}>
-              {item.role}
-            </span>
-          )}
-          {item.projectCount !== undefined && (
-            <div className="flex gap-[8px] items-center">
-              <Briefcase size={16} className="shrink-0" style={{ color: 'var(--muted-foreground)' }} />
-              <span className="text-[14px] font-medium" style={{ color: 'var(--muted-foreground)' }}>
-                {item.projectCount} projects
-              </span>
-            </div>
-          )}
-        </div>
+        <span style={metaTextStyle}>
+          {projCount} Project{projCount !== 1 ? 's' : ''} • {memberCount} Account{memberCount !== 1 ? 's' : ''}
+        </span>
+      );
+    }
+
+    // Accounts: "Role • Access Level"
+    if (item.iconType === 'account') {
+      const role = item.role || '';
+      const accessLevel = item.accessLevel || '';
+      return (
+        <span style={metaTextStyle}>
+          {role}{accessLevel ? ` • ${accessLevel}` : ''}
+        </span>
       );
     }
 

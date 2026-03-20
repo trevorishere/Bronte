@@ -1,4 +1,4 @@
-import { Star, Clock, UserRoundPlus, ShieldUser, FolderOpen, X } from 'lucide-react';
+import { Star, Clock, UserRoundPlus, ShieldUser, FolderOpen, X, Search } from 'lucide-react';
 import { getWorkspaceInitials } from './WorkspaceIcon';
 import { useState, useEffect } from 'react';
 
@@ -22,7 +22,6 @@ const myWorkspaceItems = [
   { id: 'recent', label: 'Recent', icon: 'Clock', fontWeight: 'var(--font-weight-medium)' },
   { id: 'favorites', label: 'Favorites', icon: 'Star', fontWeight: 'var(--font-weight-medium)' },
   { id: 'shared', label: 'Shared', icon: 'UserRoundPlus', fontWeight: 'var(--font-weight-medium)' },
-  { id: 'admin', label: 'Admin', icon: 'ShieldUser', fontWeight: 'var(--font-weight-medium)' },
 ];
 
 export function Sidebar({ 
@@ -94,9 +93,6 @@ export function Sidebar({
                       <p className="leading-[normal]">Bronte</p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-center px-[6px] py-[2px] rounded" style={{ backgroundColor: 'var(--bg-beta-badge)' }}>
-                    <p style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-extrabold)', lineHeight: 'var(--line-height-15)', fontSize: 'var(--font-size-10)', color: 'var(--text-white)', letterSpacing: 'var(--letter-spacing-lg)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>BETA</p>
-                  </div>
                 </div>
               </div>
             </div>
@@ -113,11 +109,24 @@ export function Sidebar({
           </div>
         </div>
 
+        {/* Search Bar */}
+        <div className="shrink-0 px-[12px] pb-[8px]">
+          <div
+            className="flex items-center gap-[8px] h-[36px] rounded-xl px-[10px]"
+            style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }}
+          >
+            <Search className="size-[14px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
+            <span style={{ fontFamily: 'var(--font-family)', fontSize: '13px', color: 'var(--muted-foreground)', letterSpacing: 'var(--letter-spacing-md)' }}>
+              Search…
+            </span>
+          </div>
+        </div>
+
         {/* Navigation Items */}
         <div className="flex flex-col flex-1 min-h-0 w-full">
           {/* Top Navigation */}
           <div className="shrink-0 w-full">
-            <div className="flex flex-col items-start px-[12px] py-[12px] w-full">
+            <div className="flex flex-col items-start px-[12px] pt-[4px] pb-[12px] w-full">
               {myWorkspaceItems.map(item => (
                 <button
                   key={item.id}
@@ -187,7 +196,7 @@ export function Sidebar({
 
           {/* Workspace Sections - Scrollable */}
           <div className="flex-1 min-h-0 w-full overflow-y-auto">
-            <div className="flex flex-col items-start px-[12px] pt-[12px] pb-[24px]">
+            <div className="flex flex-col items-start px-[12px] pt-[4px] pb-[24px]">
               {/* Team Workspaces */}
               {teamWorkspaces.length > 0 && (
                 <div className="w-full">
@@ -263,6 +272,100 @@ export function Sidebar({
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Bottom Section: Admin + User Avatar */}
+          <div className="shrink-0 w-full" style={{ borderTop: '1px solid var(--border-interactive)' }}>
+            <div className="flex flex-col items-start px-[12px] pt-[8px] pb-[12px] w-full">
+              {/* Admin nav item */}
+              <button
+                onClick={() => handleItemClick('admin')}
+                onMouseEnter={() => setHoveredItem('admin')}
+                onMouseLeave={() => setHoveredItem(null)}
+                className={`h-[40px] w-full rounded-xl transition-all duration-150 ease-in-out`}
+                style={{
+                  backgroundColor: activeItem === 'admin' ? 'var(--accent)' : (hoveredItem === 'admin' ? 'var(--bg-nav-hover)' : 'transparent')
+                }}
+              >
+                <div className="flex gap-[12px] items-center p-[12px] size-full">
+                  <div className="shrink-0 size-[20px]">
+                    <ShieldUser
+                      className="size-full"
+                      style={{ color: activeItem === 'admin' ? 'var(--foreground)' : (hoveredItem === 'admin' ? 'var(--icon-nav-hover)' : 'var(--muted-foreground)') }}
+                    />
+                  </div>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-family)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      lineHeight: 'var(--line-height-20)',
+                      fontSize: 'var(--font-size-14)',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      letterSpacing: 'var(--letter-spacing-md)',
+                      textAlign: 'left',
+                      color: activeItem === 'admin' ? 'var(--primary)' : (hoveredItem === 'admin' ? 'var(--primary)' : 'var(--foreground)')
+                    }}
+                    className="flex-1 min-w-0"
+                  >
+                    Admin
+                  </p>
+                </div>
+              </button>
+
+              {/* User Avatar */}
+              <button
+                onClick={() => handleItemClick('account')}
+                onMouseEnter={() => setHoveredItem('account')}
+                onMouseLeave={() => setHoveredItem(null)}
+                className="h-[52px] w-full rounded-xl transition-all duration-150 ease-in-out"
+                style={{
+                  backgroundColor: activeItem === 'account' ? 'var(--accent)' : (hoveredItem === 'account' ? 'var(--bg-nav-hover)' : 'transparent')
+                }}
+              >
+                <div className="flex gap-[10px] items-center px-[10px] py-[8px] size-full">
+                  {/* Avatar circle */}
+                  <div
+                    className="shrink-0 size-[32px] rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: 'var(--bg-account-avatar)' }}
+                  >
+                    <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'bold', fontSize: '12px', color: 'white', letterSpacing: '0.5px' }}>
+                      LD
+                    </span>
+                  </div>
+                  {/* Name + email */}
+                  <div className="flex flex-col min-w-0 flex-1 text-left">
+                    <p
+                      className="truncate"
+                      style={{
+                        fontFamily: 'var(--font-family)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        fontSize: '13px',
+                        color: activeItem === 'account' ? 'var(--primary)' : 'var(--foreground)',
+                        letterSpacing: 'var(--letter-spacing-md)',
+                        lineHeight: '18px',
+                      }}
+                    >
+                      Lena Doe
+                    </p>
+                    <p
+                      className="truncate"
+                      style={{
+                        fontFamily: 'var(--font-family)',
+                        fontWeight: 'var(--font-weight-regular)',
+                        fontSize: '11px',
+                        color: 'var(--muted-foreground)',
+                        letterSpacing: 'var(--letter-spacing-md)',
+                        lineHeight: '15px',
+                      }}
+                    >
+                      lena.doe@university.edu
+                    </p>
+                  </div>
+                </div>
+              </button>
             </div>
           </div>
         </div>
