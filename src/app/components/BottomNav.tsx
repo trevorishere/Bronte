@@ -169,7 +169,7 @@ export function BottomNav({ activeItem = 'recent', onItemClick, workspaces = [] 
 
       {/* Bottom Nav Bar */}
       <div 
-        className="flex items-center justify-around px-4 pb-[12px]"
+        className="flex items-center justify-around px-4 pb-[4px]"
         style={{
           backgroundColor: 'var(--sidebar)',
           borderTop: '1px solid var(--border-interactive)',
@@ -200,7 +200,7 @@ export function BottomNav({ activeItem = 'recent', onItemClick, workspaces = [] 
               <span 
                 style={{ 
                   fontFamily: 'var(--font-family)',
-                  fontWeight: 'var(--font-weight-medium)',
+                  fontWeight: 'var(--font-weight-regular)',
                   fontSize: '10px',
                   lineHeight: 'normal',
                   letterSpacing: 'var(--letter-spacing-md)',
