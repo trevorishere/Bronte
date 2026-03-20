@@ -66,7 +66,7 @@ export function BottomNav({ activeItem = 'recent', onItemClick, workspaces = [] 
       <AnimatePresence>
         {isWorkspacesMenuOpen && (
           <motion.div 
-            className="absolute bottom-[104px] left-24 right-2 bg-background shadow-lg overflow-hidden p-[8px]"
+            className="absolute bottom-[80px] left-24 right-2 bg-background shadow-lg overflow-hidden p-[8px]"
             style={{ 
               border: '1px solid var(--border-interactive-hover)',
               borderRadius: 'var(--radius-16)',
@@ -169,13 +169,13 @@ export function BottomNav({ activeItem = 'recent', onItemClick, workspaces = [] 
 
       {/* Bottom Nav Bar */}
       <div 
-        className="flex items-center justify-around px-4 pb-[24px]"
-        style={{ 
+        className="flex items-center justify-around px-4 pb-[12px]"
+        style={{
           backgroundColor: 'var(--sidebar)',
           borderTop: '1px solid var(--border-interactive)',
           boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.1)',
-          paddingTop: '12px',
-          height: '96px'
+          paddingTop: '10px',
+          height: '72px'
         }}
       >
         {navItems.map((item) => {

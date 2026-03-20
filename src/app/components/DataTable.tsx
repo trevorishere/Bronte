@@ -340,7 +340,7 @@ export function DataTable({
   return (
     <>
       {/* Mobile Card View - Only visible on mobile */}
-      <div className="md:hidden flex-1 flex flex-col overflow-hidden pb-[96px]">
+      <div className="md:hidden flex-1 flex flex-col overflow-hidden pb-[72px]">
         {/* Mobile Sort Header */}
         <MobileSortHeader
           sortColumn={sortConfig?.key || 'lastModified'}
@@ -558,15 +558,15 @@ export function DataTable({
                             // ========================================
                             <div className="flex items-center gap-[16px] min-w-0">
                               {/* Render icon based on iconType */}
-                              {row.iconType === 'user' ? (
-                                <Avatar 
-                                  name={row.name} 
-                                  role={accounts.find(acc => acc.name === row.name)?.role || 'Viewer'} 
-                                  size="medium" 
+                              {row.iconType === 'user' || row.iconType === 'account' ? (
+                                <Avatar
+                                  name={row.name}
+                                  role={accounts.find(acc => acc.name === row.name)?.role || row.role || 'Viewer'}
+                                  size="medium"
                                 />
                               ) : row.iconType === 'team' ? (
                                 <TeamIcon size="medium" />
-                              ) : row.iconType === 'folder' ? (
+                              ) : row.iconType === 'folder' || row.iconType === 'workspace' ? (
                                 <WorkspaceIcon name={row.name} size="medium" />
                               ) : row.iconType === 'project' ? (
                                 <ProjectIcon size="medium" />

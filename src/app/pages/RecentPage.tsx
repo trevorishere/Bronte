@@ -5,6 +5,7 @@ import { TopBar } from '../components/TopBar';
 import { Toolbar } from '../components/Toolbar';
 import { DataTable, Column, RowData } from '../components/DataTable';
 import { GridView, GridItemData } from '../components/GridView';
+import { DataTableSkeleton, GridSkeleton, useLoadingDelay } from '../components/SkeletonLoader';
 import { projects } from '../data/workspaces';
 import { useFavorites } from '../contexts/FavoritesContext';
 
@@ -41,6 +42,7 @@ const tableData: RowData[] = allProjects;
 export function RecentPage() {
   const { isDarkMode, onThemeToggle } = useOutletContext<OutletContext>();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const isLoading = useLoadingDelay(600);
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const { favorites, addFavorite, removeFavorite } = useFavorites();
@@ -128,7 +130,9 @@ export function RecentPage() {
         dateFilters={dateFilters}
         onDateFilterChange={handleDateFilterChange}
       />
-      {viewMode === 'grid' ? (
+      {isLoading ? (
+        viewMode === 'grid' ? <GridSkeleton itemCount={8} /> : <DataTableSkeleton rowCount={8} />
+      ) : viewMode === 'grid' ? (
         <GridView
           data={filteredData as GridItemData[]}
           onItemClick={handleRowClick}

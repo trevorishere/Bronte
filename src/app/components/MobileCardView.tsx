@@ -34,7 +34,7 @@ export function MobileCardView({
 
   const renderIcon = (row: RowData, size: 'small' | 'medium' | 'large' = 'medium') => {
     const iconType = row.iconType || 'user';
-    if (iconType === 'user') {
+    if (iconType === 'user' || iconType === 'account') {
       const account = accounts.find(acc => acc.name === (row.name || row.accountName || row.teamName));
       const role = row.role || account?.role || 'Viewer';
       return <Avatar size={size} name={row.name || row.accountName || row.teamName} role={role as any} />;
@@ -116,7 +116,7 @@ export function MobileCardView({
             <div
               key={row.id}
               onClick={() => onRowClick?.(row)}
-              className="flex items-center gap-2 h-[56px] cursor-pointer px-4"
+              className="flex items-center gap-3 h-[64px] cursor-pointer px-4"
             >
               {/* Icon */}
               <div className="shrink-0">

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router';
 import { toast } from 'sonner';
+import { DataTableSkeleton, GridSkeleton, useLoadingDelay } from '../components/SkeletonLoader';
 import { TopBar } from '../components/TopBar';
 import { TabNav, Tab } from '../components/TabNav';
 import { Toolbar } from '../components/Toolbar';
@@ -52,6 +53,7 @@ const workspaceColumns: Column[] = [
 export function AdminPage() {
   const { isDarkMode, onThemeToggle } = useOutletContext<OutletContext>();
   const [activeTab, setActiveTab] = useState('projects');
+  const isLoading = useLoadingDelay(600);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
@@ -251,7 +253,9 @@ export function AdminPage() {
         dateFilters={dateFilters}
         onDateFilterChange={handleDateFilterChange}
       />
-      {viewMode === 'grid' ? (
+      {isLoading ? (
+        viewMode === 'grid' ? <GridSkeleton itemCount={8} /> : <DataTableSkeleton rowCount={8} />
+      ) : viewMode === 'grid' ? (
         <GridView
           data={filteredData as GridItemData[]}
           onItemClick={handleRowClick}

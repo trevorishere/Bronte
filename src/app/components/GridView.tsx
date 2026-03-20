@@ -64,21 +64,19 @@ export function GridView({
   };
 
   const renderPictogram = (item: GridItemData) => {
-    const bgColor = getPictogramColor(item.iconType);
-
     return (
-      <div className="w-full h-[128px] rounded-[12px] overflow-hidden flex items-center justify-center" style={{ backgroundColor: bgColor }}>
+      <div className="w-full h-[128px] rounded-[12px] flex items-center justify-center" style={{ backgroundColor: 'var(--muted)' }}>
         {item.iconType === 'workspace' && item.name && (
           <WorkspaceIcon name={item.name} size="x-large" />
         )}
-        {item.iconType === 'team' && item.name && (
+        {item.iconType === 'team' && (
           <TeamIcon size="x-large" />
         )}
         {item.iconType === 'account' && (
-          <Avatar 
-            name={item.name} 
-            role={accounts.find(acc => acc.name === item.name)?.role || 'Viewer'}
-            size="x-large" 
+          <Avatar
+            name={item.name}
+            role={accounts.find(acc => acc.name === item.name)?.role || item.role || 'Viewer'}
+            size="x-large"
           />
         )}
         {item.iconType === 'project' && (
@@ -171,7 +169,7 @@ export function GridView({
 
   return (
     <div className="w-full h-full overflow-y-auto px-4 md:px-[40px] pb-2" style={{ backgroundColor: 'var(--background)' }}>
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-[48px] pt-8">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 pt-8">
         {data.map((item) => {
           const isStarred = favorites.has(item.id);
           const isHovered = hoveredCard === item.id;
