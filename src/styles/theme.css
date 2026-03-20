@@ -14,73 +14,73 @@
 :root {
   /* Base */
   --font-size: 16px;
-  --background: #fcfcfc; /* Content area - neutral light gray, lighter than sidebar */
-  --foreground: #666D7C; /* Default text color */
-  
+  --background: #faf7f4; /* Content area - warm off-white */
+  --foreground: #665e56; /* Default text color - warm medium brown-gray */
+
   /** Card **/
-  --card: #fcfcfc;
-  --card-foreground: #666D7C;
-  
+  --card: #faf7f4;
+  --card-foreground: #665e56;
+
   /* Popover */
-  --popover: #fcfcfc;
-  --popover-foreground: #666D7C;
-  
+  --popover: #faf7f4;
+  --popover-foreground: #665e56;
+
   /* Primary (hover/selected text) */
-  --primary: #323232;
-  --primary-foreground: #ffffff;
-  
+  --primary: #2b2520;
+  --primary-foreground: #faf7f4;
+
   /* Secondary */
-  --secondary: rgba(0, 0, 0, 0.05); /* Workspace count background */
-  --secondary-foreground: #727D9B;
-  
+  --secondary: rgba(0, 0, 0, 0.05);
+  --secondary-foreground: #7a7068;
+
   /* Muted (light backgrounds and icons) */
-  --muted: #f5f5f5; /* Row hover background */
-  --muted-foreground: #999999; /* Icon muted color */
-  
+  --muted: #f0ebe5; /* Row hover background - warm light */
+  --muted-foreground: #9a8f86; /* Icon muted color - warm gray */
+
   /* Accent (navigation selected) */
-  --accent: #e0e0e0; /* Nav selected background - medium gray for good contrast */
-  --accent-foreground: #323232; /* Hover/selected text */
-  
+  --accent: #e4ddd6; /* Nav selected background - warm medium */
+  --accent-foreground: #2b2520;
+
   /* Destructive */
   --destructive: #d4183d;
   --destructive-foreground: #ffffff;
-  
+
   /* Borders */
-  --border: #e5e5e5; /* Table borders */
+  --border: #e0d8d0; /* Table borders - warm */
   --input: transparent;
-  --input-background: #f3f3f5;
-  --switch-background: #cbced4;
-  --ring: #999999;
-  
+  --input-background: #f0ebe5;
+  --switch-background: #c8c0b8;
+  --ring: #9a8f86;
+
   /* Charts */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  
+
   /* Radius */
   --radius: 0.5rem;
-  
+
   /* Sidebar */
-  --sidebar: #fbfaf9; /* Sidebar background */
-  --sidebar-foreground: #666D7C;
-  --sidebar-primary: #323232;
-  --sidebar-primary-foreground: #fbfaf9;
-  --sidebar-accent: #e0e0e0; /* Nav selected - medium gray for good contrast */
-  --sidebar-accent-foreground: #323232;
-  --sidebar-border: #d0d0d0;
-  --sidebar-ring: #999999;
+  --sidebar: #f4f0ec; /* Sidebar background - warm, slightly deeper than page */
+  --sidebar-foreground: #665e56;
+  --sidebar-primary: #2b2520;
+  --sidebar-primary-foreground: #f4f0ec;
+  --sidebar-accent: #e4ddd6;
+  --sidebar-accent-foreground: #2b2520;
+  --sidebar-border: #d0c8c0;
+  --sidebar-ring: #9a8f86;
 
   /* Template-specific custom properties (truly unique values) */
-  --bg-nav-hover: rgba(236, 236, 236, 0.5); /* 50% of nav selected - neutral gray */
-  --bg-row-selected: #ececec; /* Table row selected background - same as nav selected */
-  --border-interactive: #d0d0d0; /* Default border for all interactive elements */
-  --border-interactive-hover: #b3b3b3; /* Hover border for dropdowns and toggles */
-  --bg-icon-container: #d58c6f; /* Brand color for icons */
-  --bg-icon-hover: rgba(0, 0, 0, 0.06); /* Universal 6% black overlay for hover/selected states on icon buttons */
-  --icon-nav-hover: #777B85; /* Nav icon hover - between default and selected */
-  --bg-grid-card: #fefefe; /* Grid card background - slightly lighter than main background */
+  --bg-nav-hover: rgba(224, 216, 208, 0.5);
+  --bg-row-selected: #e8e0d8;
+  --border-interactive: #d0c8c0;
+  --border-interactive-hover: #b8b0a8;
+  --bg-icon-container: #d58c6f;
+  --bg-icon-hover: rgba(0, 0, 0, 0.06);
+  --icon-nav-hover: #7a7068;
+  --bg-grid-card: #fdfaf8; /* Grid card background - warm white */
 
   /* Font family - single variable for the typeface */
   --font-family: 'Figtree', sans-serif;
@@ -125,66 +125,77 @@
   --transition-timing: ease-in-out;
 
   /* Additional icon/UI colors */
-  --icon: #525A70;
-  --icon-toggle-active: #323232; /* Darker for better contrast when selected */
-  --icon-toggle-inactive: #d0d0d0; /* Lighter gray for clear visual distinction */
-  --icon-toggle-hover: #7a7f8a; /* Hover state - between inactive and active */
-  --bg-account-avatar: #934790;
-  --bg-beta-badge: #36609e; /* Beta badge background color */
-  --text-white: white;
-  --icon-team-bg: #7FA073; /* Team icon background */
-  --icon-workspace-bg: #6BA0D2; /* Workspace icon background */
-}
-
-.dark {
-  --background: #1c1c1c;
-  --foreground: #e5e5e5;
-  --card: #1d1d1d;
-  --card-foreground: #e5e5e5;
-  --popover: #1a1a1a;
-  --popover-foreground: #e5e5e5;
-  --primary: #e5e5e5;
-  --primary-foreground: #1a1a1a;
-  --secondary: rgba(255, 255, 255, 0.05);
-  --secondary-foreground: #a3a3a3;
-  --muted: #2a2a2a;
-  --muted-foreground: #999999;
-  --accent: #303030;
-  --accent-foreground: #e5e5e5;
-  --destructive: #d4183d;
-  --destructive-foreground: #ffffff;
-  --border: #333333;
-  --input: transparent;
-  --input-background: #2a2a2a;
-  --switch-background: #4a4a4a;
-  --ring: #666666;
-  --sidebar: #1a1a1a; /* 5% darker than main background */
-  --sidebar-foreground: #b8b8b8; /* More contrast for default nav text */
-  --sidebar-primary: #e5e5e5;
-  --sidebar-primary-foreground: #1a1a1a;
-  --sidebar-accent: #303030;
-  --sidebar-accent-foreground: #e5e5e5;
-  --sidebar-border: #333333;
-  --sidebar-ring: #666666;
-  
-  /* Dark mode specific custom properties */
-  --bg-nav-hover: rgba(42, 42, 42, 0.5);
-  --bg-row-selected: #2a2a2a;
-  --border-interactive: #4a4a4a;
-  --border-interactive-hover: #666666;
-  --bg-icon-container: #d58c6f;
-  --bg-icon-hover: rgba(255, 255, 255, 0.06);
-  --icon-nav-hover: #b3b3b3;
-  --icon: #a3a3a3;
-  --icon-toggle-active: #e5e5e5;
-  --icon-toggle-inactive: #4a4a4a;
-  --icon-toggle-hover: #999999;
+  --icon: #5a5048;
+  --icon-toggle-active: #2b2520;
+  --icon-toggle-inactive: #d0c8c0;
+  --icon-toggle-hover: #7a7068;
   --bg-account-avatar: #934790;
   --bg-beta-badge: #36609e;
   --text-white: white;
-  --bg-grid-card: #1f1f1f;
   --icon-team-bg: #7FA073;
-  --icon-workspace-bg: #6BA0D2; /* Grid card background - about 5% lighter than main background #1a1a1a */
+  --icon-workspace-bg: #6BA0D2;
+}
+
+.dark {
+  --background: #1e1a16; /* Warm very dark brown */
+  --foreground: #d8d0c8; /* Warm light */
+  --card: #221e1a; /* Warm dark card */
+  --card-foreground: #d8d0c8;
+  --popover: #201c18;
+  --popover-foreground: #d8d0c8;
+  --primary: #ede8e2; /* Warm off-white */
+  --primary-foreground: #1e1a16;
+  --secondary: rgba(255, 255, 255, 0.05);
+  --secondary-foreground: #a09890;
+  --muted: #2c2822; /* Warm dark muted */
+  --muted-foreground: #9a9088;
+  --accent: #342e28; /* Warm medium dark */
+  --accent-foreground: #ede8e2;
+  --destructive: #d4183d;
+  --destructive-foreground: #ffffff;
+  --border: #3c3630; /* Warm border */
+  --input: transparent;
+  --input-background: #2c2822;
+  --switch-background: #4a4440;
+  --ring: #6a6460;
+  --sidebar: #1a1612; /* Warm dark sidebar, slightly deeper */
+  --sidebar-foreground: #b8b0a6;
+  --sidebar-primary: #ede8e2;
+  --sidebar-primary-foreground: #1a1612;
+  --sidebar-accent: #342e28;
+  --sidebar-accent-foreground: #ede8e2;
+  --sidebar-border: #3c3630;
+  --sidebar-ring: #6a6460;
+
+  /* Dark mode specific custom properties */
+  --bg-nav-hover: rgba(44, 40, 34, 0.5);
+  --bg-row-selected: #2c2822;
+  --border-interactive: #4a4440;
+  --border-interactive-hover: #6a6460;
+  --bg-icon-container: #d58c6f;
+  --bg-icon-hover: rgba(255, 255, 255, 0.06);
+  --icon-nav-hover: #b0a898;
+  --icon: #a09890;
+  --icon-toggle-active: #ede8e2;
+  --icon-toggle-inactive: #4a4440;
+  --icon-toggle-hover: #9a9088;
+  --bg-account-avatar: #934790;
+  --bg-beta-badge: #36609e;
+  --text-white: white;
+  --bg-grid-card: #261e1a; /* Warm dark grid card */
+  --icon-team-bg: #7FA073;
+  --icon-workspace-bg: #6BA0D2;
+}
+
+/* Masthead / TopBar texture */
+.masthead-texture {
+  background-color: var(--sidebar);
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.07) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+.dark .masthead-texture {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
 }
 
 @theme inline {

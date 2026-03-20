@@ -340,7 +340,7 @@ export function DataTable({
   return (
     <>
       {/* Mobile Card View - Only visible on mobile */}
-      <div className="md:hidden flex-1 flex flex-col overflow-hidden pb-[72px]">
+      <div className="md:hidden flex-1 flex flex-col overflow-hidden">
         {/* Mobile Sort Header */}
         <MobileSortHeader
           sortColumn={sortConfig?.key || 'lastModified'}
@@ -350,9 +350,9 @@ export function DataTable({
           viewMode={viewMode}
           onViewModeChange={onViewModeChange}
         />
-        
+
         {/* Scrollable Card List */}
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto pb-[72px]">
           <MobileCardView
             data={sortedData}
             onRowClick={onRowClick}
@@ -368,9 +368,11 @@ export function DataTable({
       {/* Desktop Table View - Hidden on mobile */}
       <div className="hidden md:flex flex-1 flex-col px-[24px] pb-[24px] min-h-0 overflow-hidden">
       {/* ======================================== */}
-      {/* TABLE HEADER SECTION */}
+      {/* TABLE (header + rows inside the same border) */}
       {/* ======================================== */}
-      <div className="shrink-0 overflow-hidden w-full">
+      <div className="flex flex-col overflow-hidden rounded-2xl w-full flex-1 min-h-0" style={{ border: '1px solid var(--border-interactive)' }}>
+      {/* TABLE HEADER SECTION */}
+      <div className="shrink-0 overflow-hidden w-full" style={{ borderBottom: '1px solid var(--border-interactive)' }}>
         <div className="w-full flex" style={{ minWidth: '100%' }}>
           {/* Header Columns */}
           <div className="flex flex-1 min-w-0">
@@ -487,8 +489,8 @@ export function DataTable({
       {/* ======================================== */}
       {/* TABLE ROWS SECTION (Scrollable) */}
       {/* ======================================== */}
-      <div className="overflow-hidden rounded-2xl w-full" style={{ border: '1px solid var(--border-interactive)' }}>
-        <div className="overflow-y-auto w-full" style={{ maxHeight: 'calc(100vh - 240px)', paddingBottom: '4px' }} onClick={handleTableAreaClick}>
+      <div className="overflow-hidden flex-1 min-h-0">
+        <div className="overflow-y-auto w-full h-full" style={{ paddingBottom: '4px' }} onClick={handleTableAreaClick}>
           <div className="w-full" style={{ minWidth: '100%' }}>
             {sortedData.map((row, rowIndex) => {
               const totalColumns = columns.length;
@@ -728,6 +730,7 @@ export function DataTable({
             })}
           </div>
         </div>
+      </div>
       </div>
 
       {/* Dropdown Menus */}

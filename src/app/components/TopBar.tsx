@@ -1,4 +1,5 @@
 import { ChevronLeft, Grid3x3, List } from 'lucide-react';
+import { ReactNode } from 'react';
 import { ActionButtons } from './ActionButtons';
 import { useMobileNav } from '../hooks/useMobileNav';
 
@@ -12,10 +13,12 @@ interface TopBarProps {
   backButtonLabel?: string;
   viewMode?: 'grid' | 'list';
   onViewModeChange?: (mode: 'grid' | 'list') => void;
+  /** Action buttons shown on the right side of the mobile TopBar */
+  mobileActions?: ReactNode;
 }
 
-export function TopBar({ 
-  title, 
+export function TopBar({
+  title,
   userInitials = 'LD',
   onThemeToggle,
   isDarkMode = false,
@@ -23,12 +26,13 @@ export function TopBar({
   onBackClick,
   backButtonLabel = 'Back',
   viewMode,
-  onViewModeChange
+  onViewModeChange,
+  mobileActions,
 }: TopBarProps) {
   const { toggleSidebar } = useMobileNav();
 
   return (
-    <div className="h-[72px] shrink-0 w-full">
+    <div className="h-[72px] shrink-0 w-full masthead-texture">
       
       {/* ================================================================ */}
       {/* MOBILE LAYOUT: TopBar for Mobile Devices                        */}
@@ -69,8 +73,12 @@ export function TopBar({
         {/* Spacer when no title */}
         {!title && <div className="flex-1" />}
 
-        {/* Mobile View Toggle - Only show if viewMode is provided */}
-        {viewMode && onViewModeChange && (
+        {/* Mobile right side: custom actions OR view toggle */}
+        {mobileActions ? (
+          <div className="flex items-center gap-1 shrink-0">
+            {mobileActions}
+          </div>
+        ) : viewMode && onViewModeChange ? (
           <button
             onClick={() => onViewModeChange(viewMode === 'grid' ? 'list' : 'grid')}
             className="flex items-center justify-center size-[40px] rounded-full transition-colors shrink-0"
@@ -84,7 +92,7 @@ export function TopBar({
               <Grid3x3 className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
             )}
           </button>
-        )}
+        ) : null}
       </div>
 
       {/* ================================================================ */}

@@ -24,9 +24,8 @@ export function Root() {
     if (path === '/favorites') return 'favorites';
     if (path === '/shared') return 'shared';
     if (path === '/admin' || path.startsWith('/admin/')) return 'admin';
-    if (path.startsWith('/workspace/')) {
-      return path.split('/')[2];
-    }
+    if (path === '/workspaces' || path.startsWith('/workspace/')) return 'workspaces';
+    if (path === '/account') return 'account';
     return 'recent';
   };
 
@@ -39,6 +38,10 @@ export function Root() {
       navigate('/shared');
     } else if (id === 'admin') {
       navigate('/admin');
+    } else if (id === 'workspaces') {
+      navigate('/workspaces');
+    } else if (id === 'account') {
+      navigate('/account');
     } else {
       // It's a workspace
       navigate(`/workspace/${id}`);
@@ -84,7 +87,6 @@ export function Root() {
         <BottomNav
           activeItem={getActiveItem()}
           onItemClick={handleItemClick}
-          workspaces={teamWorkspaces}
         />
       </div>
     </FavoritesProvider>

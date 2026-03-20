@@ -8,6 +8,7 @@ import { WorkspacePage } from "./pages/WorkspacePage";
 import { WorkspacesPage } from "./pages/WorkspacesPage";
 import { AccountDetailPage } from "./pages/AccountDetailPage";
 import { TeamDetailPage } from "./pages/TeamDetailPage";
+import { AccountPage } from "./pages/AccountPage";
 
 export const router = createBrowserRouter([
   {
@@ -19,6 +20,7 @@ export const router = createBrowserRouter([
       { path: "favorites", Component: FavoritesPage },
       { path: "shared", Component: SharedPage },
       { path: "workspaces", Component: WorkspacesPage },
+      { path: "account", Component: AccountPage },
       { path: "admin", Component: AdminPage },
       { path: "admin/account/:accountId", Component: AccountDetailPage },
       { path: "admin/team/:teamId", Component: TeamDetailPage },
