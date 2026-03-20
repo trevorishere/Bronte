@@ -174,7 +174,7 @@ export function BottomNav({ activeItem = 'recent', onItemClick, workspaces = [] 
           backgroundColor: 'var(--sidebar)',
           borderTop: '1px solid var(--muted)',
           boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.1)',
-          paddingTop: '12px',
+          paddingTop: '16px',
       
         }}
       >
@@ -188,7 +188,7 @@ export function BottomNav({ activeItem = 'recent', onItemClick, workspaces = [] 
             <button
               key={item.id}
               onClick={() => handleNavClick(item.id)}
-              className="flex flex-col items-center justify-center gap-[6px] min-w-0 flex-1"
+              className="flex flex-col items-center justify-center gap-[8px] min-w-0 flex-1"
             >
               <Icon 
                 className="size-[24px]" 
