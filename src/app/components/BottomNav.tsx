@@ -69,10 +69,10 @@ export function BottomNav({ activeItem = 'recent', onItemClick, workspaces = [] 
             className="absolute bottom-[80px] left-24 right-2 bg-background shadow-lg overflow-hidden p-[8px]"
             style={{ 
               border: '1px solid var(--border-interactive-hover)',
-              borderRadius: 'var(--radius-16)',
+              borderRadius: 'var(--radius-24)',
               maxHeight: '300px',
               overflowY: 'auto',
-              transformOrigin: 'bottom center'
+              transformOrigin: 'bottom right'
             }}
             initial={{ opacity: 0, scaleY: 0 }}
             animate={{ opacity: 1, scaleY: 1 }}
@@ -174,8 +174,8 @@ export function BottomNav({ activeItem = 'recent', onItemClick, workspaces = [] 
           backgroundColor: 'var(--sidebar)',
           borderTop: '1px solid var(--border-interactive)',
           boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.1)',
-          paddingTop: '10px',
-          height: '72px'
+          paddingTop: '8px',
+          height: '52px'
         }}
       >
         {navItems.map((item) => {
@@ -188,7 +188,7 @@ export function BottomNav({ activeItem = 'recent', onItemClick, workspaces = [] 
             <button
               key={item.id}
               onClick={() => handleNavClick(item.id)}
-              className="flex flex-col items-center justify-center gap-[4px] min-w-0 flex-1"
+              className="flex flex-col items-center justify-center gap-[6px] min-w-0 flex-1"
             >
               <Icon 
                 className="size-[24px]" 
