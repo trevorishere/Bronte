@@ -172,9 +172,9 @@ export function BottomNav({ activeItem = 'recent', onItemClick, workspaces = [] 
         className="flex items-center justify-around px-2"
         style={{
           backgroundColor: 'var(--sidebar)',
-          borderTop: '1px solid var(--border-interactive)',
+          borderTop: '1px solid var(--muted)',
           boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.1)',
-          paddingTop: '8px',
+          paddingTop: '12px',
       
         }}
       >
