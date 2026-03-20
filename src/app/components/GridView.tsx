@@ -1,0 +1,294 @@
+import { Star, MoreHorizontal, Users, Calendar, Briefcase, Book } from 'lucide-react';
+import { useState } from 'react';
+import { WorkspaceIcon } from './WorkspaceIcon';
+import { TeamIcon } from './TeamIcon';
+import { Avatar } from './Avatar';
+import { ProjectIcon } from './ProjectIcon';
+import { DropdownMenu } from './DropdownMenu';
+import { accounts } from '../data/accounts';
+
+export interface GridItemData {
+  id: string;
+  name: string;
+  owner: string;
+  iconType?: 'project' | 'workspace' | 'team' | 'account';
+  workspace?: string;
+  team?: string;
+  // Additional metadata
+  members?: number;
+  dateCreated?: string;
+  lastModified?: string;
+  role?: string;
+  projectCount?: number;
+}
+
+interface GridViewProps {
+  data: GridItemData[];
+  onItemClick?: (item: GridItemData) => void;
+  onItemDoubleClick?: (item: GridItemData) => void;
+  onStarClick?: (item: GridItemData, isStarred: boolean) => void;
+  favorites?: Set<string>;
+}
+
+export function GridView({
+  data,
+  onItemClick,
+  onItemDoubleClick,
+  onStarClick,
+  favorites = new Set(),
+}: GridViewProps) {
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [hoveredFavorite, setHoveredFavorite] = useState<string | null>(null);
+
+  const getRandomMembers = (id: string) => {
+    // Generate consistent random number based on ID
+    const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return 5 + (hash % 96); // 5-100
+  };
+
+  const getPictogramColor = (iconType: string | undefined) => {
+    // Each icon type has one consistent color
+    if (iconType === 'project') {
+      return '#D58C6F'; // Orange for projects
+    }
+    if (iconType === 'workspace') {
+      return '#6BA0D2'; // Blue for workspaces
+    }
+    if (iconType === 'team') {
+      return '#8B7AB8'; // Purple for teams
+    }
+    if (iconType === 'account') {
+      return '#7CB8A2'; // Green for accounts
+    }
+    return '#6BA0D2';
+  };
+
+  const renderPictogram = (item: GridItemData) => {
+    const bgColor = getPictogramColor(item.iconType);
+
+    return (
+      <div className="w-full h-[128px] rounded-[12px] overflow-hidden flex items-center justify-center" style={{ backgroundColor: bgColor }}>
+        {item.iconType === 'workspace' && item.name && (
+          <WorkspaceIcon name={item.name} size="x-large" />
+        )}
+        {item.iconType === 'team' && item.name && (
+          <TeamIcon size="x-large" />
+        )}
+        {item.iconType === 'account' && (
+          <Avatar 
+            name={item.name} 
+            role={accounts.find(acc => acc.name === item.name)?.role || 'Viewer'}
+            size="x-large" 
+          />
+        )}
+        {item.iconType === 'project' && (
+          <ProjectIcon size="x-large" />
+        )}
+      </div>
+    );
+  };
+
+  const renderMetadata = (item: GridItemData) => {
+    // For projects: show members
+    if (item.iconType === 'project') {
+      const members = item.members || getRandomMembers(item.id);
+      return (
+        <div className="flex gap-[8px] items-center">
+          <Users size={16} className="shrink-0" style={{ color: 'var(--muted-foreground)' }} />
+          <span className="text-[14px] font-medium" style={{ color: 'var(--muted-foreground)' }}>
+            {members} members
+          </span>
+        </div>
+      );
+    }
+
+    // For workspaces: show members and date created
+    if (item.iconType === 'workspace') {
+      const members = item.members || getRandomMembers(item.id);
+      return (
+        <div className="flex gap-[12px] items-center">
+          <div className="flex gap-[8px] items-center">
+            <Users size={16} className="shrink-0" style={{ color: 'var(--muted-foreground)' }} />
+            <span className="text-[14px] font-medium" style={{ color: 'var(--muted-foreground)' }}>
+              {members} members
+            </span>
+          </div>
+          {item.dateCreated && (
+            <div className="flex gap-[8px] items-center">
+              <Calendar size={16} className="shrink-0" style={{ color: 'var(--muted-foreground)' }} />
+              <span className="text-[14px] font-medium" style={{ color: 'var(--muted-foreground)' }}>
+                {item.dateCreated}
+              </span>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // For teams: show members and role
+    if (item.iconType === 'team') {
+      const members = item.members || getRandomMembers(item.id);
+      return (
+        <div className="flex gap-[12px] items-center">
+          <div className="flex gap-[8px] items-center">
+            <Users size={16} className="shrink-0" style={{ color: 'var(--muted-foreground)' }} />
+            <span className="text-[14px] font-medium" style={{ color: 'var(--muted-foreground)' }}>
+              {members} members
+            </span>
+          </div>
+          {item.role && (
+            <span className="text-[14px] font-medium" style={{ color: 'var(--muted-foreground)' }}>
+              {item.role}
+            </span>
+          )}
+        </div>
+      );
+    }
+
+    // For accounts: show role and project count
+    if (item.iconType === 'account') {
+      return (
+        <div className="flex gap-[12px] items-center">
+          {item.role && (
+            <span className="text-[14px] font-medium" style={{ color: 'var(--muted-foreground)' }}>
+              {item.role}
+            </span>
+          )}
+          {item.projectCount !== undefined && (
+            <div className="flex gap-[8px] items-center">
+              <Briefcase size={16} className="shrink-0" style={{ color: 'var(--muted-foreground)' }} />
+              <span className="text-[14px] font-medium" style={{ color: 'var(--muted-foreground)' }}>
+                {item.projectCount} projects
+              </span>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <div className="w-full h-full overflow-y-auto px-4 md:px-[40px] pb-2" style={{ backgroundColor: 'var(--background)' }}>
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-[48px] pt-8">
+        {data.map((item) => {
+          const isStarred = favorites.has(item.id);
+          const isHovered = hoveredCard === item.id;
+
+          return (
+            <div
+              key={item.id}
+              className="flex flex-col gap-[8px] rounded-[16px] cursor-pointer transition-shadow"
+              style={{
+                backgroundColor: 'var(--bg-grid-card)',
+                border: '1px solid var(--sidebar-border)',
+                padding: '16px',
+                paddingBottom: '20px',
+                boxShadow: isHovered
+                  ? '0px 0px 6px 0px rgba(0,0,0,0.025), 0px 1px 5px 0px rgba(0,0,0,0.04), 0px 6px 15px 0px rgba(50,50,93,0.075)'
+                  : '0px 0px 6px 0px rgba(0,0,0,0.025), 0px 1px 5px 0px rgba(0,0,0,0.04), 0px 4px 9px 0px rgba(50,50,93,0.055)',
+              }}
+              onClick={() => onItemClick?.(item)}
+              onDoubleClick={() => onItemDoubleClick?.(item)}
+              onMouseEnter={() => setHoveredCard(item.id)}
+              onMouseLeave={() => setHoveredCard(null)}
+            >
+              {/* Pictogram */}
+              <div style={{ marginBottom: '16px' }}>
+                {renderPictogram(item)}
+              </div>
+
+              {/* Title - Two lines with fixed height */}
+              <h3
+                className="text-[16px] font-semibold leading-[24px]"
+                style={{ 
+                  color: 'var(--foreground)',
+                  height: '48px', // Reserve space for 2 lines (24px * 2)
+                  overflow: 'hidden',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  letterSpacing: 'var(--letter-spacing-md)',
+                  wordWrap: 'break-word'
+                }}
+                title={item.name}
+              >
+                {item.name}
+              </h3>
+
+              {/* Owner */}
+              <p
+                className="text-[14px] font-normal leading-[21px]"
+                style={{ color: 'var(--muted-foreground)', letterSpacing: 'var(--letter-spacing-md)' }}
+              >
+                {item.owner}
+              </p>
+
+              {/* Metadata and Actions */}
+              <div className="flex items-center justify-between">
+                {renderMetadata(item)}
+
+                {/* Icon Buttons */}
+                <div className="flex gap-[8px] items-center">
+                  {/* Favorite Button */}
+                  <button
+                    className="size-[32px] flex items-center justify-center rounded-full transition-colors"
+                    style={{
+                      backgroundColor:
+                        hoveredFavorite === `${item.id}-favorite`
+                          ? 'var(--bg-nav-hover)'
+                          : 'transparent',
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onStarClick?.(item, !isStarred);
+                    }}
+                    onMouseEnter={() => setHoveredFavorite(`${item.id}-favorite`)}
+                    onMouseLeave={() => setHoveredFavorite(null)}
+                  >
+                    <Star
+                      size={16}
+                      fill={isStarred ? 'currentColor' : 'none'}
+                      style={{ color: 'var(--icon)' }}
+                      strokeWidth={2}
+                    />
+                  </button>
+
+                  {/* More Menu */}
+                  <div style={{ position: 'relative', zIndex: 10 }}>
+                    <DropdownMenu
+                      trigger={
+                        <button
+                          className="size-[32px] flex items-center justify-center rounded-full transition-colors"
+                          style={{
+                            backgroundColor:
+                              hoveredFavorite === `${item.id}-more`
+                                ? 'var(--bg-nav-hover)'
+                                : 'transparent',
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          onMouseEnter={() => setHoveredFavorite(`${item.id}-more`)}
+                          onMouseLeave={() => setHoveredFavorite(null)}
+                        >
+                          <MoreHorizontal size={16} style={{ color: 'var(--icon)' }} />
+                        </button>
+                      }
+                      items={[
+                        { label: 'Open', action: () => console.log('Open', item.name) },
+                        { label: 'Rename', action: () => console.log('Rename', item.name) },
+                        { label: 'Duplicate', action: () => console.log('Duplicate', item.name) },
+                        { type: 'separator' },
+                        { label: 'Delete', action: () => console.log('Delete', item.name) },
+                      ]}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

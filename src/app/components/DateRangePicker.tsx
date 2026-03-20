@@ -321,6 +321,7 @@ function CalendarView({
             fontSize: 'var(--font-size-14)',
             fontWeight: 'var(--font-weight-semibold)',
             lineHeight: 'var(--line-height-20)',
+            letterSpacing: 'var(--letter-spacing-md)',
             color: 'var(--primary)'
           }}
         >
@@ -358,8 +359,9 @@ function CalendarView({
             style={{
               fontFamily: 'var(--font-family)',
               fontSize: 'var(--font-size-11)',
-              fontWeight: 'var(--font-weight-semibold)',
+              fontWeight: 'var(--font-weight-medium)',
               lineHeight: 'var(--line-height-20)',
+              letterSpacing: 'var(--letter-spacing-md)',
               color: 'var(--muted-foreground)',
               padding: '4px'
             }}
@@ -416,6 +418,7 @@ function CalendarView({
                 fontSize: 'var(--font-size-14)',
                 fontWeight: 'var(--font-weight-regular)',
                 lineHeight: 'var(--line-height-20)',
+                letterSpacing: 'var(--letter-spacing-md)',
                 color: isFuture 
                   ? 'var(--muted-foreground)' 
                   : isSelected 

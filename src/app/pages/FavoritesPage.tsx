@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { TopBar } from '../components/TopBar';
 import { Toolbar } from '../components/Toolbar';
 import { DataTable, Column, RowData } from '../components/DataTable';
+import { GridView, GridItemData } from '../components/GridView';
 import { EmptyState } from '../components/EmptyState';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { projects } from '../data/workspaces';
@@ -15,7 +16,7 @@ interface OutletContext {
 
 const tableColumns: Column[] = [
   { key: 'name', label: 'Project Name', sortable: true, width: 'w-[400px]' },
-  { key: 'owner', label: 'Owner', sortable: true, width: 'w-[250px]' },
+  { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
   { key: 'lastModified', label: 'Last Modified', sortable: true, width: 'w-[200px]' },
 ];
 
@@ -34,7 +35,8 @@ export function FavoritesPage() {
       name: project.name,
       owner: project.owner,
       lastModified: project.lastModified,
-      iconType: 'project'
+      workspace: project.workspace,
+      iconType: 'project' as const,
     }));
 
   // Get unique owners for filter options
@@ -84,7 +86,7 @@ export function FavoritesPage() {
     console.log('Row double-clicked (navigate to):', row);
   };
 
-  const handleStarClick = (row: RowData, isStarred: boolean) => {
+  const handleStarClick = (row: RowData | GridItemData, isStarred: boolean) => {
     if (isStarred) {
       addFavorite(row.id);
       toast.success(`${row.name} has been added to Favorites`);
@@ -107,21 +109,35 @@ export function FavoritesPage() {
         userInitials="LD"
         isDarkMode={isDarkMode}
         onThemeToggle={onThemeToggle}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
+      
+      {/* Toolbar - Always visible */}
+      <Toolbar
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        filters={[
+          { label: 'Owner', options: uniqueOwners },
+          { label: 'Last Modified', type: 'date' as const }
+        ]}
+        selectedFilters={selectedFilters}
+        onFilterChange={handleFilterChange}
+        dateFilters={dateFilters}
+        onDateFilterChange={handleDateFilterChange}
+      />
+
+      {/* Content area */}
       {hasData ? (
-        <>
-          <Toolbar
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            filters={[
-              { label: 'Owner', options: uniqueOwners },
-              { label: 'Last Modified', type: 'date' as const }
-            ]}
-            selectedFilters={selectedFilters}
-            onFilterChange={handleFilterChange}
-            dateFilters={dateFilters}
-            onDateFilterChange={handleDateFilterChange}
+        viewMode === 'grid' ? (
+          <GridView
+            data={filteredData as GridItemData[]}
+            onItemClick={handleRowClick}
+            onItemDoubleClick={handleRowDoubleClick}
+            onStarClick={handleStarClick}
+            favorites={favorites}
           />
+        ) : (
           <DataTable
             columns={tableColumns}
             data={filteredData}
@@ -131,7 +147,7 @@ export function FavoritesPage() {
             onMoreClick={handleMoreClick}
             starredItems={favorites}
           />
-        </>
+        )
       ) : (
         <EmptyState message="You currently have no favorite projects yet." />
       )}

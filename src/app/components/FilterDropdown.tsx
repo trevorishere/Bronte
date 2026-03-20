@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Check, Search } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface FilterDropdownProps {
   label: string;
@@ -58,7 +59,7 @@ export function FilterDropdown({
 
   // Filter options based on search query
   const filteredOptions = options.filter(option =>
-    option.toLowerCase().includes(searchQuery.toLowerCase())
+    option && option.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const selectedValue = selectedValues.length > 0 ? selectedValues[0] : null;
@@ -66,10 +67,10 @@ export function FilterDropdown({
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        className="flex h-[40px] items-center pr-[12px] transition-colors bg-background group"
+        className="flex h-[40px] items-center pr-[8px] transition-colors bg-background group"
         style={{
           border: `1px solid ${isHovered || isOpen ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}`,
-          borderRadius: 'var(--radius-16)',
+          borderRadius: 'var(--radius-12)',
           paddingLeft: selectedValue ? '4px' : '16px',
           minWidth: 'fit-content'
         }}
@@ -81,12 +82,12 @@ export function FilterDropdown({
           {selectedValue ? (
             // Show pill when item is selected - 32px height
             <div
-              className="flex items-center gap-[6px] px-[10px]"
+              className="flex items-center gap-[12px] pl-[12px] pr-[8px]"
               style={{
                 backgroundColor: 'var(--muted)',
                 border: '1px solid var(--border-interactive)',
-                borderRadius: '9999px',
-                height: '32px',
+                borderRadius: '8px',
+                height: '30px',
                 maxWidth: '200px'
               }}
             >
@@ -94,9 +95,10 @@ export function FilterDropdown({
                 className="truncate"
                 style={{
                   fontFamily: 'var(--font-family)',
-                  fontWeight: 'var(--font-weight-regular)',
+                  fontWeight: 'var(--font-weight-semibold)',
                   fontSize: 'var(--font-size-13)',
-                  color: 'var(--foreground)',
+                  color: 'var(--secondary-foreground)',
+                  paddingTop: '1px',
                   whiteSpace: 'nowrap'
                 }}
               >
@@ -106,18 +108,19 @@ export function FilterDropdown({
                 onClick={clearSelection}
                 className="flex items-center justify-center size-[14px] rounded-full hover:bg-background transition-colors cursor-pointer shrink-0"
               >
-                <X className="size-[10px]" style={{ color: 'var(--foreground)' }} strokeWidth={2} />
+                <X className="size-[12px]" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2} />
               </div>
             </div>
           ) : (
             // Show label when nothing is selected
             <div
-              className={`${isHovered || isOpen ? 'text-primary' : 'text-foreground'}`}
+              className={`${isHovered || isOpen ? 'text-foreground' : 'secondary-foreground'}`}
               style={{
                 fontFamily: 'var(--font-family)',
-                fontWeight: 'var(--font-weight-medium)',
+                fontWeight: 'var(--font-weight-regular)',
                 lineHeight: 'var(--line-height-20)',
                 fontSize: 'var(--font-size-14)',
+                letterSpacing: 'var(--letter-spacing-md)',
                 whiteSpace: 'nowrap',
                 textAlign: 'left'
               }}
@@ -141,7 +144,7 @@ export function FilterDropdown({
                 <g>
                   <path
                     d="M4 6L8 10L12 6"
-                    stroke={isHovered || isOpen ? 'var(--primary)' : 'var(--foreground)'}
+                    stroke={isHovered || isOpen ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}
                     strokeLinecap="square"
                     strokeLinejoin="round"
                     strokeWidth="1.5"
@@ -154,103 +157,115 @@ export function FilterDropdown({
       </button>
 
       {/* Dropdown Menu - separate shape */}
-      {isOpen && (
-        <div
-          className="absolute left-0 bg-background shadow-lg overflow-hidden p-[8px]"
-          style={{
-            border: `1px solid var(--border-interactive-hover)`,
-            borderRadius: 'var(--radius-16)',
-            top: '48px',
-            zIndex: 100,
-            minWidth: '280px'
-          }}
-        >
-          {/* Search Field */}
-          <div>
-            <div
-              className="flex items-center gap-[8px] px-[12px] py-[8px] rounded-lg"
-              style={{
-                border: `1px solid var(--border-interactive)`,
-                backgroundColor: 'var(--background)'
-              }}
-            >
-              <input
-                ref={searchInputRef}
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search..."
-                className="flex-1 outline-none bg-transparent"
-                style={{
-                  fontFamily: 'var(--font-family)',
-                  fontWeight: 'var(--font-weight-regular)',
-                  fontSize: 'var(--font-size-14)',
-                  lineHeight: 'var(--line-height-20)',
-                  color: 'var(--foreground)'
-                }}
-              />
-              <Search className="size-[16px] shrink-0" style={{ color: 'var(--foreground)' }} strokeWidth={2} />
-            </div>
-          </div>
-
-          {/* Options List */}
-          <div 
-            className="mt-[8px]"
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className="absolute left-0 bg-background shadow-lg overflow-hidden p-[8px]"
             style={{
-              maxHeight: '240px',
-              overflowY: 'auto'
+              border: `1px solid var(--border-interactive-hover)`,
+              borderRadius: 'var(--radius-16)',
+              top: '48px',
+              zIndex: 100,
+              minWidth: '280px',
+              transformOrigin: 'top center'
+            }}
+            initial={{ opacity: 0, scaleY: 0 }}
+            animate={{ opacity: 1, scaleY: 1 }}
+            exit={{ opacity: 0, scaleY: 0 }}
+            transition={{ 
+              duration: 0.25,
+              type: 'spring',
+              stiffness: 400,
+              damping: 25
             }}
           >
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((option) => {
-                const isSelected = selectedValue === option;
-                return (
-                  <button
-                    key={option}
-                    onClick={() => selectOption(option)}
-                    onMouseEnter={() => setHoveredOption(option)}
-                    onMouseLeave={() => setHoveredOption(null)}
-                    className="w-full flex items-center justify-between px-[12px] py-[10px] transition-colors rounded-xl"
-                    style={{
-                      backgroundColor: hoveredOption === option ? 'var(--muted)' : 'transparent'
-                    }}
-                  >
-                    <span
-                      className={`${hoveredOption === option ? 'text-primary' : 'text-foreground'} truncate`}
-                      style={{
-                        fontFamily: 'var(--font-family)',
-                        fontWeight: 'var(--font-weight-regular)',
-                        fontSize: 'var(--font-size-14)',
-                        lineHeight: 'var(--line-height-20)',
-                        textAlign: 'left'
-                      }}
-                    >
-                      {option}
-                    </span>
-                    {isSelected && (
-                      <Check className="size-[16px] shrink-0 ml-[8px]" style={{ color: 'var(--primary)' }} strokeWidth={2} />
-                    )}
-                  </button>
-                );
-              })
-            ) : (
+            {/* Search Field */}
+            <div>
               <div
-                className="px-[12px] py-[10px]"
+                className="flex items-center gap-[8px] px-[12px] py-[8px] rounded-lg"
                 style={{
-                  fontFamily: 'var(--font-family)',
-                  fontWeight: 'var(--font-weight-regular)',
-                  fontSize: 'var(--font-size-14)',
-                  lineHeight: 'var(--line-height-20)',
-                  color: 'var(--foreground)',
-                  opacity: 0.5
+                  border: `1px solid var(--border-interactive)`,
+                  backgroundColor: 'var(--background)'
                 }}
               >
-                No matches found
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search..."
+                  className="flex-1 outline-none bg-transparent"
+                  style={{
+                    fontFamily: 'var(--font-family)',
+                    fontWeight: 'var(--font-weight-regular)',
+                    fontSize: 'var(--font-size-14)',
+                    lineHeight: 'var(--line-height-20)',
+                    color: 'var(--foreground)'
+                  }}
+                />
+                <Search className="size-[16px] shrink-0" style={{ color: 'var(--foreground)' }} strokeWidth={2} />
               </div>
-            )}
-          </div>
-        </div>
-      )}
+            </div>
+
+            {/* Options List */}
+            <div 
+              className="mt-[8px]"
+              style={{
+                maxHeight: '240px',
+                overflowY: 'auto'
+              }}
+            >
+              {filteredOptions.length > 0 ? (
+                filteredOptions.map((option) => {
+                  const isSelected = selectedValue === option;
+                  return (
+                    <button
+                      key={option}
+                      onClick={() => selectOption(option)}
+                      onMouseEnter={() => setHoveredOption(option)}
+                      onMouseLeave={() => setHoveredOption(null)}
+                      className="w-full flex items-center justify-between px-[12px] py-[10px] transition-colors rounded-xl"
+                      style={{
+                        backgroundColor: hoveredOption === option ? 'var(--muted)' : 'transparent'
+                      }}
+                    >
+                      <span
+                        className={`${hoveredOption === option ? 'text-primary' : 'text-foreground'} truncate`}
+                        style={{
+                          fontFamily: 'var(--font-family)',
+                          fontWeight: 'var(--font-weight-regular)',
+                          fontSize: 'var(--font-size-14)',
+                          lineHeight: 'var(--line-height-20)',
+                          textAlign: 'left'
+                        }}
+                      >
+                        {option}
+                      </span>
+                      {isSelected && (
+                        <Check className="size-[16px] shrink-0 ml-[8px]" style={{ color: 'var(--primary)' }} strokeWidth={2} />
+                      )}
+                    </button>
+                  );
+                })
+              ) : (
+                <div
+                  className="px-[12px] py-[10px]"
+                  style={{
+                    fontFamily: 'var(--font-family)',
+                    fontWeight: 'var(--font-weight-regular)',
+                    fontSize: 'var(--font-size-14)',
+                    lineHeight: 'var(--line-height-20)',
+                    color: 'var(--foreground)',
+                    opacity: 0.5
+                  }}
+                >
+                  No matches found
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

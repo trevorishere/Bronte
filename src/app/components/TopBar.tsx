@@ -1,96 +1,138 @@
-import { HelpCircle, Bell, Moon, Sun } from 'lucide-react';
-import svgPaths from "../../imports/svg-2hg6thd8pt";
-import { useState } from 'react';
+import { ChevronLeft, Grid3x3, List } from 'lucide-react';
+import { ActionButtons } from './ActionButtons';
+import { useMobileNav } from '../hooks/useMobileNav';
 
 interface TopBarProps {
-  title: string;
+  title?: string;
   userInitials?: string;
   onThemeToggle?: () => void;
   isDarkMode?: boolean;
+  showBackButton?: boolean;
+  onBackClick?: () => void;
+  backButtonLabel?: string;
+  viewMode?: 'grid' | 'list';
+  onViewModeChange?: (mode: 'grid' | 'list') => void;
 }
 
 export function TopBar({ 
   title, 
   userInitials = 'LD',
   onThemeToggle,
-  isDarkMode = false
+  isDarkMode = false,
+  showBackButton = false,
+  onBackClick,
+  backButtonLabel = 'Back',
+  viewMode,
+  onViewModeChange
 }: TopBarProps) {
-  const [showNotifications, setShowNotifications] = useState(false);
+  const { toggleSidebar } = useMobileNav();
 
   return (
-    <div className="h-[64px] shrink-0 w-full">
-      <div className="flex items-center justify-between px-[24px] size-full">
-        {/* Title */}
-        <div className="flex gap-[8px] items-center">
-          <p className="text-primary" style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-normal)', fontSize: 'var(--font-size-20)', letterSpacing: 'var(--letter-spacing-md)', whiteSpace: 'nowrap' }}>
-            {title}
-          </p>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-[8px] items-center">
-          {/* Help Button */}
-          <button 
-            className="flex items-center justify-center shrink-0 size-[32px] rounded-full transition-colors"
-            style={{ backgroundColor: 'transparent' }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-            onClick={() => console.log('Help clicked')}
-          >
-            <div className="shrink-0 size-[20px]">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
-                <g clipPath="url(#clip0_help)">
-                  <path d={svgPaths.p3111f900} stroke="var(--icon)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.875" />
-                  <path d={svgPaths.p2bf069e0} stroke="var(--icon)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.875" />
-                  <path d="M10 14.1669H10.0087" stroke="var(--icon)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.875" />
-                </g>
-                <defs>
-                  <clipPath id="clip0_help">
-                    <rect fill="white" height="20" width="20" />
-                  </clipPath>
-                </defs>
-              </svg>
-            </div>
-          </button>
-
-          {/* Notifications Button */}
-          <button 
-            className="relative flex items-center justify-center shrink-0 size-[32px] rounded-full transition-colors"
-            style={{ backgroundColor: 'transparent' }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-            onClick={() => setShowNotifications(!showNotifications)}
-          >
-            <Bell className="shrink-0 size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={1.875} />
-            {showNotifications && (
-              <div className="absolute top-0 right-0 size-[8px] bg-destructive rounded-full"></div>
+    <div className="h-[72px] shrink-0 w-full">
+      
+      {/* ================================================================ */}
+      {/* MOBILE LAYOUT: TopBar for Mobile Devices                        */}
+      {/* Height: 72px                                                    */}
+      {/* Padding: 16px horizontal                                        */}
+      {/* Layout: Title (left) + View Toggle (right, if provided)         */}
+      {/* ================================================================ */}
+      <div className="md:hidden flex items-center justify-between pt-1 px-[16px] size-full">
+        {/* Title with optional back button - Mobile */}
+        {title && (
+          <div className="flex gap-[8px] items-center flex-1 min-w-0">
+            {showBackButton && (
+              <button
+                onClick={onBackClick}
+                className="size-[32px] flex items-center justify-center pr-[2px] rounded-full transition-colors shrink-0"
+                style={{ backgroundColor: 'transparent' }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                <ChevronLeft className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={3} />
+              </button>
             )}
-          </button>
-
-          {/* Dark/Light Toggle */}
-          <button 
-            className="flex items-center justify-center shrink-0 size-[32px] rounded-full transition-colors"
-            style={{ backgroundColor: 'transparent' }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-            onClick={onThemeToggle}
-          >
-            {isDarkMode ? (
-              <Sun className="shrink-0 size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={1.875} />
-            ) : (
-              <Moon className="shrink-0 size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={1.875} />
-            )}
-          </button>
-
-          {/* Account Icon */}
-          <div className="flex items-center">
-            <div className="flex items-center justify-center overflow-clip shrink-0 size-[32px] rounded-full" style={{ backgroundColor: 'var(--bg-account-avatar)' }}>
-              <p style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-bold)', lineHeight: 'var(--line-height-normal)', fontSize: 'var(--font-size-13)', textAlign: 'center', color: 'var(--text-white)', letterSpacing: 'var(--letter-spacing-sm)', whiteSpace: 'nowrap' }}>
-                {userInitials}
-              </p>
-            </div>
+            <h1 
+              className={`truncate ${backButtonLabel && showBackButton ? 'text-[16px]' : 'text-[24px]'}`}
+              style={{ 
+                fontFamily: 'var(--font-family)', 
+                fontWeight: 'bold',
+                lineHeight: 'normal',
+                color: 'var(--primary)',
+                letterSpacing: 'var(--letter-spacing-md)'
+              }}
+            >
+              {backButtonLabel && showBackButton ? backButtonLabel : title}
+            </h1>
           </div>
-        </div>
+        )}
+
+        {/* Spacer when no title */}
+        {!title && <div className="flex-1" />}
+
+        {/* Mobile View Toggle - Only show if viewMode is provided */}
+        {viewMode && onViewModeChange && (
+          <button
+            onClick={() => onViewModeChange(viewMode === 'grid' ? 'list' : 'grid')}
+            className="flex items-center justify-center size-[40px] rounded-full transition-colors shrink-0"
+            style={{ backgroundColor: 'transparent' }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            {viewMode === 'grid' ? (
+              <List className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
+            ) : (
+              <Grid3x3 className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
+            )}
+          </button>
+        )}
+      </div>
+
+      {/* ================================================================ */}
+      {/* DESKTOP LAYOUT: TopBar for Desktop Devices                      */}
+      {/* Height: 72px                                                    */}
+      {/* Padding: 32px left, 32px right                                  */}
+      {/* Layout: Title (left) + Action Buttons (right)                   */}
+      {/* ================================================================ */}
+      <div className="hidden md:flex items-center justify-between pt-1 pl-[32px] pr-[32px] size-full">
+        {/* Title with optional back button - Desktop */}
+        {title && (
+          <div className="flex gap-[8px] items-center flex-1 min-w-0">
+            {showBackButton && (
+              <button
+                onClick={onBackClick}
+                className="size-[32px] flex items-center justify-center pr-[2px] rounded-full transition-colors shrink-0"
+                style={{ backgroundColor: 'transparent' }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                <ChevronLeft className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={3} />
+              </button>
+            )}
+            <h1 
+              className={`truncate ${backButtonLabel && showBackButton ? 'text-[24px]' : 'text-[28px]'}`}
+              style={{ 
+                fontFamily: 'var(--font-family)', 
+                fontWeight: 'bold',
+                lineHeight: 'normal',
+                color: 'var(--primary)',
+                letterSpacing: 'var(--letter-spacing-md)'
+              }}
+            >
+              {backButtonLabel && showBackButton ? backButtonLabel : title}
+            </h1>
+          </div>
+        )}
+
+        {/* Spacer when no title */}
+        {!title && <div className="flex-1" />}
+
+        {/* Desktop Action Buttons - Help, Notifications, Theme, User Menu */}
+        <ActionButtons 
+          userInitials={userInitials}
+          onThemeToggle={onThemeToggle}
+          isDarkMode={isDarkMode}
+          onMenuClick={toggleSidebar}
+        />
       </div>
     </div>
   );

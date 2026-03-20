@@ -5,6 +5,9 @@ import { FavoritesPage } from "./pages/FavoritesPage";
 import { SharedPage } from "./pages/SharedPage";
 import { AdminPage } from "./pages/AdminPage";
 import { WorkspacePage } from "./pages/WorkspacePage";
+import { WorkspacesPage } from "./pages/WorkspacesPage";
+import { AccountDetailPage } from "./pages/AccountDetailPage";
+import { TeamDetailPage } from "./pages/TeamDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -15,7 +18,11 @@ export const router = createBrowserRouter([
       { path: "recent", Component: RecentPage },
       { path: "favorites", Component: FavoritesPage },
       { path: "shared", Component: SharedPage },
+      { path: "workspaces", Component: WorkspacesPage },
       { path: "admin", Component: AdminPage },
+      { path: "admin/account/:accountId", Component: AccountDetailPage },
+      { path: "admin/team/:teamId", Component: TeamDetailPage },
+      { path: "admin/workspace/:workspaceId", Component: WorkspacePage },
       { path: "workspace/:workspaceId", Component: WorkspacePage },
     ],
   },
