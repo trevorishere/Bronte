@@ -21,8 +21,9 @@ export function Button({
     fontSize: 'var(--font-size-14)',
     fontWeight: 'var(--font-weight-medium)',
     lineHeight: 'var(--line-height-20)',
+    letterSpacing: 'var(--letter-spacing-md)',
     cursor: props.disabled ? 'not-allowed' : 'pointer',
-    transition: 'background-color 0.2s, color 0.2s',
+    transition: `background-color var(--transition-duration) var(--transition-timing), color var(--transition-duration) var(--transition-timing)`,
     border: 'none',
     ...style,
   };
@@ -30,20 +31,20 @@ export function Button({
   const variantStyles: Record<string, React.CSSProperties> = {
     text: {
       padding: '8px 16px',
-      borderRadius: '8px',
+      borderRadius: 'var(--radius-8)',
       border: '1px solid var(--border-interactive)',
       backgroundColor: isHovered && !props.disabled ? 'var(--muted)' : 'transparent',
       color: 'var(--foreground)',
     },
     primary: {
       padding: '8px 16px',
-      borderRadius: '8px',
+      borderRadius: 'var(--radius-8)',
       backgroundColor: isHovered && !props.disabled ? 'var(--accent-hover)' : 'var(--accent)',
       color: 'var(--primary)',
     },
     secondary: {
       padding: '8px 16px',
-      borderRadius: '8px',
+      borderRadius: 'var(--radius-8)',
       border: '1px solid var(--border-interactive)',
       backgroundColor: isHovered && !props.disabled ? 'var(--border-interactive-hover)' : 'var(--background)',
       color: 'var(--foreground)',

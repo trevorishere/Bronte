@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { TopBar } from '../components/TopBar';
 import { Toolbar } from '../components/Toolbar';
 import { DataTable, Column, RowData } from '../components/DataTable';
+import { GridView, GridItemData } from '../components/GridView';
 import { projects } from '../data/workspaces';
 import { useFavorites } from '../contexts/FavoritesContext';
 
@@ -14,12 +15,12 @@ interface OutletContext {
 
 const tableColumns: Column[] = [
   { key: 'name', label: 'Project Name', sortable: true, width: 'w-[400px]' },
-  { key: 'owner', label: 'Owner', sortable: true, width: 'w-[250px]' },
+  { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
   { key: 'lastModified', label: 'Last Modified', sortable: true, width: 'w-[200px]' },
 ];
 
 // Sort all projects by lastModified date (newest first) and take the top 24
-const tableData: RowData[] = [...projects]
+const allProjects: RowData[] = [...projects]
   .sort((a, b) => {
     const dateA = new Date(a.lastModified).getTime();
     const dateB = new Date(b.lastModified).getTime();
@@ -31,8 +32,11 @@ const tableData: RowData[] = [...projects]
     name: project.name,
     owner: project.owner,
     lastModified: project.lastModified,
-    iconType: 'book' as const,
+    workspace: project.workspace,
+    iconType: 'project' as const,
   }));
+
+const tableData: RowData[] = allProjects;
 
 export function RecentPage() {
   const { isDarkMode, onThemeToggle } = useOutletContext<OutletContext>();
@@ -88,7 +92,7 @@ export function RecentPage() {
     console.log('Row double-clicked (navigate to):', row);
   };
 
-  const handleStarClick = (row: RowData, isStarred: boolean) => {
+  const handleStarClick = (row: RowData | GridItemData, isStarred: boolean) => {
     if (isStarred) {
       addFavorite(row.id);
       toast.success(`${row.name} has been added to Favorites`);
@@ -109,6 +113,8 @@ export function RecentPage() {
         userInitials="LD"
         isDarkMode={isDarkMode}
         onThemeToggle={onThemeToggle}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
       <Toolbar
         viewMode={viewMode}
@@ -122,15 +128,25 @@ export function RecentPage() {
         dateFilters={dateFilters}
         onDateFilterChange={handleDateFilterChange}
       />
-      <DataTable
-        columns={tableColumns}
-        data={filteredData}
-        onRowClick={handleRowClick}
-        onRowDoubleClick={handleRowDoubleClick}
-        onStarClick={handleStarClick}
-        onMoreClick={handleMoreClick}
-        starredItems={favorites}
-      />
+      {viewMode === 'grid' ? (
+        <GridView
+          data={filteredData as GridItemData[]}
+          onItemClick={handleRowClick}
+          onItemDoubleClick={handleRowDoubleClick}
+          onStarClick={handleStarClick}
+          favorites={favorites}
+        />
+      ) : (
+        <DataTable
+          columns={tableColumns}
+          data={filteredData}
+          onRowClick={handleRowClick}
+          onRowDoubleClick={handleRowDoubleClick}
+          onStarClick={handleStarClick}
+          onMoreClick={handleMoreClick}
+          starredItems={favorites}
+        />
+      )}
     </div>
   );
 }

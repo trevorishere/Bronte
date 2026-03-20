@@ -1,26 +1,37 @@
 @custom-variant dark (&:is(.dark *));
 
+/* Mobile-specific utilities */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 :root {
   /* Base */
   --font-size: 16px;
   --background: #fcfcfc; /* Content area - neutral light gray, lighter than sidebar */
-  --foreground: #525A70; /* Default text color */
+  --foreground: #666D7C; /* Default text color */
   
   /** Card **/
   --card: #fcfcfc;
-  --card-foreground: #525A70;
+  --card-foreground: #666D7C;
   
   /* Popover */
   --popover: #fcfcfc;
-  --popover-foreground: #525A70;
+  --popover-foreground: #666D7C;
   
   /* Primary (hover/selected text) */
   --primary: #323232;
   --primary-foreground: #ffffff;
   
   /* Secondary */
-  --secondary: #f7f7f7; /* Workspace count background */
-  --secondary-foreground: #525A70;
+  --secondary: rgba(0, 0, 0, 0.05); /* Workspace count background */
+  --secondary-foreground: #727D9B;
   
   /* Muted (light backgrounds and icons) */
   --muted: #f5f5f5; /* Row hover background */
@@ -53,12 +64,12 @@
   
   /* Sidebar */
   --sidebar: #fbfaf9; /* Sidebar background */
-  --sidebar-foreground: #525A70;
+  --sidebar-foreground: #666D7C;
   --sidebar-primary: #323232;
   --sidebar-primary-foreground: #fbfaf9;
   --sidebar-accent: #ececec; /* Nav selected - neutral gray */
   --sidebar-accent-foreground: #323232;
-  --sidebar-border: #e5e5e5;
+  --sidebar-border: #d0d0d0;
   --sidebar-ring: #999999;
 
   /* Template-specific custom properties (truly unique values) */
@@ -67,11 +78,12 @@
   --border-interactive: #d0d0d0; /* Default border for all interactive elements */
   --border-interactive-hover: #b3b3b3; /* Hover border for dropdowns and toggles */
   --bg-icon-container: #d58c6f; /* Brand color for icons */
-  --bg-icon-hover: rgba(0, 0, 0, 0.06); /* Universal semi-transparent hover for icon buttons */
+  --bg-icon-hover: rgba(0, 0, 0, 0.06); /* Universal 6% black overlay for hover/selected states on icon buttons */
   --icon-nav-hover: #777B85; /* Nav icon hover - between default and selected */
+  --bg-grid-card: #fefefe; /* Grid card background - slightly lighter than main background */
 
   /* Font family - single variable for the typeface */
-  --font-family: 'Inter', sans-serif;
+  --font-family: 'Figtree', sans-serif;
 
   /* Font weights - semantic weight values */
   --font-weight-regular: 400;
@@ -81,7 +93,7 @@
   --font-weight-extrabold: 800;
 
   /* Font sizes */
-  --font-size-9: 9px;
+  --font-size-8: 8px;
   --font-size-10: 10px;
   --font-size-11: 11px;
   --font-size-13: 13px;
@@ -95,9 +107,9 @@
   --line-height-20: 20px;
 
   /* Letter spacing */
-  --letter-spacing-sm: 0.13px;
-  --letter-spacing-md: 0.2px;
-  --letter-spacing-lg: 0.5px;
+  --letter-spacing-sm: 0.16px;
+  --letter-spacing-md: 0.3px;
+  --letter-spacing-lg: 0.6px;
 
   /* Border radius */
   --radius-4: 4px;
@@ -105,6 +117,7 @@
   --radius-8: 8px;
   --radius-12: 12px;
   --radius-16: 16px;
+  --radius-24: 24px;
   --radius-round: 50%;
 
   /* Transition */
@@ -119,19 +132,21 @@
   --bg-account-avatar: #934790;
   --bg-beta-badge: #36609e; /* Beta badge background color */
   --text-white: white;
+  --icon-team-bg: #7FA073; /* Team icon background */
+  --icon-workspace-bg: #6BA0D2; /* Workspace icon background */
 }
 
 .dark {
-  --background: #1a1a1a;
+  --background: #1c1c1c;
   --foreground: #e5e5e5;
-  --card: #1a1a1a;
+  --card: #1d1d1d;
   --card-foreground: #e5e5e5;
   --popover: #1a1a1a;
   --popover-foreground: #e5e5e5;
   --primary: #e5e5e5;
   --primary-foreground: #1a1a1a;
-  --secondary: #2a2a2a;
-  --secondary-foreground: #e5e5e5;
+  --secondary: rgba(255, 255, 255, 0.05);
+  --secondary-foreground: #a3a3a3;
   --muted: #2a2a2a;
   --muted-foreground: #999999;
   --accent: #2a2a2a;
@@ -143,14 +158,33 @@
   --input-background: #2a2a2a;
   --switch-background: #4a4a4a;
   --ring: #666666;
-  --sidebar: #1a1a1a;
-  --sidebar-foreground: #e5e5e5;
+  --sidebar: #1a1a1a; /* 5% darker than main background */
+  --sidebar-foreground: #b8b8b8; /* More contrast for default nav text */
   --sidebar-primary: #e5e5e5;
   --sidebar-primary-foreground: #1a1a1a;
   --sidebar-accent: #2a2a2a;
   --sidebar-accent-foreground: #e5e5e5;
   --sidebar-border: #333333;
   --sidebar-ring: #666666;
+  
+  /* Dark mode specific custom properties */
+  --bg-nav-hover: rgba(42, 42, 42, 0.5);
+  --bg-row-selected: #2a2a2a;
+  --border-interactive: #4a4a4a;
+  --border-interactive-hover: #666666;
+  --bg-icon-container: #d58c6f;
+  --bg-icon-hover: rgba(255, 255, 255, 0.06);
+  --icon-nav-hover: #b3b3b3;
+  --icon: #a3a3a3;
+  --icon-toggle-active: #e5e5e5;
+  --icon-toggle-inactive: #4a4a4a;
+  --icon-toggle-hover: #999999;
+  --bg-account-avatar: #934790;
+  --bg-beta-badge: #36609e;
+  --text-white: white;
+  --bg-grid-card: #1f1f1f;
+  --icon-team-bg: #7FA073;
+  --icon-workspace-bg: #6BA0D2; /* Grid card background - about 5% lighter than main background #1a1a1a */
 }
 
 @theme inline {
