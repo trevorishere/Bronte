@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { useParams, useOutletContext, useNavigate, useLocation } from 'react-router';
 import { toast } from 'sonner';
-import { Plus, UserRoundPlus } from 'lucide-react';
 import { TopBar } from '../components/TopBar';
-import { WorkspaceIcon } from '../components/WorkspaceIcon';
 import { Toolbar } from '../components/Toolbar';
 import { DataTable, Column, RowData } from '../components/DataTable';
 import { GridView, GridItemData } from '../components/GridView';
 import { DetailPageHeader } from '../components/DetailPageHeader';
+import { WorkspaceIcon } from '../components/WorkspaceIcon';
 import { projects, workspaces } from '../data/workspaces';
 import { accounts } from '../data/accounts';
 import { useFavorites } from '../contexts/FavoritesContext';
@@ -35,6 +34,9 @@ export function WorkspacePage() {
 
   // Check if we're in Admin context (from /admin/workspace/:id route)
   const isAdminRoute = location.pathname.startsWith('/admin');
+
+  // Check if we arrived from an account detail page
+  const fromState = location.state as { fromAccount?: string; fromAccountId?: string } | null;
 
   // Find the workspace
   const workspace = workspaces.find(w => w.id === workspaceId);
@@ -115,40 +117,22 @@ export function WorkspacePage() {
     console.log('More clicked:', row);
   };
 
-  const mobileTopBarActions = !isAdminRoute ? (
-    <>
-      <button
-        className="size-[40px] flex items-center justify-center rounded-full transition-colors"
-        style={{ backgroundColor: 'transparent' }}
-        onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
-        onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-      >
-        <Plus className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
-      </button>
-      <button
-        className="size-[40px] flex items-center justify-center rounded-full transition-colors"
-        style={{ backgroundColor: 'transparent' }}
-        onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
-        onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-      >
-        <UserRoundPlus className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
-      </button>
-    </>
-  ) : undefined;
-
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ backgroundColor: 'var(--background)' }}>
       {/* Top bar */}
       {isAdminRoute ? (
         <TopBar
-          title="Admin"
+          title={workspace?.name || 'Workspace'}
           userInitials="LD"
           onThemeToggle={onThemeToggle}
           isDarkMode={isDarkMode}
           showBackButton={true}
-          onBackClick={() => navigate('/admin')}
-          backButtonLabel={workspace?.name || 'Workspace'}
-          pageIcon={workspace ? <WorkspaceIcon size="small" name={workspace.name} /> : undefined}
+          onBackClick={() =>
+            fromState?.fromAccountId
+              ? navigate(`/admin/account/${fromState.fromAccountId}`)
+              : navigate('/admin')
+          }
+          backButtonLabel={fromState?.fromAccount ?? 'Admin'}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
         />
@@ -158,23 +142,21 @@ export function WorkspacePage() {
           userInitials="LD"
           onThemeToggle={onThemeToggle}
           isDarkMode={isDarkMode}
-          showBackButton={true}
-          backButtonLabel={workspace?.name || 'Workspace'}
-          pageIcon={workspace ? <WorkspaceIcon size="small" name={workspace.name} /> : undefined}
-          onBackClick={() => navigate('/workspaces')}
-          mobileActions={mobileTopBarActions}
+          showBackButton={false}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
         />
       )}
 
-      {/* Detail header with large title + metadata (shows on both mobile and desktop for non-admin) */}
-      {!isAdminRoute && workspace && (
+      {/* Workspace header */}
+      {workspace && (
         <DetailPageHeader
           title={workspace.name}
+          icon={(size) => <WorkspaceIcon name={workspace.name} size={size} />}
           metadata={[
-            { icon: 'users', label: `${memberCount} ${memberCount === 1 ? 'Member' : 'Members'}` },
-            { icon: 'book', label: `${workspaceProjects.length} ${workspaceProjects.length === 1 ? 'Project' : 'Projects'}` },
+            { icon: 'folder', label: `${workspaceProjects.length} project${workspaceProjects.length !== 1 ? 's' : ''}` },
+            { icon: 'users', label: `${memberCount} member${memberCount !== 1 ? 's' : ''}` },
+            { icon: 'calendar', label: `Created ${workspace.created}` },
           ]}
         />
       )}
@@ -198,6 +180,7 @@ export function WorkspacePage() {
           onItemDoubleClick={handleRowDoubleClick}
           onStarClick={handleStarClick}
           favorites={favorites}
+          onViewModeChange={setViewMode}
         />
       ) : (
         <DataTable
@@ -208,6 +191,8 @@ export function WorkspacePage() {
           onStarClick={handleStarClick}
           onMoreClick={handleMoreClick}
           starredItems={favorites}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
         />
       )}
     </div>

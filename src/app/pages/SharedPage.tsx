@@ -143,6 +143,7 @@ export function SharedPage() {
             onItemDoubleClick={handleRowDoubleClick}
             onStarClick={handleStarClick}
             favorites={favorites}
+          onViewModeChange={setViewMode}
           />
         ) : (
           <DataTable
@@ -153,6 +154,8 @@ export function SharedPage() {
             onStarClick={handleStarClick}
             onMoreClick={handleMoreClick}
             starredItems={favorites}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
           />
         )
       )}

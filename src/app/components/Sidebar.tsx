@@ -1,4 +1,4 @@
-import { Star, Clock, UserRoundPlus, ShieldUser, FolderOpen, X, Search } from 'lucide-react';
+import { Star, Clock, UserRoundPlus, ShieldUser, FolderOpen, X } from 'lucide-react';
 import { getWorkspaceInitials } from './WorkspaceIcon';
 import { useState, useEffect } from 'react';
 
@@ -106,19 +106,6 @@ export function Sidebar({
             >
               <X className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
             </button>
-          </div>
-        </div>
-
-        {/* Search Bar */}
-        <div className="shrink-0 px-[12px] pb-[8px]">
-          <div
-            className="flex items-center gap-[8px] h-[36px] rounded-xl px-[10px]"
-            style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }}
-          >
-            <Search className="size-[14px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
-            <span style={{ fontFamily: 'var(--font-family)', fontSize: '13px', color: 'var(--muted-foreground)', letterSpacing: 'var(--letter-spacing-md)' }}>
-              Search…
-            </span>
           </div>
         </div>
 

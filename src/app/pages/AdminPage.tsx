@@ -38,16 +38,16 @@ const accountColumns: Column[] = [
 
 const teamColumns: Column[] = [
   { key: 'name', label: 'Team Name', sortable: true, width: 'w-[400px]' },
-  { key: 'membersCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' },
   { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
   { key: 'created', label: 'Created On', sortable: true, width: 'w-[200px]' },
+  { key: 'membersCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' },
 ];
 
 const workspaceColumns: Column[] = [
   { key: 'name', label: 'Workspace Name', sortable: true, width: 'w-[400px]' },
-  { key: 'projectsCount', label: 'Projects', sortable: true, width: 'w-[120px]', align: 'right' },
   { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
   { key: 'created', label: 'Created On', sortable: true, width: 'w-[200px]' },
+  { key: 'projectsCount', label: 'Projects', sortable: true, width: 'w-[120px]', align: 'right' },
 ];
 
 export function AdminPage() {
@@ -268,6 +268,7 @@ export function AdminPage() {
           onItemDoubleClick={handleRowDoubleClick}
           onStarClick={handleStarClick}
           favorites={favorites}
+          onViewModeChange={setViewMode}
         />
       ) : (
         <DataTable
@@ -278,6 +279,8 @@ export function AdminPage() {
           onStarClick={handleStarClick}
           onMoreClick={handleMoreClick}
           starredItems={favorites}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
         />
       )}
     </div>

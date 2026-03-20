@@ -1,5 +1,4 @@
-import { useParams, useNavigate, useOutletContext } from 'react-router';
-import { ChevronLeft, HelpCircle, Bell, Moon, Sun } from 'lucide-react';
+import { useParams, useNavigate, useOutletContext, useLocation } from 'react-router';
 import { teams } from '../data/teams';
 import { projects } from '../data/workspaces';
 import { accounts } from '../data/accounts';
@@ -12,8 +11,6 @@ import { DetailPageHeader } from '../components/DetailPageHeader';
 import { TabNav, Tab } from '../components/TabNav';
 import { TopBar } from '../components/TopBar';
 import { useState } from 'react';
-import { useMobileNav } from '../hooks/useMobileNav';
-import svgPaths from '../../imports/svg-2hg6thd8pt';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -24,12 +21,13 @@ export function TeamDetailPage() {
   const { teamId } = useParams<{ teamId: string }>();
   const navigate = useNavigate();
   const { isDarkMode, onThemeToggle } = useOutletContext<OutletContext>();
-  const { toggleSidebar } = useMobileNav();
   const [activeTab, setActiveTab] = useState('Members');
-  const [hoveredTab, setHoveredTab] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
+
+  const location = useLocation();
+  const fromState = location.state as { fromAccount?: string; fromAccountId?: string } | null;
 
   const team = teams.find(t => t.id === teamId);
 
@@ -71,6 +69,7 @@ export function TeamDetailPage() {
             lastModified: project.lastModified,
             workspace: project.workspace,
             iconType: 'project' as const,
+            accountCount: accounts.filter(a => a.projectIds.includes(project.id)).length,
           }))
         };
       case 'Members':
@@ -86,9 +85,10 @@ export function TeamDetailPage() {
             name: account.name,
             owner: account.name,
             role: account.role,
+            accessLevel: account.accessLevel,
             email: account.email,
             created: account.created,
-            projectCount: account.projects,
+            projectCount: account.projectIds.length,
             iconType: 'account' as const,
           }))
         };
@@ -199,19 +199,25 @@ export function TeamDetailPage() {
     <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       {/* Top bar */}
       <TopBar
-        title="Admin"
+        title={team.name}
         userInitials="LD"
         onThemeToggle={onThemeToggle}
         isDarkMode={isDarkMode}
         showBackButton={true}
-        onBackClick={() => navigate('/admin')}
-        backButtonLabel={team.name}
-        pageIcon={<TeamIcon size="small" />}
+        onBackClick={() =>
+          fromState?.fromAccountId
+            ? navigate(`/admin/account/${fromState.fromAccountId}`)
+            : navigate('/admin')
+        }
+        backButtonLabel={fromState?.fromAccount ?? 'Admin'}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
 
       {/* Team header */}
       <DetailPageHeader
         title={team.name}
+        icon={(size) => <TeamIcon size={size} />}
         metadata={[
           { icon: 'users', label: `${team.membersCount} member${team.membersCount !== 1 ? 's' : ''}` },
           { icon: 'calendar', label: `Created ${team.created}` }
@@ -257,11 +263,14 @@ export function TeamDetailPage() {
             onItemClick={(item) => console.log('Item clicked:', item)}
             onItemDoubleClick={(item) => console.log('Item double-clicked:', item)}
             favorites={new Set()}
+            onViewModeChange={setViewMode}
           />
         ) : (
           <DataTable
             columns={columns}
             data={filteredData}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
           />
         )
       )}

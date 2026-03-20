@@ -88,15 +88,15 @@ export function MobileSortHeader({
         {viewMode && onViewModeChange && (
           <button
             onClick={() => onViewModeChange(viewMode === 'grid' ? 'list' : 'grid')}
-            className="flex items-center justify-center size-[32px] rounded-full transition-colors"
+            className="flex items-center justify-center size-[40px] rounded-full transition-colors"
             style={{ backgroundColor: 'transparent' }}
             onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
             onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             {viewMode === 'grid' ? (
-              <List className="size-[18px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
+              <List className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
             ) : (
-              <Grid3x3 className="size-[18px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
+              <Grid3x3 className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
             )}
           </button>
         )}

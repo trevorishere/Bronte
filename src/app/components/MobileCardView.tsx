@@ -12,6 +12,7 @@ import { accounts } from '../data/accounts';
 interface MobileCardViewProps {
   data: RowData[];
   onRowClick?: (row: RowData) => void;
+  onRowDoubleClick?: (row: RowData) => void;
   onStarClick?: (row: RowData, isStarred: boolean) => void;
   onMoreClick?: (row: RowData) => void;
   starredItems?: Set<string>;
@@ -25,6 +26,7 @@ interface MobileCardViewProps {
 export function MobileCardView({
   data,
   onRowClick,
+  onRowDoubleClick,
   onStarClick,
   starredItems,
   viewMode = 'list',
@@ -58,7 +60,7 @@ export function MobileCardView({
           return (
             <div
               key={row.id}
-              onClick={() => onRowClick?.(row)}
+              onClick={() => (onRowDoubleClick ?? onRowClick)?.(row)}
               className="relative flex flex-col items-center gap-2 p-3 rounded-xl cursor-pointer"
               style={{
                 backgroundColor: 'var(--background)',
@@ -144,7 +146,7 @@ export function MobileCardView({
           return (
             <div
               key={row.id}
-              onClick={() => onRowClick?.(row)}
+              onClick={() => (onRowDoubleClick ?? onRowClick)?.(row)}
               className="flex items-center gap-3 h-[64px] cursor-pointer px-4"
             >
               {/* Icon */}

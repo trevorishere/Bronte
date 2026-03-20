@@ -1,4 +1,4 @@
-import { Star, MoreHorizontal } from 'lucide-react';
+import { Star, MoreHorizontal, List } from 'lucide-react';
 import { useState } from 'react';
 import { WorkspaceIcon } from './WorkspaceIcon';
 import { TeamIcon } from './TeamIcon';
@@ -34,6 +34,7 @@ interface GridViewProps {
   onItemDoubleClick?: (item: GridItemData) => void;
   onStarClick?: (item: GridItemData, isStarred: boolean) => void;
   favorites?: Set<string>;
+  onViewModeChange?: (mode: 'grid' | 'list') => void;
 }
 
 export function GridView({
@@ -42,6 +43,7 @@ export function GridView({
   onItemDoubleClick,
   onStarClick,
   favorites = new Set(),
+  onViewModeChange,
 }: GridViewProps) {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [hoveredFavorite, setHoveredFavorite] = useState<string | null>(null);
@@ -149,8 +151,25 @@ export function GridView({
   };
 
   return (
-    <div className="w-full h-full overflow-y-auto px-4 md:px-[40px] pb-[80px] md:pb-4" style={{ backgroundColor: 'var(--background)' }}>
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 pt-8">
+    <div className="w-full h-full flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--background)' }}>
+
+      {/* Mobile header row — matches MobileSortHeader height/position, toggle on right */}
+      {onViewModeChange && (
+        <div className="md:hidden shrink-0 px-4 h-[40px] flex items-center justify-end">
+          <button
+            onClick={() => onViewModeChange('list')}
+            className="flex items-center justify-center size-[40px] rounded-full transition-colors"
+            style={{ backgroundColor: 'transparent' }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            <List className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
+          </button>
+        </div>
+      )}
+
+      <div className="flex-1 overflow-y-auto px-4 md:px-[40px] pb-[80px] md:pb-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 pt-4 md:pt-8">
         {data.map((item) => {
           const isStarred = favorites.has(item.id);
           const isHovered = hoveredCard === item.id;
@@ -267,6 +286,7 @@ export function GridView({
             </div>
           );
         })}
+      </div>
       </div>
     </div>
   );

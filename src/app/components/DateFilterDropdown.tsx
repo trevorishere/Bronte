@@ -162,7 +162,7 @@ export function DateFilterDropdown({
                 <g>
                   <path
                     d="M4 6L8 10L12 6"
-                    stroke={isHovered || isOpen ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}
+                    stroke={isHovered || isOpen ? 'var(--foreground)' : 'var(--muted-foreground)'}
                     strokeLinecap="square"
                     strokeLinejoin="round"
                     strokeWidth="1.5"
