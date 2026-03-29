@@ -74,12 +74,12 @@ const PERM_ROWS: { id: keyof PermissionsState; label: string }[] = [
 ];
 
 const AUTHORING_ROWS: { id: keyof AuthoringState; label: string }[] = [
-  { id: 'view', label: 'Authoring - View' },
-  { id: 'comment', label: 'Authoring - Comment' },
-  { id: 'import', label: 'Authoring - Import' },
-  { id: 'export', label: 'Authoring - Export' },
-  { id: 'sync', label: 'Authoring - Sync' },
-  { id: 'contentMgmt', label: 'Authoring - Content Mgmt' },
+  { id: 'view', label: 'View' },
+  { id: 'comment', label: 'Comment' },
+  { id: 'import', label: 'Import' },
+  { id: 'export', label: 'Export' },
+  { id: 'sync', label: 'Sync' },
+  { id: 'contentMgmt', label: 'Content Mgmt' },
 ];
 
 const capsStyle: React.CSSProperties = {
@@ -89,6 +89,7 @@ const capsStyle: React.CSSProperties = {
   color: 'var(--muted-foreground)',
   letterSpacing: '0.07em',
   textTransform: 'uppercase',
+  whiteSpace: 'nowrap',
 };
 
 // ─── Props ───────────────────────────────────────────────────────────────────
