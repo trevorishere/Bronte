@@ -258,8 +258,12 @@ export function TeamDetailPage() {
         viewMode === 'grid' ? (
           <GridView
             data={filteredData as GridItemData[]}
-            onItemClick={(item) => console.log('Item clicked:', item)}
-            onItemDoubleClick={(item) => console.log('Item double-clicked:', item)}
+            onItemClick={(item) => {
+              if (activeTab === 'Members') navigate(`/admin/account/${item.id}`);
+            }}
+            onItemDoubleClick={(item) => {
+              if (activeTab === 'Members') navigate(`/admin/account/${item.id}`);
+            }}
             favorites={new Set()}
             onViewModeChange={setViewMode}
           />
@@ -267,6 +271,12 @@ export function TeamDetailPage() {
           <DataTable
             columns={columns}
             data={filteredData}
+            onRowClick={(row) => {
+              if (activeTab === 'Members') navigate(`/admin/account/${row.id}`);
+            }}
+            onRowDoubleClick={(row) => {
+              if (activeTab === 'Members') navigate(`/admin/account/${row.id}`);
+            }}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
           />

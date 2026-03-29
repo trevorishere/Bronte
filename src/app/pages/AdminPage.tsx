@@ -196,22 +196,19 @@ export function AdminPage() {
   };
 
   const handleRowClick = (row: RowData) => {
-    console.log('Row clicked (selected):', row);
-  };
-
-  const handleRowDoubleClick = (row: RowData) => {
-    // Map tab IDs to navigation paths
     const pathMap: Record<string, string> = {
-      'projects': '', // Projects don't have detail pages
       'accounts': 'account',
       'teams': 'team',
       'workspaces': 'workspace',
     };
-
     const path = pathMap[activeTab];
     if (path) {
       navigate(`/admin/${path}/${row.id}`);
     }
+  };
+
+  const handleRowDoubleClick = (row: RowData) => {
+    handleRowClick(row);
   };
 
   const handleStarClick = (row: RowData | GridItemData, isStarred: boolean) => {
