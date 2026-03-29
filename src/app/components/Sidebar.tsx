@@ -179,9 +179,9 @@ export function Sidebar({
                     onMouseEnter={() => setHoveredItem(workspace.id)}
                     onMouseLeave={() => setHoveredItem(null)}
                     className="h-[40px] w-full rounded-xl transition-all duration-150 ease-in-out"
-                    style={{ backgroundColor: navBg(workspace.id), maxWidth: !isDesktopOpen ? '46px' : undefined, overflow: 'hidden', transition: 'background-color 150ms ease-in-out, max-width 0.2s ease' }}
+                    style={{ backgroundColor: navBg(workspace.id), maxWidth: !isDesktopOpen ? '48px' : undefined, overflow: 'hidden', transition: 'background-color 150ms ease-in-out, max-width 0.2s ease' }}
                   >
-                    <div className="flex gap-[12px] items-center pl-[10px] pr-[12px] py-[12px] size-full">
+                    <div className="flex gap-[12px] items-center p-[12px] size-full">
                       <div className="shrink-0 size-[24px]">
                         <div className="relative size-full">
                           <svg className="size-full" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

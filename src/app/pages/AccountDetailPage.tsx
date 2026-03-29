@@ -245,7 +245,6 @@ export function AccountDetailPage() {
             icon={(size) => <Avatar size={size} name={account.name} role={account.role} />}
             metadata={[
               { icon: 'email', label: account.email },
-              { icon: 'users', label: `${accountTeams.length} team${accountTeams.length !== 1 ? 's' : ''}` },
               { icon: 'calendar', label: `Joined ${account.created}` }
             ]}
             onSettingsClick={() => setIsTrayOpen(prev => !prev)}

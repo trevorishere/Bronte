@@ -1,7 +1,7 @@
 import { X, Feather, Code2, ShieldUser, Check } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Button } from './ui/button';
+import { Button } from './Button';
 
 // Role → avatar bg color (mirrors Avatar.tsx roleColors)
 const ROLE_AVATAR_BG: Record<string, string> = {
@@ -84,7 +84,7 @@ const AUTHORING_ROWS: { id: keyof AuthoringState; label: string }[] = [
 
 const capsStyle: React.CSSProperties = {
   fontFamily: 'var(--font-family)',
-  fontSize: '10px',
+  fontSize: '11px',
   fontWeight: 'var(--font-weight-semibold)',
   color: 'var(--muted-foreground)',
   letterSpacing: '0.07em',
@@ -224,7 +224,7 @@ export function RolesPermissionsTray({
 
               {/* Role section */}
               <div className="px-6 pt-5 pb-4">
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: '13px', fontWeight: 'var(--font-weight-semibold)', color: 'var(--foreground)', letterSpacing: 'var(--letter-spacing-md)', marginBottom: '12px' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: '14px', fontWeight: 'var(--font-weight-semibold)', color: 'var(--foreground)', letterSpacing: 'var(--letter-spacing-md)', marginBottom: '12px' }}>
                   Role
                 </p>
                 <div className="flex gap-[8px]">
@@ -276,7 +276,7 @@ export function RolesPermissionsTray({
 
               {/* Permissions section */}
               <div className="px-6 pt-5 pb-6">
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: '13px', fontWeight: 'var(--font-weight-semibold)', color: 'var(--foreground)', letterSpacing: 'var(--letter-spacing-md)', marginBottom: '12px' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: '14px', fontWeight: 'var(--font-weight-semibold)', color: 'var(--foreground)', letterSpacing: 'var(--letter-spacing-md)', marginBottom: '12px' }}>
                   Permissions
                 </p>
 
@@ -389,7 +389,7 @@ export function RolesPermissionsTray({
                   {PERM_ROWS.map((row, i) => (
                     <div
                       key={row.id}
-                      className="flex items-center py-[10px]"
+                      className="flex items-center py-[14px]"
                       style={{ borderBottom: i < PERM_ROWS.length - 1 ? '1px solid var(--border)' : 'none' }}
                     >
                       <span className="shrink-0" style={{ ...capsStyle, width: '108px' }}>
@@ -412,7 +412,7 @@ export function RolesPermissionsTray({
                   {AUTHORING_ROWS.map((row, i) => (
                     <div
                       key={row.id}
-                      className="flex items-center py-[10px]"
+                      className="flex items-center py-[14px]"
                       style={{ borderBottom: i < AUTHORING_ROWS.length - 1 ? '1px solid var(--border)' : 'none' }}
                     >
                       <span className="shrink-0" style={{ ...capsStyle, width: '108px' }}>{row.label}</span>
@@ -431,8 +431,8 @@ export function RolesPermissionsTray({
               className="shrink-0 flex items-center justify-between px-6 pt-4 pb-6"
               style={{ borderTop: '1px solid var(--border)' }}
             >
-              <Button variant="outline" size="sm" className="pl-0 border-0 shadow-none">Save as Preset</Button>
-              <Button variant="outline" size="sm" className="bg-muted hover:bg-accent" onClick={onClose}>Finish</Button>
+              <Button variant="text">Save as Preset</Button>
+              <Button variant="text" onClick={onClose}>Finish</Button>
             </div>
 
           </div>
