@@ -73,7 +73,7 @@ export function GridView({
 
   const renderPictogram = (item: GridItemData) => {
     return (
-      <div className="w-full h-[128px] rounded-[12px] flex items-center justify-center" style={{ backgroundColor: 'var(--muted)' }}>
+      <div className="w-full h-[128px] flex items-center justify-center">
         {item.iconType === 'workspace' && item.name && (
           <WorkspaceIcon name={item.name} size="x-large" />
         )}
@@ -103,24 +103,21 @@ export function GridView({
   };
 
   const renderMetadata = (item: GridItemData) => {
-    // Projects: "X Accounts • Owner Name"
+    // Projects: "Owner Name"
     if (item.iconType === 'project') {
-      const accCount = item.accountCount ?? 0;
-      const accStr = `${accCount} Account${accCount !== 1 ? 's' : ''}`;
       return (
         <span style={metaTextStyle}>
-          {accStr}{item.owner ? ` • ${item.owner}` : ''}
+          {item.owner}
         </span>
       );
     }
 
-    // Teams: "X Accounts • Y Projects"
+    // Teams: "Y Projects"
     if (item.iconType === 'team') {
-      const members = item.members ?? 0;
       const projCount = item.teamProjectCount ?? 0;
       return (
         <span style={metaTextStyle}>
-          {members} Account{members !== 1 ? 's' : ''} • {projCount} Project{projCount !== 1 ? 's' : ''}
+          {projCount} Project{projCount !== 1 ? 's' : ''}
         </span>
       );
     }
@@ -179,7 +176,7 @@ export function GridView({
               key={item.id}
               className="flex flex-col gap-[8px] rounded-[16px] cursor-pointer transition-shadow"
               style={{
-                backgroundColor: 'var(--bg-grid-card)',
+                backgroundColor: 'color-mix(in srgb, var(--background) 96%, white)',
                 border: '1px solid var(--sidebar-border)',
                 padding: '16px',
                 paddingBottom: '20px',
