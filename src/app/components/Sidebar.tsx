@@ -233,7 +233,7 @@ export function Sidebar({
               onClick={() => handleItemClick('account')}
               onMouseEnter={() => setHoveredItem('account')}
               onMouseLeave={() => setHoveredItem(null)}
-              className="h-[52px] w-full rounded-xl transition-all duration-150 ease-in-out mt-4"
+              className="h-[52px] w-full rounded-xl transition-all duration-150 ease-in-out mt-2 mb-2"
               style={{ backgroundColor: navBg('account'), maxWidth: !isDesktopOpen ? '52px' : undefined, overflow: 'hidden', transition: 'background-color 150ms ease-in-out, max-width 0.2s ease' }}
             >
               <div className="flex gap-[10px] items-center px-[10px] py-[8px] size-full">
