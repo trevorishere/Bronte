@@ -200,14 +200,11 @@ export function AdminPage() {
   };
 
   const handleRowDoubleClick = (row: RowData) => {
-    // Map tab IDs to navigation paths
     const pathMap: Record<string, string> = {
-      'projects': '', // Projects don't have detail pages
       'accounts': 'account',
       'teams': 'team',
       'workspaces': 'workspace',
     };
-
     const path = pathMap[activeTab];
     if (path) {
       navigate(`/admin/${path}/${row.id}`);

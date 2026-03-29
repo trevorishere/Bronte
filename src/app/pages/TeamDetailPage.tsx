@@ -199,7 +199,6 @@ export function TeamDetailPage() {
     <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       {/* Top bar */}
       <TopBar
-        title={team.name}
         userInitials="LD"
         onThemeToggle={onThemeToggle}
         isDarkMode={isDarkMode}
@@ -209,7 +208,6 @@ export function TeamDetailPage() {
             ? navigate(`/admin/account/${fromState.fromAccountId}`)
             : navigate('/admin')
         }
-        backButtonLabel={fromState?.fromAccount ?? 'Admin'}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
       />
@@ -261,7 +259,9 @@ export function TeamDetailPage() {
           <GridView
             data={filteredData as GridItemData[]}
             onItemClick={(item) => console.log('Item clicked:', item)}
-            onItemDoubleClick={(item) => console.log('Item double-clicked:', item)}
+            onItemDoubleClick={(item) => {
+              if (activeTab === 'Members') navigate(`/admin/account/${item.id}`);
+            }}
             favorites={new Set()}
             onViewModeChange={setViewMode}
           />
@@ -269,6 +269,10 @@ export function TeamDetailPage() {
           <DataTable
             columns={columns}
             data={filteredData}
+            onRowClick={(row) => console.log('Row clicked:', row)}
+            onRowDoubleClick={(row) => {
+              if (activeTab === 'Members') navigate(`/admin/account/${row.id}`);
+            }}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
           />
