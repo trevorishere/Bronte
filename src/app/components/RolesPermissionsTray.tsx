@@ -189,7 +189,7 @@ export function RolesPermissionsTray({
             {/* ── Header ── */}
             <div
               className="shrink-0 flex items-center justify-between px-6 py-4"
-              style={{ borderBottom: '1px solid var(--border)' }}
+              style={{}}
             >
               <div className="flex items-center gap-[10px] min-w-0">
                 {accountName && (
@@ -272,8 +272,6 @@ export function RolesPermissionsTray({
                 </div>
               </div>
 
-              {/* Divider */}
-              <div style={{ height: '1px', backgroundColor: 'var(--border)', margin: '0 24px' }} />
 
               {/* Permissions section */}
               <div className="px-6 pt-5 pb-6">
@@ -430,7 +428,7 @@ export function RolesPermissionsTray({
             {/* ── Footer ── */}
             <div
               className="shrink-0 flex items-center justify-between px-6 pt-4 pb-6"
-              style={{ borderTop: '1px solid var(--border)' }}
+              style={{}}
             >
               <Button variant="text">Save as Preset</Button>
               <Button variant="text" onClick={onClose}>Finish</Button>
