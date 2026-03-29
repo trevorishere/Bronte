@@ -122,7 +122,6 @@ export function WorkspacePage() {
       {/* Top bar */}
       {isAdminRoute ? (
         <TopBar
-          title={workspace?.name || 'Workspace'}
           userInitials="LD"
           onThemeToggle={onThemeToggle}
           isDarkMode={isDarkMode}
@@ -132,13 +131,11 @@ export function WorkspacePage() {
               ? navigate(`/admin/account/${fromState.fromAccountId}`)
               : navigate('/admin')
           }
-          backButtonLabel={fromState?.fromAccount ?? 'Admin'}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
         />
       ) : (
         <TopBar
-          title={workspace?.name || 'Workspace'}
           userInitials="LD"
           onThemeToggle={onThemeToggle}
           isDarkMode={isDarkMode}

@@ -10,6 +10,7 @@ import { GridView, GridItemData } from '../components/GridView';
 import { Toolbar } from '../components/Toolbar';
 import { EmptyState } from '../components/EmptyState';
 import { DetailPageHeader } from '../components/DetailPageHeader';
+import { RolesPermissionsTray } from '../components/RolesPermissionsTray';
 import { TabNav, Tab } from '../components/TabNav';
 import { TopBar } from '../components/TopBar';
 import { useState } from 'react';
@@ -27,6 +28,7 @@ export function AccountDetailPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
+  const [isTrayOpen, setIsTrayOpen] = useState(false);
 
   const account = accounts.find(acc => acc.id === accountId);
 
@@ -53,7 +55,6 @@ export function AccountDetailPage() {
     { id: 'Projects', label: 'Projects' },
     { id: 'Teams', label: 'Teams' },
     { id: 'Workspaces', label: 'Workspaces' },
-    { id: 'Permissions', label: 'Permissions' }
   ];
 
   const getTabData = () => {
@@ -115,11 +116,6 @@ export function AccountDetailPage() {
             workspaceMemberCount: accounts.filter(a => a.workspaceIds.includes(workspace.id)).length,
           }))
         };
-      case 'Permissions':
-        return {
-          columns: [] as Column[],
-          data: [] as RowData[]
-        };
       default:
         return { columns: [], data: [] };
     }
@@ -129,8 +125,8 @@ export function AccountDetailPage() {
 
   // Get unique values for filters based on current tab
   const getFilters = () => {
-    if (activeTab === 'Permissions') return [];
-    
+    if (activeTab === 'Permissions') return []; // unreachable but safe
+
     switch (activeTab) {
       case 'Projects':
         return [
@@ -227,91 +223,98 @@ export function AccountDetailPage() {
 
   return (
     <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-      {/* Top bar */}
+      {/* Top bar — full width, unaffected by tray */}
       <TopBar
-        title="Admin"
         userInitials="LD"
         onThemeToggle={onThemeToggle}
         isDarkMode={isDarkMode}
         showBackButton={true}
         onBackClick={() => navigate('/admin')}
-        backButtonLabel="Admin"
         viewMode={viewMode}
         onViewModeChange={setViewMode}
       />
 
-      {/* Account header - Figma layout */}
-      <DetailPageHeader
-        title={account.name}
-        badge={<RoleBadge role={account.role} />}
-        icon={(size) => <Avatar size={size} name={account.name} role={account.role} />}
-        metadata={[
-          { icon: 'email', label: account.email },
-          { icon: 'users', label: `${accountTeams.length} team${accountTeams.length !== 1 ? 's' : ''}` },
-          { icon: 'calendar', label: `Joined ${account.created}` }
-        ]}
-      />
-
-      {/* Tabs */}
-      <TabNav
-        tabs={tabs}
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        variant="detail"
-      />
-
-      {/* Toolbar - Always visible for tabs that display tables */}
-      {activeTab !== 'Permissions' && (
-        <Toolbar
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-          filters={getFilters()}
-          selectedFilters={selectedFilters}
-          onFilterChange={handleFilterChange}
-          dateFilters={dateFilters}
-          onDateFilterChange={handleDateFilterChange}
-        />
-      )}
-
-      {/* Content area */}
-      {activeTab === 'Permissions' ? (
-        <EmptyState
-          title="No permissions configured"
-          description="This account doesn't have any specific permissions set yet."
-        />
-      ) : data.length === 0 ? (
-        <EmptyState
-          title={`No ${activeTab.toLowerCase()} found`}
-          description={`This account is not associated with any ${activeTab.toLowerCase()}.`}
-        />
-      ) : (
-        viewMode === 'grid' ? (
-          <GridView
-            data={filteredData as GridItemData[]}
-            onItemClick={(item) => {
-              if (activeTab === 'Teams') navigate(`/admin/team/${item.id}`);
-              else if (activeTab === 'Workspaces') navigate(`/admin/workspace/${item.id}`);
-            }}
-            onItemDoubleClick={(item) => {
-              if (activeTab === 'Teams') navigate(`/admin/team/${item.id}`);
-              else if (activeTab === 'Workspaces') navigate(`/admin/workspace/${item.id}`);
-            }}
-            favorites={new Set()}
-            onViewModeChange={setViewMode}
+      {/* Below top bar: content column + tray side by side */}
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+        {/* Content column */}
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden" style={{ borderRight: isTrayOpen ? '1px solid var(--border)' : 'none' }}>
+          {/* Account header */}
+          <DetailPageHeader
+            title={account.name}
+            badge={<RoleBadge role={account.role} />}
+            icon={(size) => <Avatar size={size} name={account.name} role={account.role} />}
+            metadata={[
+              { icon: 'email', label: account.email },
+              { icon: 'users', label: `${accountTeams.length} team${accountTeams.length !== 1 ? 's' : ''}` },
+              { icon: 'calendar', label: `Joined ${account.created}` }
+            ]}
+            onSettingsClick={() => setIsTrayOpen(prev => !prev)}
           />
-        ) : (
-          <DataTable
-            columns={columns}
-            data={filteredData}
-            onRowClick={(row) => {
-              if (activeTab === 'Teams') navigate(`/admin/team/${row.id}`);
-              else if (activeTab === 'Workspaces') navigate(`/admin/workspace/${row.id}`);
-            }}
+
+          {/* Tabs */}
+          <TabNav
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            variant="detail"
+          />
+
+          {/* Toolbar */}
+          <Toolbar
             viewMode={viewMode}
             onViewModeChange={setViewMode}
+            filters={getFilters()}
+            selectedFilters={selectedFilters}
+            onFilterChange={handleFilterChange}
+            dateFilters={dateFilters}
+            onDateFilterChange={handleDateFilterChange}
           />
-        )
-      )}
+
+          {/* Content area */}
+          {data.length === 0 ? (
+            <EmptyState
+              title={`No ${activeTab.toLowerCase()} found`}
+              description={`This account is not associated with any ${activeTab.toLowerCase()}.`}
+            />
+          ) : (
+            viewMode === 'grid' ? (
+              <GridView
+                data={filteredData as GridItemData[]}
+                onItemClick={(item) => {
+                  if (activeTab === 'Teams') navigate(`/admin/team/${item.id}`);
+                  else if (activeTab === 'Workspaces') navigate(`/admin/workspace/${item.id}`);
+                }}
+                onItemDoubleClick={(item) => {
+                  if (activeTab === 'Teams') navigate(`/admin/team/${item.id}`);
+                  else if (activeTab === 'Workspaces') navigate(`/admin/workspace/${item.id}`);
+                }}
+                favorites={new Set()}
+                onViewModeChange={setViewMode}
+              />
+            ) : (
+              <DataTable
+                columns={columns}
+                data={filteredData}
+                onRowClick={(row) => {
+                  if (activeTab === 'Teams') navigate(`/admin/team/${row.id}`);
+                  else if (activeTab === 'Workspaces') navigate(`/admin/workspace/${row.id}`);
+                }}
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
+              />
+            )
+          )}
+        </div>
+
+        {/* Roles & Permissions tray — pushes content left */}
+        <RolesPermissionsTray
+          isOpen={isTrayOpen}
+          onClose={() => setIsTrayOpen(false)}
+          initialRole={account.role}
+          initialAccessLevel={account.accessLevel}
+          accountName={account.name}
+        />
+      </div>
     </div>
   );
 }

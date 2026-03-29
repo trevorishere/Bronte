@@ -16,6 +16,7 @@ export function Root() {
     return true; // default to dark mode
   });
   const { isSidebarOpen, closeSidebar } = useMobileNav();
+  const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
 
   // Determine active item from current route
   const getActiveItem = () => {
@@ -73,6 +74,8 @@ export function Root() {
           onItemClick={handleItemClick}
           isMobileOpen={isSidebarOpen}
           onMobileClose={closeSidebar}
+          isDesktopOpen={isDesktopSidebarOpen}
+          onDesktopToggle={() => setIsDesktopSidebarOpen(prev => !prev)}
         />
 
         {/* Main Content Area */}

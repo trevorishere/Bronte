@@ -58,7 +58,7 @@ export function TopBar({
   );
 
   return (
-    <div className="h-[72px] shrink-0 w-full" style={{ backgroundColor: 'var(--background)' }}>
+    <div className="h-[72px] shrink-0 w-full" style={{ backgroundColor: 'var(--background)', borderBottom: showBackButton ? '1px solid var(--border)' : 'none' }}>
 
       {/* ================================================================ */}
       {/* MOBILE LAYOUT                                                    */}
