@@ -196,6 +196,10 @@ export function AdminPage() {
   };
 
   const handleRowClick = (row: RowData) => {
+    console.log('Row clicked (selected):', row);
+  };
+
+  const handleRowDoubleClick = (row: RowData) => {
     const pathMap: Record<string, string> = {
       'accounts': 'account',
       'teams': 'team',
@@ -205,10 +209,6 @@ export function AdminPage() {
     if (path) {
       navigate(`/admin/${path}/${row.id}`);
     }
-  };
-
-  const handleRowDoubleClick = (row: RowData) => {
-    handleRowClick(row);
   };
 
   const handleStarClick = (row: RowData | GridItemData, isStarred: boolean) => {

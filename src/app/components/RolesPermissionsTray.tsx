@@ -172,7 +172,7 @@ export function RolesPermissionsTray({
         <motion.div
           initial={{ width: 0, opacity: 0 }}
           animate={{ width: 380, opacity: 1 }}
-          exit={{ width: 0, opacity: 0 }}
+          exit={{ width: 0, opacity: 0, transition: { width: { type: 'tween', duration: 0.22, ease: 'easeInOut' }, opacity: { duration: 0.15, ease: 'easeInOut' } } }}
           transition={{
             width: { type: 'spring', stiffness: 320, damping: 32 },
             opacity: { duration: 0.18, ease: 'easeInOut' },

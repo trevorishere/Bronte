@@ -258,9 +258,7 @@ export function TeamDetailPage() {
         viewMode === 'grid' ? (
           <GridView
             data={filteredData as GridItemData[]}
-            onItemClick={(item) => {
-              if (activeTab === 'Members') navigate(`/admin/account/${item.id}`);
-            }}
+            onItemClick={(item) => console.log('Item clicked:', item)}
             onItemDoubleClick={(item) => {
               if (activeTab === 'Members') navigate(`/admin/account/${item.id}`);
             }}
@@ -271,9 +269,7 @@ export function TeamDetailPage() {
           <DataTable
             columns={columns}
             data={filteredData}
-            onRowClick={(row) => {
-              if (activeTab === 'Members') navigate(`/admin/account/${row.id}`);
-            }}
+            onRowClick={(row) => console.log('Row clicked:', row)}
             onRowDoubleClick={(row) => {
               if (activeTab === 'Members') navigate(`/admin/account/${row.id}`);
             }}

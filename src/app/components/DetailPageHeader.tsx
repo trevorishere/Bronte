@@ -154,7 +154,7 @@ export function DetailPageHeader({ title, badge, icon, metadata, onSettingsClick
         <div className="flex items-start justify-between gap-4">
 
           {/* Left: icon + title + badge + metadata */}
-          <div className="flex items-start gap-4 min-w-0">
+          <div className="flex items-start gap-8 min-w-0">
             {icon && (
               <div className="shrink-0 mt-1">
                 {icon('large')}
