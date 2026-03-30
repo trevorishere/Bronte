@@ -433,7 +433,7 @@ export function DataTable({
                     fontFamily: 'var(--font-family)',
                     fontWeight: 'var(--font-weight-semibold)',
                     color: sortConfig?.key === column.key || hoveredHeader === column.key ? 'var(--primary)' : 'var(--muted-foreground)',
-                    fontSize: '11px',
+                    fontSize: '12px',
                     letterSpacing: '0.06em',
                     textTransform: 'uppercase',
                     textAlign: column.align || 'left',
@@ -569,7 +569,7 @@ export function DataTable({
                           style={{ 
                             ...flexStyle,
                             fontFamily: 'var(--font-family)', 
-                            fontSize: 'var(--font-size-16)',
+                            fontSize: 'var(--font-size-15)',
                             textAlign: column.align || 'left',
                             letterSpacing: 'var(--letter-spacing-md)',
                             paddingLeft: index === 0 ? '20px' : column.align === 'right' ? '12px' : '24px',
@@ -626,7 +626,7 @@ export function DataTable({
                                     width: '100%',
                                     fontFamily: 'var(--font-family)',
                                     fontWeight: 'var(--font-weight-regular)',
-                                    fontSize: 'var(--font-size-16)',
+                                    fontSize: 'var(--font-size-15)',
                                     letterSpacing: 'var(--letter-spacing-md)',
                                     lineHeight: 'var(--line-height-20)',
                                     color: 'var(--foreground)',
@@ -642,8 +642,8 @@ export function DataTable({
                                   className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'} flex-1 min-w-0 cursor-text`} 
                                   style={{ 
                                     fontFamily: 'var(--font-family)', 
-                                    fontSize: 'var(--font-size-16)', 
-                                    fontWeight: 'var(--font-weight-medium)',
+                                    fontSize: 'var(--font-size-15)', 
+                                    fontWeight: 'var(--font-weight-regular)',
                                     letterSpacing: 'var(--letter-spacing-md)',
                                     whiteSpace: 'nowrap', 
                                     overflow: 'hidden', 
@@ -663,7 +663,7 @@ export function DataTable({
                               (() => {
                                 const ownerAccount = accounts.find(a => a.name === row[column.key]);
                                 return (
-                                  <div className="flex items-center gap-[12px] min-w-0">
+                                  <div className="flex items-center gap-[8px] min-w-0">
                                     {ownerAccount && (
                                       <Avatar name={ownerAccount.name} role={ownerAccount.role} size="small" />
                                     )}
@@ -672,7 +672,7 @@ export function DataTable({
                                         className="cursor-pointer hover:underline min-w-0"
                                         style={{
                                           fontFamily: 'var(--font-family)',
-                                          fontSize: 'var(--font-size-16)',
+                                          fontSize: 'var(--font-size-15)',
                                           letterSpacing: 'var(--letter-spacing-md)',
                                           color: 'var(--primary)',
                                           whiteSpace: 'nowrap',
@@ -687,7 +687,7 @@ export function DataTable({
                                         {row[column.key]}
                                       </span>
                                     ) : (
-                                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-16)', letterSpacing: 'var(--letter-spacing-md)', color: 'var(--foreground)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-15)', letterSpacing: 'var(--letter-spacing-md)', color: 'var(--foreground)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                         {row[column.key]}
                                       </span>
                                     )}
@@ -714,10 +714,10 @@ export function DataTable({
                                           width: '122px',
                                           backgroundColor: rc?.badge,
                                           borderRadius: '16px',
-                                          paddingTop: '4px',
-                                          paddingBottom: '5px',
-                                          paddingLeft: '16px',
-                                          paddingRight: '12px',
+                                          paddingTop: '5px',
+                                          paddingBottom: '6px',
+                                          paddingLeft: '14px',
+                                          paddingRight: '10px',
                                         }}
                                       >
                                         <span style={{
@@ -730,7 +730,7 @@ export function DataTable({
                                         }}>
                                           {row[column.key]}
                                         </span>
-                                        <ChevronDown className="size-[12px]" style={{ color: rc?.text, flexShrink: 0 }} />
+                                        <ChevronDown className="size-[14px]" style={{ color: rc?.text, flexShrink: 0 }} />
                                       </div>
                                     </button>
                                     <AnimatePresence>
@@ -741,7 +741,7 @@ export function DataTable({
                                             border: '1px solid var(--border-interactive-hover)',
                                             borderRadius: 'var(--radius-12)',
                                             top: 'calc(100% + 4px)',
-                                            minWidth: '140px',
+                                            minWidth: '160px',
                                           }}
                                           initial={{ opacity: 0, scaleY: 0.9, transformOrigin: 'top center' }}
                                           animate={{ opacity: 1, scaleY: 1 }}
@@ -784,7 +784,7 @@ export function DataTable({
                                   <div className="flex items-center justify-between" style={{ width: '122px' }}>
                                     <span style={{
                                       fontFamily: 'var(--font-family)',
-                                      fontSize: 'var(--font-size-16)',
+                                      fontSize: 'var(--font-size-14)',
                                       letterSpacing: 'var(--letter-spacing-md)',
                                       color: (hoveredRow === row.id || selectedRow === row.id) ? 'var(--primary)' : 'var(--foreground)',
                                       whiteSpace: 'nowrap',
@@ -802,7 +802,7 @@ export function DataTable({
                                         border: '1px solid var(--border-interactive-hover)',
                                         borderRadius: 'var(--radius-12)',
                                         top: 'calc(100% + 4px)',
-                                        minWidth: '140px',
+                                        minWidth: '160px',
                                       }}
                                       initial={{ opacity: 0, scaleY: 0.9, transformOrigin: 'top center' }}
                                       animate={{ opacity: 1, scaleY: 1 }}
@@ -844,7 +844,7 @@ export function DataTable({
                                   className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'}`}
                                   style={{
                                     fontFamily: 'var(--font-family)',
-                                    fontSize: 'var(--font-size-16)',
+                                    fontSize: 'var(--font-size-15)',
                                     letterSpacing: 'var(--letter-spacing-md)',
                                     whiteSpace: 'nowrap',
                                     overflow: 'hidden',
@@ -860,7 +860,7 @@ export function DataTable({
                                 className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'} block min-w-0`}
                                 style={{
                                   fontFamily: 'var(--font-family)',
-                                  fontSize: 'var(--font-size-16)',
+                                  fontSize: 'var(--font-size-15)',
                                   letterSpacing: 'var(--letter-spacing-md)',
                                   whiteSpace: 'nowrap',
                                   overflow: 'hidden',
@@ -877,7 +877,7 @@ export function DataTable({
                   </div>
                   
                   {/* Separate icons column */}
-                  <div className="py-[16px]" style={{ flex: '0 0 88px', minWidth: '88px', maxWidth: '88px', paddingLeft: '8px', paddingRight: '8px' }}>
+                  <div className="py-[16px]" style={{ flex: '0 0 124px', minWidth: '124px', maxWidth: '124px', paddingLeft: '32px', paddingRight: '20px' }}>
                     <div className={`flex items-center justify-end gap-[0px] ${(hoveredRow === row.id || openMenuRowId === row.id) ? 'opacity-100' : 'opacity-0'}`} style={{ transition: `opacity var(--transition-duration) var(--transition-timing)` }}>
                       {/* ========================================
                           STAR BUTTON - Uses theme variables
@@ -932,7 +932,7 @@ export function DataTable({
       <div
         className="shrink-0 flex items-center px-[20px]"
         style={{
-          height: '32px',
+          height: '36px',
           borderTop: '1px solid var(--border-interactive)',
         }}
       >
