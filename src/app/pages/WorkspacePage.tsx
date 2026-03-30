@@ -20,6 +20,7 @@ const tableColumns: Column[] = [
   { key: 'name', label: 'Project Name', sortable: true, width: 'w-[400px]' },
   { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
   { key: 'lastModified', label: 'Last Modified', sortable: true, width: 'w-[200px]' },
+  { key: 'accountCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
 ];
 
 export function WorkspacePage() {
@@ -57,6 +58,7 @@ export function WorkspacePage() {
     lastModified: project.lastModified,
     workspace: project.workspace,
     iconType: 'project' as const,
+    accountCount: accounts.filter(a => a.projectIds.includes(project.id)).length,
   }));
 
   // Apply filters to table data

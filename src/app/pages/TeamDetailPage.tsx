@@ -61,6 +61,7 @@ export function TeamDetailPage() {
             { key: 'name', label: 'Project Name', sortable: true, width: 'w-[400px]' },
             { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
             { key: 'lastModified', label: 'Last Modified', sortable: true, width: 'w-[200px]' },
+            { key: 'accountCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
           ] as Column[],
           data: teamProjects.map(project => ({
             id: project.id,
@@ -77,7 +78,7 @@ export function TeamDetailPage() {
           columns: [
             { key: 'name', label: 'Name', sortable: true, width: 'w-[400px]' },
             { key: 'role', label: 'Role', sortable: true, width: 'w-[200px]' },
-            { key: 'email', label: 'Email', sortable: true, width: 'w-[200px]' },
+            { key: 'accessLevel', label: 'Access Level', sortable: true, width: 'w-[200px]' },
             { key: 'created', label: 'Created On', sortable: true, width: 'w-[200px]' },
           ] as Column[],
           data: teamMembers.map(account => ({
@@ -127,6 +128,10 @@ export function TeamDetailPage() {
             options: Array.from(new Set(data.map(d => d.role as string))).sort()
           },
           {
+            label: 'Access Level',
+            options: Array.from(new Set(data.map(d => d.accessLevel as string))).sort()
+          },
+          {
             label: 'Created On',
             type: 'date' as const
           }
@@ -162,6 +167,13 @@ export function TeamDetailPage() {
     // Apply role filter for members
     if (activeTab === 'Members' && selectedFilters['Role'] && selectedFilters['Role'].length > 0) {
       if (!selectedFilters['Role'].includes(row.role as string)) {
+        return false;
+      }
+    }
+
+    // Apply access level filter for members
+    if (activeTab === 'Members' && selectedFilters['Access Level'] && selectedFilters['Access Level'].length > 0) {
+      if (!selectedFilters['Access Level'].includes(row.accessLevel as string)) {
         return false;
       }
     }

@@ -65,6 +65,7 @@ export function AccountDetailPage() {
             { key: 'name', label: 'Project Name', sortable: true, width: 'w-[400px]' },
             { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
             { key: 'lastModified', label: 'Last Modified', sortable: true, width: 'w-[200px]' },
+            { key: 'accountCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
           ] as Column[],
           data: accountProjects.map(project => ({
             id: project.id,
@@ -81,16 +82,17 @@ export function AccountDetailPage() {
           columns: [
             { key: 'name', label: 'Team Name', sortable: true, width: 'w-[400px]' },
             { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
-            { key: 'created', label: 'Created On', sortable: true, width: 'w-[200px]' },
             { key: 'membersCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
+            { key: 'lastModified', label: 'Last Modified', sortable: true, width: 'w-[200px]' },
           ] as Column[],
           data: accountTeams.map(team => ({
             id: team.id,
             name: team.name,
             owner: team.owner,
-            membersCount: team.membersCount.toString(),
+            membersCount: team.membersCount,
             members: team.membersCount,
             created: team.created,
+            lastModified: team.created,
             iconType: 'team' as const,
             teamProjectCount: projects.filter(p =>
               accounts.filter(a => a.teamIds.includes(team.id)).some(a => a.projectIds.includes(p.id))
@@ -101,8 +103,9 @@ export function AccountDetailPage() {
         return {
           columns: [
             { key: 'name', label: 'Workspace Name', sortable: true, width: 'w-[400px]' },
-            { key: 'type', label: 'Type', sortable: true, width: 'w-[200px]' },
+            { key: 'projectsCount', label: 'Projects', sortable: true, width: 'w-[120px]', align: 'right' as const },
             { key: 'created', label: 'Created On', sortable: true, width: 'w-[200px]' },
+            { key: 'membersCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
           ] as Column[],
           data: accountWorkspaces.map(workspace => ({
             id: workspace.id,
@@ -112,7 +115,9 @@ export function AccountDetailPage() {
             created: workspace.created,
             dateCreated: workspace.created,
             iconType: 'workspace' as const,
+            projectsCount: projects.filter(p => p.workspace === workspace.id).length,
             workspaceProjectCount: projects.filter(p => p.workspace === workspace.id).length,
+            membersCount: accounts.filter(a => a.workspaceIds.includes(workspace.id)).length,
             workspaceMemberCount: accounts.filter(a => a.workspaceIds.includes(workspace.id)).length,
           }))
         };
@@ -142,16 +147,12 @@ export function AccountDetailPage() {
       case 'Teams':
         return [
           {
-            label: 'Created On',
+            label: 'Last Modified',
             type: 'date' as const
           }
         ];
       case 'Workspaces':
         return [
-          {
-            label: 'Type',
-            options: Array.from(new Set(data.map(d => d.type as string))).sort()
-          },
           {
             label: 'Created On',
             type: 'date' as const
@@ -185,13 +186,6 @@ export function AccountDetailPage() {
       }
     }
 
-    // Apply type filter for workspaces
-    if (activeTab === 'Workspaces' && selectedFilters['Type'] && selectedFilters['Type'].length > 0) {
-      if (!selectedFilters['Type'].includes(row.type as string)) {
-        return false;
-      }
-    }
-
     // Apply Last Modified date filter for Projects
     if (activeTab === 'Projects' && dateFilters['Last Modified']) {
       const { start, end } = dateFilters['Last Modified'];
@@ -202,8 +196,18 @@ export function AccountDetailPage() {
       }
     }
 
-    // Apply Created On date filter for Teams and Workspaces
-    if ((activeTab === 'Teams' || activeTab === 'Workspaces') && dateFilters['Created On']) {
+    // Apply Last Modified date filter for Teams
+    if (activeTab === 'Teams' && dateFilters['Last Modified']) {
+      const { start, end } = dateFilters['Last Modified'];
+      if (start || end) {
+        const rowDate = new Date(row.lastModified);
+        if (start && rowDate < start) return false;
+        if (end && rowDate > end) return false;
+      }
+    }
+
+    // Apply Created On date filter for Workspaces
+    if (activeTab === 'Workspaces' && dateFilters['Created On']) {
       const { start, end } = dateFilters['Created On'];
       if (start || end) {
         const rowDate = new Date(row.created);
