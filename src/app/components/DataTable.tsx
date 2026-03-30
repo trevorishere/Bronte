@@ -939,7 +939,7 @@ export function DataTable({
         <span style={{
           fontFamily: 'var(--font-family)',
           fontSize: '12px',
-          fontWeight: 'var(--font-weight-medium)',
+          fontWeight: 'var(--font-weight-regular)',
           letterSpacing: 'var(--letter-spacing-md)',
           color: 'var(--muted-foreground)',
         }}>
