@@ -41,14 +41,14 @@ const accountColumns: Column[] = [
 const teamColumns: Column[] = [
   { key: 'name', label: 'Team Name', sortable: true, width: 'w-[400px]' },
   { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
-  { key: 'membersCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
   { key: 'lastModified', label: 'Last Modified', sortable: true, width: 'w-[200px]' },
+  { key: 'membersCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
 ];
 
 const workspaceColumns: Column[] = [
   { key: 'name', label: 'Workspace Name', sortable: true, width: 'w-[400px]' },
-  { key: 'projectsCount', label: 'Projects', sortable: true, width: 'w-[120px]', align: 'right' as const },
   { key: 'created', label: 'Created On', sortable: true, width: 'w-[200px]' },
+  { key: 'projectsCount', label: 'Projects', sortable: true, width: 'w-[120px]', align: 'right' as const },
   { key: 'membersCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
 ];
 

@@ -1,4 +1,4 @@
-import { Star, Clock, UserRoundPlus, ShieldUser, FolderOpen, X, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { Star, Clock, UserRoundPlus, ShieldUser, FolderOpen, X, ChevronsLeftRightEllipsis } from 'lucide-react';
 import { IconButton } from './IconButton';
 import { getWorkspaceInitials } from './WorkspaceIcon';
 import { useState, useEffect } from 'react';
@@ -86,7 +86,7 @@ export function Sidebar({
       {!isDesktopOpen && (
         <div className="hidden md:flex h-[72px] shrink-0 items-center px-[12px] w-full">
           <IconButton
-            icon={<ChevronsRight className="size-[18px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
+            icon={<ChevronsLeftRightEllipsis className="size-[18px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
             onClick={onDesktopToggle}
             size={44}
             rounded="xl"
@@ -118,7 +118,7 @@ export function Sidebar({
           {/* Desktop Collapse Button */}
           <IconButton
             className="hidden md:flex mr-4"
-            icon={<ChevronsLeft className="size-[18px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
+            icon={<ChevronsLeftRightEllipsis className="size-[18px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
             onClick={onDesktopToggle}
             size={32}
             rounded="xl"

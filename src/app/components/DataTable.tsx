@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { Star, MoreHorizontal, ArrowUp, ArrowDown, File, ChevronRight } from 'lucide-react';
+import { Star, MoreHorizontal, ArrowUp, ArrowDown, File, ChevronDown } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router';
 import { DropdownMenu, createDefaultMenuItems } from './DropdownMenu';
-import { Avatar, RoleBadge } from './Avatar';
+import { Avatar, RoleBadge, roleColors } from './Avatar';
 import { TeamIcon } from './TeamIcon';
 import { WorkspaceIcon } from './WorkspaceIcon';
 import { ProjectIcon } from './ProjectIcon';
@@ -357,7 +357,7 @@ export function DataTable({
     if (selectedRow === rowId) {
       return 'var(--bg-row-selected)';
     }
-    return '';
+    return 'var(--background)';
   };
 
   return (
@@ -508,7 +508,7 @@ export function DataTable({
             })}
           </div>
           {/* Icons column header */}
-          <div style={{ flex: '0 0 96px', minWidth: '96px', maxWidth: '96px', paddingLeft: '16px', paddingRight: '16px' }}></div>
+          <div style={{ flex: '0 0 88px', minWidth: '88px', maxWidth: '88px', paddingLeft: '8px', paddingRight: '8px' }}></div>
         </div>
       </div>
 
@@ -696,62 +696,84 @@ export function DataTable({
                               })()
                             ) :
                             column.key === 'role' ? (
-                              <div className="relative">
-                                <button
-                                  className="flex items-center gap-[4px] rounded-full transition-colors"
-                                  style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setOpenRoleDropdownId(openRoleDropdownId === row.id ? null : row.id);
-                                    setOpenAccessDropdownId(null);
-                                  }}
-                                >
-                                  <RoleBadge role={row[column.key] as any} />
-                                  <ChevronRight className="size-[14px]" style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
-                                </button>
-                                <AnimatePresence>
-                                  {openRoleDropdownId === row.id && (
-                                    <motion.div
-                                      className="absolute left-0 bg-background shadow-lg p-[8px] z-50"
-                                      style={{
-                                        border: '1px solid var(--border-interactive-hover)',
-                                        borderRadius: 'var(--radius-12)',
-                                        top: 'calc(100% + 4px)',
-                                        minWidth: '140px',
+                              (() => {
+                                const rc = roleColors[row[column.key] as keyof typeof roleColors];
+                                return (
+                                  <div className="relative">
+                                    <button
+                                      style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setOpenRoleDropdownId(openRoleDropdownId === row.id ? null : row.id);
+                                        setOpenAccessDropdownId(null);
                                       }}
-                                      initial={{ opacity: 0, scaleY: 0.9, transformOrigin: 'top center' }}
-                                      animate={{ opacity: 1, scaleY: 1 }}
-                                      exit={{ opacity: 0, scaleY: 0.9 }}
-                                      transition={{ duration: 0.15, type: 'spring', stiffness: 400, damping: 28 }}
                                     >
-                                      {ROLE_OPTIONS.map(option => (
-                                        <button
-                                          key={option}
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            onRoleChange?.(row, option);
-                                            setOpenRoleDropdownId(null);
+                                      <div
+                                        className="flex items-center justify-between"
+                                        style={{
+                                          width: '122px',
+                                          backgroundColor: rc?.badge,
+                                          borderRadius: '16px',
+                                          paddingTop: '4px',
+                                          paddingBottom: '5px',
+                                          paddingLeft: '16px',
+                                          paddingRight: '12px',
+                                        }}
+                                      >
+                                        <span style={{
+                                          fontFamily: 'var(--font-family)',
+                                          fontWeight: 600,
+                                          fontSize: '14px',
+                                          letterSpacing: '0.14px',
+                                          color: rc?.text,
+                                          whiteSpace: 'nowrap',
+                                        }}>
+                                          {row[column.key]}
+                                        </span>
+                                        <ChevronDown className="size-[12px]" style={{ color: rc?.text, flexShrink: 0 }} />
+                                      </div>
+                                    </button>
+                                    <AnimatePresence>
+                                      {openRoleDropdownId === row.id && (
+                                        <motion.div
+                                          className="absolute left-0 bg-background shadow-lg p-[8px] z-50"
+                                          style={{
+                                            border: '1px solid var(--border-interactive-hover)',
+                                            borderRadius: 'var(--radius-12)',
+                                            top: 'calc(100% + 4px)',
+                                            minWidth: '140px',
                                           }}
-                                          className="w-full flex items-center justify-between px-[10px] py-[8px] rounded-lg transition-colors"
-                                          style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-                                          onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
-                                          onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                                          initial={{ opacity: 0, scaleY: 0.9, transformOrigin: 'top center' }}
+                                          animate={{ opacity: 1, scaleY: 1 }}
+                                          exit={{ opacity: 0, scaleY: 0.9 }}
+                                          transition={{ duration: 0.15, type: 'spring', stiffness: 400, damping: 28 }}
                                         >
-                                          <RoleBadge role={option as any} />
-                                          {row[column.key] === option && (
-                                            <ChevronRight className="size-[14px]" style={{ color: 'var(--primary)' }} />
-                                          )}
-                                        </button>
-                                      ))}
-                                    </motion.div>
-                                  )}
-                                </AnimatePresence>
-                              </div>
+                                          {ROLE_OPTIONS.map(option => (
+                                            <button
+                                              key={option}
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                onRoleChange?.(row, option);
+                                                setOpenRoleDropdownId(null);
+                                              }}
+                                              className="w-full flex items-center px-[4px] py-[4px] rounded-lg transition-colors"
+                                              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                                              onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
+                                              onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                                            >
+                                              <RoleBadge role={option as any} />
+                                            </button>
+                                          ))}
+                                        </motion.div>
+                                      )}
+                                    </AnimatePresence>
+                                  </div>
+                                );
+                              })()
                             ) :
                             column.key === 'accessLevel' ? (
                               <div className="relative">
                                 <button
-                                  className="flex items-center gap-[6px] transition-colors"
                                   style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -759,16 +781,18 @@ export function DataTable({
                                     setOpenRoleDropdownId(null);
                                   }}
                                 >
-                                  <span style={{
-                                    fontFamily: 'var(--font-family)',
-                                    fontSize: 'var(--font-size-16)',
-                                    letterSpacing: 'var(--letter-spacing-md)',
-                                    color: (hoveredRow === row.id || selectedRow === row.id) ? 'var(--primary)' : 'var(--foreground)',
-                                    whiteSpace: 'nowrap',
-                                  }}>
-                                    {row[column.key]}
-                                  </span>
-                                  <ChevronRight className="size-[14px]" style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
+                                  <div className="flex items-center justify-between" style={{ width: '122px' }}>
+                                    <span style={{
+                                      fontFamily: 'var(--font-family)',
+                                      fontSize: 'var(--font-size-16)',
+                                      letterSpacing: 'var(--letter-spacing-md)',
+                                      color: (hoveredRow === row.id || selectedRow === row.id) ? 'var(--primary)' : 'var(--foreground)',
+                                      whiteSpace: 'nowrap',
+                                    }}>
+                                      {row[column.key]}
+                                    </span>
+                                    <ChevronDown className="size-[14px]" style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
+                                  </div>
                                 </button>
                                 <AnimatePresence>
                                   {openAccessDropdownId === row.id && (
@@ -793,7 +817,7 @@ export function DataTable({
                                             onAccessLevelChange?.(row, option);
                                             setOpenAccessDropdownId(null);
                                           }}
-                                          className="w-full flex items-center justify-between px-[10px] py-[8px] rounded-lg transition-colors"
+                                          className="w-full flex items-center px-[10px] py-[8px] rounded-lg transition-colors"
                                           style={{ background: 'none', border: 'none', cursor: 'pointer' }}
                                           onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
                                           onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
@@ -806,9 +830,6 @@ export function DataTable({
                                           }}>
                                             {option}
                                           </span>
-                                          {row[column.key] === option && (
-                                            <ChevronRight className="size-[14px]" style={{ color: 'var(--primary)' }} />
-                                          )}
                                         </button>
                                       ))}
                                     </motion.div>
@@ -856,7 +877,7 @@ export function DataTable({
                   </div>
                   
                   {/* Separate icons column */}
-                  <div className="py-[16px]" style={{ flex: '0 0 96px', minWidth: '96px', maxWidth: '96px', paddingLeft: '16px', paddingRight: '16px' }}>
+                  <div className="py-[16px]" style={{ flex: '0 0 88px', minWidth: '88px', maxWidth: '88px', paddingLeft: '8px', paddingRight: '8px' }}>
                     <div className={`flex items-center justify-end gap-[0px] ${(hoveredRow === row.id || openMenuRowId === row.id) ? 'opacity-100' : 'opacity-0'}`} style={{ transition: `opacity var(--transition-duration) var(--transition-timing)` }}>
                       {/* ========================================
                           STAR BUTTON - Uses theme variables
@@ -917,10 +938,9 @@ export function DataTable({
       >
         <span style={{
           fontFamily: 'var(--font-family)',
-          fontSize: '11px',
-          fontWeight: 'var(--font-weight-semibold)',
-          letterSpacing: '0.07em',
-          textTransform: 'uppercase',
+          fontSize: '12px',
+          fontWeight: 'var(--font-weight-medium)',
+          letterSpacing: 'var(--letter-spacing-md)',
           color: 'var(--muted-foreground)',
         }}>
           {sortedData.length} {sortedData.length === 1 ? 'item' : 'items'}
