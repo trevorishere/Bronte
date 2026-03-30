@@ -96,7 +96,7 @@ export function FilterDropdown({
                 style={{
                   fontFamily: 'var(--font-family)',
                   fontWeight: 'var(--font-weight-semibold)',
-                  fontSize: 'var(--font-size-13)',
+                  fontSize: 'var(--font-size-14)',
                   color: 'var(--secondary-foreground)',
                   paddingTop: '1px',
                   whiteSpace: 'nowrap'
