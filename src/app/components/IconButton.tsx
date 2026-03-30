@@ -14,7 +14,7 @@ interface IconButtonProps {
 export function IconButton({
   icon,
   onClick,
-  size = 32,
+  size = 40,
   rounded = 'full',
   title,
   className = '',
