@@ -1,15 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
-import { Star, MoreHorizontal, ArrowUp, ArrowDown, File } from 'lucide-react';
+import { Star, MoreHorizontal, ArrowUp, ArrowDown, File, ChevronDown } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router';
 import { DropdownMenu, createDefaultMenuItems } from './DropdownMenu';
-import { Avatar, RoleBadge } from './Avatar';
+import { Avatar, RoleBadge, roleColors } from './Avatar';
 import { TeamIcon } from './TeamIcon';
 import { WorkspaceIcon } from './WorkspaceIcon';
 import { ProjectIcon } from './ProjectIcon';
 import { RenameModal } from './RenameModal';
 import { MobileCardView } from './MobileCardView';
 import { MobileSortHeader } from './MobileSortHeader';
-import { accounts } from '../data/accounts';
+import { accounts, AccessLevel } from '../data/accounts';
 
 // ========================================
 // TYPE DEFINITIONS
@@ -29,6 +31,9 @@ export interface RowData {
   [key: string]: any;
 }
 
+const ROLE_OPTIONS = ['Admin', 'Owner', 'Manager', 'Creator', 'Viewer', 'Member', 'Developer', 'Editor'] as const;
+const ACCESS_LEVEL_OPTIONS: AccessLevel[] = ['Super Admin', 'Owner', 'Editor', 'Viewer', 'None'];
+
 interface DataTableProps {
   columns: Column[];
   data: RowData[];
@@ -37,6 +42,8 @@ interface DataTableProps {
   onStarClick?: (row: RowData, isStarred: boolean) => void;
   onMoreClick?: (row: RowData) => void;
   onRename?: (row: RowData, newName: string) => void;
+  onRoleChange?: (row: RowData, newRole: string) => void;
+  onAccessLevelChange?: (row: RowData, newLevel: string) => void;
   starredItems?: Set<string>;
   viewMode?: 'grid' | 'list';
   onViewModeChange?: (mode: 'grid' | 'list') => void;
@@ -47,14 +54,16 @@ type SortConfig = {
   direction: 'asc' | 'desc';
 } | null;
 
-export function DataTable({ 
-  columns, 
+export function DataTable({
+  columns,
   data,
   onRowClick,
   onRowDoubleClick,
   onStarClick,
   onMoreClick,
   onRename,
+  onRoleChange,
+  onAccessLevelChange,
   starredItems,
   viewMode,
   onViewModeChange
@@ -94,6 +103,7 @@ export function DataTable({
   // ========================================
   // STATE MANAGEMENT
   // ========================================
+  const navigate = useNavigate();
   const [sortConfig, setSortConfig] = useState<SortConfig>(getDefaultSort());
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const [selectedRow, setSelectedRow] = useState<string | null>(null); // Toggle-able selection (click same row to deselect)
@@ -104,6 +114,8 @@ export function DataTable({
     return defaultSort ? new Set([defaultSort.key]) : new Set();
   });
   const [openMenuRowId, setOpenMenuRowId] = useState<string | null>(null);
+  const [openRoleDropdownId, setOpenRoleDropdownId] = useState<string | null>(null);
+  const [openAccessDropdownId, setOpenAccessDropdownId] = useState<string | null>(null);
   
   // Rename Mode State
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
@@ -322,6 +334,17 @@ export function DataTable({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedRow]);
 
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setOpenRoleDropdownId(null);
+      setOpenAccessDropdownId(null);
+    };
+    if (openRoleDropdownId || openAccessDropdownId) {
+      document.addEventListener('click', handleClickOutside);
+    }
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [openRoleDropdownId, openAccessDropdownId]);
+
   // Handle clicking on empty space in the table area
   const handleTableAreaClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Only clear selection if clicking directly on the scrollable area (not bubbled from rows)
@@ -334,7 +357,7 @@ export function DataTable({
     if (selectedRow === rowId) {
       return 'var(--bg-row-selected)';
     }
-    return '';
+    return 'var(--background)';
   };
 
   return (
@@ -358,10 +381,8 @@ export function DataTable({
             onRowClick={onRowClick}
             onRowDoubleClick={onRowDoubleClick}
             onStarClick={onStarClick}
-            onMoreClick={onMoreClick}
             starredItems={starredItems}
             viewMode={viewMode}
-            onRename={onRename}
           />
         </div>
       </div>
@@ -487,7 +508,7 @@ export function DataTable({
             })}
           </div>
           {/* Icons column header */}
-          <div style={{ flex: '0 0 96px', minWidth: '96px', maxWidth: '96px', paddingLeft: '16px', paddingRight: '16px' }}></div>
+          <div style={{ flex: '0 0 88px', minWidth: '88px', maxWidth: '88px', paddingLeft: '8px', paddingRight: '8px' }}></div>
         </div>
       </div>
 
@@ -638,22 +659,195 @@ export function DataTable({
                             // ========================================
                             // MIDDLE COLUMNS: Role badges or text
                             // ========================================
+                            column.key === 'owner' ? (
+                              (() => {
+                                const ownerAccount = accounts.find(a => a.name === row[column.key]);
+                                return (
+                                  <div className="flex items-center gap-[12px] min-w-0">
+                                    {ownerAccount && (
+                                      <Avatar name={ownerAccount.name} role={ownerAccount.role} size="small" />
+                                    )}
+                                    {ownerAccount ? (
+                                      <span
+                                        className="cursor-pointer hover:underline min-w-0"
+                                        style={{
+                                          fontFamily: 'var(--font-family)',
+                                          fontSize: 'var(--font-size-16)',
+                                          letterSpacing: 'var(--letter-spacing-md)',
+                                          color: 'var(--primary)',
+                                          whiteSpace: 'nowrap',
+                                          overflow: 'hidden',
+                                          textOverflow: 'ellipsis',
+                                        }}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          navigate(`/admin/account/${ownerAccount.id}`);
+                                        }}
+                                      >
+                                        {row[column.key]}
+                                      </span>
+                                    ) : (
+                                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-16)', letterSpacing: 'var(--letter-spacing-md)', color: 'var(--foreground)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                        {row[column.key]}
+                                      </span>
+                                    )}
+                                  </div>
+                                );
+                              })()
+                            ) :
                             column.key === 'role' ? (
-                              // Special handling for role column - render RoleBadge
-                              <div className="flex items-center">
-                                <RoleBadge role={row[column.key] as any} />
+                              (() => {
+                                const rc = roleColors[row[column.key] as keyof typeof roleColors];
+                                return (
+                                  <div className="relative">
+                                    <button
+                                      style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setOpenRoleDropdownId(openRoleDropdownId === row.id ? null : row.id);
+                                        setOpenAccessDropdownId(null);
+                                      }}
+                                    >
+                                      <div
+                                        className="flex items-center justify-between"
+                                        style={{
+                                          width: '122px',
+                                          backgroundColor: rc?.badge,
+                                          borderRadius: '16px',
+                                          paddingTop: '4px',
+                                          paddingBottom: '5px',
+                                          paddingLeft: '16px',
+                                          paddingRight: '12px',
+                                        }}
+                                      >
+                                        <span style={{
+                                          fontFamily: 'var(--font-family)',
+                                          fontWeight: 600,
+                                          fontSize: '14px',
+                                          letterSpacing: '0.14px',
+                                          color: rc?.text,
+                                          whiteSpace: 'nowrap',
+                                        }}>
+                                          {row[column.key]}
+                                        </span>
+                                        <ChevronDown className="size-[12px]" style={{ color: rc?.text, flexShrink: 0 }} />
+                                      </div>
+                                    </button>
+                                    <AnimatePresence>
+                                      {openRoleDropdownId === row.id && (
+                                        <motion.div
+                                          className="absolute left-0 bg-background shadow-lg p-[8px] z-50"
+                                          style={{
+                                            border: '1px solid var(--border-interactive-hover)',
+                                            borderRadius: 'var(--radius-12)',
+                                            top: 'calc(100% + 4px)',
+                                            minWidth: '140px',
+                                          }}
+                                          initial={{ opacity: 0, scaleY: 0.9, transformOrigin: 'top center' }}
+                                          animate={{ opacity: 1, scaleY: 1 }}
+                                          exit={{ opacity: 0, scaleY: 0.9 }}
+                                          transition={{ duration: 0.15, type: 'spring', stiffness: 400, damping: 28 }}
+                                        >
+                                          {ROLE_OPTIONS.map(option => (
+                                            <button
+                                              key={option}
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                onRoleChange?.(row, option);
+                                                setOpenRoleDropdownId(null);
+                                              }}
+                                              className="w-full flex items-center px-[4px] py-[4px] rounded-lg transition-colors"
+                                              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                                              onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
+                                              onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                                            >
+                                              <RoleBadge role={option as any} />
+                                            </button>
+                                          ))}
+                                        </motion.div>
+                                      )}
+                                    </AnimatePresence>
+                                  </div>
+                                );
+                              })()
+                            ) :
+                            column.key === 'accessLevel' ? (
+                              <div className="relative">
+                                <button
+                                  style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpenAccessDropdownId(openAccessDropdownId === row.id ? null : row.id);
+                                    setOpenRoleDropdownId(null);
+                                  }}
+                                >
+                                  <div className="flex items-center justify-between" style={{ width: '122px' }}>
+                                    <span style={{
+                                      fontFamily: 'var(--font-family)',
+                                      fontSize: 'var(--font-size-16)',
+                                      letterSpacing: 'var(--letter-spacing-md)',
+                                      color: (hoveredRow === row.id || selectedRow === row.id) ? 'var(--primary)' : 'var(--foreground)',
+                                      whiteSpace: 'nowrap',
+                                    }}>
+                                      {row[column.key]}
+                                    </span>
+                                    <ChevronDown className="size-[14px]" style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
+                                  </div>
+                                </button>
+                                <AnimatePresence>
+                                  {openAccessDropdownId === row.id && (
+                                    <motion.div
+                                      className="absolute left-0 bg-background shadow-lg p-[8px] z-50"
+                                      style={{
+                                        border: '1px solid var(--border-interactive-hover)',
+                                        borderRadius: 'var(--radius-12)',
+                                        top: 'calc(100% + 4px)',
+                                        minWidth: '140px',
+                                      }}
+                                      initial={{ opacity: 0, scaleY: 0.9, transformOrigin: 'top center' }}
+                                      animate={{ opacity: 1, scaleY: 1 }}
+                                      exit={{ opacity: 0, scaleY: 0.9 }}
+                                      transition={{ duration: 0.15, type: 'spring', stiffness: 400, damping: 28 }}
+                                    >
+                                      {ACCESS_LEVEL_OPTIONS.map(option => (
+                                        <button
+                                          key={option}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            onAccessLevelChange?.(row, option);
+                                            setOpenAccessDropdownId(null);
+                                          }}
+                                          className="w-full flex items-center px-[10px] py-[8px] rounded-lg transition-colors"
+                                          style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                                          onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
+                                          onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                                        >
+                                          <span style={{
+                                            fontFamily: 'var(--font-family)',
+                                            fontSize: 'var(--font-size-14)',
+                                            letterSpacing: 'var(--letter-spacing-md)',
+                                            color: row[column.key] === option ? 'var(--primary)' : 'var(--foreground)',
+                                          }}>
+                                            {option}
+                                          </span>
+                                        </button>
+                                      ))}
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
                               </div>
-                            ) : column.align === 'right' ? (
+                            ) :
+                            column.align === 'right' ? (
                               // Right-aligned columns - use flex justify-end to match header
                               <div className="flex items-center justify-end w-full">
-                                <span 
-                                  className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'}`} 
-                                  style={{ 
-                                    fontFamily: 'var(--font-family)', 
-                                    fontSize: 'var(--font-size-16)', 
+                                <span
+                                  className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'}`}
+                                  style={{
+                                    fontFamily: 'var(--font-family)',
+                                    fontSize: 'var(--font-size-16)',
                                     letterSpacing: 'var(--letter-spacing-md)',
-                                    whiteSpace: 'nowrap', 
-                                    overflow: 'hidden', 
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
                                     textOverflow: 'ellipsis'
                                   }}
                                 >
@@ -662,14 +856,14 @@ export function DataTable({
                               </div>
                             ) : (
                               // Left-aligned columns
-                              <span 
-                                className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'} block min-w-0`} 
-                                style={{ 
-                                  fontFamily: 'var(--font-family)', 
-                                  fontSize: 'var(--font-size-16)', 
+                              <span
+                                className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'} block min-w-0`}
+                                style={{
+                                  fontFamily: 'var(--font-family)',
+                                  fontSize: 'var(--font-size-16)',
                                   letterSpacing: 'var(--letter-spacing-md)',
-                                  whiteSpace: 'nowrap', 
-                                  overflow: 'hidden', 
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
                                   textOverflow: 'ellipsis'
                                 }}
                               >
@@ -683,7 +877,7 @@ export function DataTable({
                   </div>
                   
                   {/* Separate icons column */}
-                  <div className="py-[16px]" style={{ flex: '0 0 96px', minWidth: '96px', maxWidth: '96px', paddingLeft: '16px', paddingRight: '16px' }}>
+                  <div className="py-[16px]" style={{ flex: '0 0 88px', minWidth: '88px', maxWidth: '88px', paddingLeft: '8px', paddingRight: '8px' }}>
                     <div className={`flex items-center justify-end gap-[0px] ${(hoveredRow === row.id || openMenuRowId === row.id) ? 'opacity-100' : 'opacity-0'}`} style={{ transition: `opacity var(--transition-duration) var(--transition-timing)` }}>
                       {/* ========================================
                           STAR BUTTON - Uses theme variables
@@ -732,6 +926,25 @@ export function DataTable({
             })}
           </div>
         </div>
+      </div>
+
+      {/* Items count tray */}
+      <div
+        className="shrink-0 flex items-center px-[20px]"
+        style={{
+          height: '32px',
+          borderTop: '1px solid var(--border-interactive)',
+        }}
+      >
+        <span style={{
+          fontFamily: 'var(--font-family)',
+          fontSize: '12px',
+          fontWeight: 'var(--font-weight-medium)',
+          letterSpacing: 'var(--letter-spacing-md)',
+          color: 'var(--muted-foreground)',
+        }}>
+          {sortedData.length} {sortedData.length === 1 ? 'item' : 'items'}
+        </span>
       </div>
       </div>
 

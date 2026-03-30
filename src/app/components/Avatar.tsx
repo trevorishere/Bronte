@@ -7,7 +7,7 @@ interface AvatarProps {
 }
 
 // Role color mapping based on Figma imports
-const roleColors = {
+export const roleColors = {
   Admin: { bg: '#934790', text: '#934790', badge: 'rgba(147,71,144,0.1)' },
   Owner: { bg: '#7669aa', text: '#7669aa', badge: 'rgba(118,105,170,0.1)' },
   Manager: { bg: '#ac4e4f', text: '#ac4e4f', badge: 'rgba(172,78,79,0.1)' },

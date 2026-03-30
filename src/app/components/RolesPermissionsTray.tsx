@@ -1,4 +1,5 @@
 import { X, Feather, Code2, ShieldUser, Check } from 'lucide-react';
+import { textStyles } from '../utils/textStyles';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from './Button';
@@ -82,15 +83,7 @@ const AUTHORING_ROWS: { id: keyof AuthoringState; label: string }[] = [
   { id: 'contentMgmt', label: 'Content Mgmt' },
 ];
 
-const capsStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-family)',
-  fontSize: '11px',
-  fontWeight: 'var(--font-weight-semibold)',
-  color: 'var(--muted-foreground)',
-  letterSpacing: '0.07em',
-  textTransform: 'uppercase',
-  whiteSpace: 'nowrap',
-};
+const capsStyle: React.CSSProperties = { ...textStyles.caps, color: 'var(--muted-foreground)' };
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -177,10 +170,9 @@ export function RolesPermissionsTray({
             width: { type: 'spring', stiffness: 320, damping: 32 },
             opacity: { duration: 0.18, ease: 'easeInOut' },
           }}
-          className="shrink-0 overflow-hidden hidden md:flex flex-col m-6"
+          className="shrink-0 overflow-hidden hidden md:flex flex-col"
           style={{
-            border: '1px solid var(--border)',
-            borderRadius: '16px',
+            borderLeft: '1px solid var(--border)',
             backgroundColor: 'color-mix(in srgb, var(--background) 96%, white)',
           }}
         >
@@ -188,8 +180,8 @@ export function RolesPermissionsTray({
 
             {/* ── Header ── */}
             <div
-              className="shrink-0 flex items-center justify-between px-6 py-4"
-              style={{ borderBottom: '1px solid var(--border)' }}
+              className="shrink-0 flex items-center justify-between px-6 py-6"
+              style={{}}
             >
               <div className="flex items-center gap-[10px] min-w-0">
                 {accountName && (
@@ -272,8 +264,6 @@ export function RolesPermissionsTray({
                 </div>
               </div>
 
-              {/* Divider */}
-              <div style={{ height: '1px', backgroundColor: 'var(--border)', margin: '0 24px' }} />
 
               {/* Permissions section */}
               <div className="px-6 pt-5 pb-6">
@@ -429,8 +419,8 @@ export function RolesPermissionsTray({
 
             {/* ── Footer ── */}
             <div
-              className="shrink-0 flex items-center justify-between px-6 pt-4 pb-6"
-              style={{ borderTop: '1px solid var(--border)' }}
+              className="shrink-0 flex items-center justify-between px-6 py-6"
+              style={{}}
             >
               <Button variant="text">Save as Preset</Button>
               <Button variant="text" onClick={onClose}>Finish</Button>

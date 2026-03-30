@@ -1,4 +1,5 @@
-import { Star, Clock, UserRoundPlus, ShieldUser, FolderOpen, X, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { Star, Clock, UserRoundPlus, ShieldUser, FolderOpen, X, ChevronsLeftRightEllipsis } from 'lucide-react';
+import { IconButton } from './IconButton';
 import { getWorkspaceInitials } from './WorkspaceIcon';
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
@@ -84,16 +85,13 @@ export function Sidebar({
       {/* Logo — Desktop collapsed: only the open chevron */}
       {!isDesktopOpen && (
         <div className="hidden md:flex h-[72px] shrink-0 items-center px-[12px] w-full">
-          <button
-            className="flex items-center justify-center size-[44px] rounded-xl transition-colors"
-            style={{ backgroundColor: 'transparent' }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          <IconButton
+            icon={<ChevronsLeftRightEllipsis className="size-[18px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
             onClick={onDesktopToggle}
+            size={44}
+            rounded="xl"
             title="Open sidebar"
-          >
-            <ChevronsRight className="size-[18px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
-          </button>
+          />
         </div>
       )}
 
@@ -110,26 +108,22 @@ export function Sidebar({
             </div>
           </div>
           {/* Mobile Close Button */}
-          <button
-            className="md:hidden mr-4 flex items-center justify-center size-[32px] rounded-full transition-colors shrink-0"
-            style={{ backgroundColor: 'transparent' }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          <IconButton
+            className="md:hidden mr-4"
+            icon={<X className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />}
             onClick={onMobileClose}
-          >
-            <X className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
-          </button>
+            size={32}
+            title="Close sidebar"
+          />
           {/* Desktop Collapse Button */}
-          <button
-            className="hidden md:flex mr-4 items-center justify-center size-[32px] rounded-xl transition-colors shrink-0"
-            style={{ backgroundColor: 'transparent' }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          <IconButton
+            className="hidden md:flex mr-4"
+            icon={<ChevronsLeftRightEllipsis className="size-[18px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
             onClick={onDesktopToggle}
+            size={32}
+            rounded="xl"
             title="Collapse sidebar"
-          >
-            <ChevronsLeft className="size-[18px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
-          </button>
+          />
         </div>
       </div>
 
@@ -233,7 +227,7 @@ export function Sidebar({
               onClick={() => handleItemClick('account')}
               onMouseEnter={() => setHoveredItem('account')}
               onMouseLeave={() => setHoveredItem(null)}
-              className="h-[52px] w-full rounded-xl transition-all duration-150 ease-in-out mt-4"
+              className="h-[52px] w-full rounded-xl transition-all duration-150 ease-in-out mt-2 mb-2"
               style={{ backgroundColor: navBg('account'), maxWidth: !isDesktopOpen ? '52px' : undefined, overflow: 'hidden', transition: 'background-color 150ms ease-in-out, max-width 0.2s ease' }}
             >
               <div className="flex gap-[10px] items-center px-[10px] py-[8px] size-full">

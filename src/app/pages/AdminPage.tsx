@@ -28,26 +28,28 @@ const projectColumns: Column[] = [
   { key: 'name', label: 'Project Name', sortable: true, width: 'w-[400px]' },
   { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
   { key: 'lastModified', label: 'Last Modified', sortable: true, width: 'w-[200px]' },
+  { key: 'accountCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
 ];
 
 const accountColumns: Column[] = [
   { key: 'name', label: 'Account Name', sortable: true, width: 'w-[400px]' },
   { key: 'role', label: 'Role', sortable: true, width: 'w-[200px]' },
+  { key: 'accessLevel', label: 'Access Level', sortable: true, width: 'w-[200px]' },
   { key: 'created', label: 'Created On', sortable: true, width: 'w-[200px]' },
 ];
 
 const teamColumns: Column[] = [
   { key: 'name', label: 'Team Name', sortable: true, width: 'w-[400px]' },
   { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
-  { key: 'created', label: 'Created On', sortable: true, width: 'w-[200px]' },
-  { key: 'membersCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' },
+  { key: 'lastModified', label: 'Last Modified', sortable: true, width: 'w-[200px]' },
+  { key: 'membersCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
 ];
 
 const workspaceColumns: Column[] = [
   { key: 'name', label: 'Workspace Name', sortable: true, width: 'w-[400px]' },
-  { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
   { key: 'created', label: 'Created On', sortable: true, width: 'w-[200px]' },
-  { key: 'projectsCount', label: 'Projects', sortable: true, width: 'w-[120px]', align: 'right' },
+  { key: 'projectsCount', label: 'Projects', sortable: true, width: 'w-[120px]', align: 'right' as const },
+  { key: 'membersCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
 ];
 
 export function AdminPage() {
@@ -97,6 +99,7 @@ export function AdminPage() {
           })),
           filters: [
             { label: 'Role', options: uniqueRoles },
+            { label: 'Access Level', options: Array.from(new Set(accounts.map(a => a.accessLevel))).sort() },
             { label: 'Created On', type: 'date' as const }
           ]
         };
@@ -109,15 +112,16 @@ export function AdminPage() {
             id: team.id,
             name: team.name,
             owner: team.owner,
-            membersCount: team.membersCount.toString(),
+            membersCount: team.membersCount,
             members: team.membersCount,
             teamProjectCount: projects.filter(p => accounts.filter(a => a.teamIds.includes(team.id)).some(a => a.projectIds.includes(p.id))).length,
             created: team.created,
+            lastModified: team.created,
             iconType: 'team' as const,
           })),
           filters: [
             { label: 'Owner', options: uniqueOwners },
-            { label: 'Created On', type: 'date' as const }
+            { label: 'Last Modified', type: 'date' as const }
           ]
         };
       }
@@ -129,7 +133,8 @@ export function AdminPage() {
             id: workspace.id,
             name: workspace.name,
             owner: workspace.owner,
-            projectsCount: projectCount.toString(),
+            projectsCount: projectCount,
+            membersCount: memberCount,
             workspaceProjectCount: projectCount,
             workspaceMemberCount: memberCount,
             created: workspace.created,
@@ -141,7 +146,6 @@ export function AdminPage() {
           columns: workspaceColumns,
           data: workspaceData,
           filters: [
-            { label: 'Owner', options: Array.from(new Set(workspaceData.map(w => w.owner).filter(Boolean))).sort() },
             { label: 'Created On', type: 'date' as const }
           ]
         };
@@ -195,9 +199,7 @@ export function AdminPage() {
     }));
   };
 
-  const handleRowClick = (row: RowData) => {
-    console.log('Row clicked (selected):', row);
-  };
+  const handleRowClick = (_row: RowData) => {};
 
   const handleRowDoubleClick = (row: RowData) => {
     const pathMap: Record<string, string> = {
@@ -221,9 +223,7 @@ export function AdminPage() {
     }
   };
 
-  const handleMoreClick = (row: RowData) => {
-    console.log('More clicked:', row);
-  };
+  const handleMoreClick = (_row: RowData) => {};
 
   // Reset filters when tab changes
   const handleTabChange = (tabId: string) => {

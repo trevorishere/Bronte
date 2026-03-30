@@ -99,9 +99,7 @@ export function WorkspacesPage() {
     }));
   };
 
-  const handleRename = (row: RowData, newName: string) => {
-    console.log(`Rename workspace ${row.id} to ${newName}`);
-  };
+  const handleRename = (_row: RowData, _newName: string) => {};
 
   return (
     <div className="flex flex-col h-screen" style={{ backgroundColor: 'var(--background-content)' }}>

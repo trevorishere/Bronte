@@ -20,6 +20,7 @@ const tableColumns: Column[] = [
   { key: 'name', label: 'Project Name', sortable: true, width: 'w-[400px]' },
   { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
   { key: 'lastModified', label: 'Last Modified', sortable: true, width: 'w-[200px]' },
+  { key: 'accountCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
 ];
 
 export function WorkspacePage() {
@@ -57,6 +58,7 @@ export function WorkspacePage() {
     lastModified: project.lastModified,
     workspace: project.workspace,
     iconType: 'project' as const,
+    accountCount: accounts.filter(a => a.projectIds.includes(project.id)).length,
   }));
 
   // Apply filters to table data
@@ -95,13 +97,9 @@ export function WorkspacePage() {
     }));
   };
 
-  const handleRowClick = (row: RowData) => {
-    console.log('Row clicked (selected):', row);
-  };
+  const handleRowClick = (_row: RowData) => {};
 
-  const handleRowDoubleClick = (row: RowData) => {
-    console.log('Row double-clicked (navigate to):', row);
-  };
+  const handleRowDoubleClick = (_row: RowData) => {};
 
   const handleStarClick = (row: RowData | GridItemData, isStarred: boolean) => {
     if (isStarred) {
@@ -113,9 +111,7 @@ export function WorkspacePage() {
     }
   };
 
-  const handleMoreClick = (row: RowData) => {
-    console.log('More clicked:', row);
-  };
+  const handleMoreClick = (_row: RowData) => {};
 
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ backgroundColor: 'var(--background)' }}>
