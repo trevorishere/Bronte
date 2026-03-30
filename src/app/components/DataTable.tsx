@@ -508,7 +508,7 @@ export function DataTable({
             })}
           </div>
           {/* Icons column header */}
-          <div style={{ flex: '0 0 88px', minWidth: '88px', maxWidth: '88px', paddingLeft: '8px', paddingRight: '8px' }}></div>
+          <div style={{ flex: '0 0 124px', minWidth: '124px', maxWidth: '124px', paddingLeft: '32px', paddingRight: '20px' }}></div>
         </div>
       </div>
 
@@ -663,7 +663,7 @@ export function DataTable({
                               (() => {
                                 const ownerAccount = accounts.find(a => a.name === row[column.key]);
                                 return (
-                                  <div className="flex items-center gap-[8px] min-w-0">
+                                  <div className="flex items-center gap-[12px] min-w-0">
                                     {ownerAccount && (
                                       <Avatar name={ownerAccount.name} role={ownerAccount.role} size="small" />
                                     )}
@@ -723,7 +723,7 @@ export function DataTable({
                                         <span style={{
                                           fontFamily: 'var(--font-family)',
                                           fontWeight: 600,
-                                          fontSize: '14px',
+                                          fontSize: '15px',
                                           letterSpacing: '0.14px',
                                           color: rc?.text,
                                           whiteSpace: 'nowrap',
@@ -741,7 +741,7 @@ export function DataTable({
                                             border: '1px solid var(--border-interactive-hover)',
                                             borderRadius: 'var(--radius-12)',
                                             top: 'calc(100% + 4px)',
-                                            minWidth: '160px',
+                                            minWidth: '180px',
                                           }}
                                           initial={{ opacity: 0, scaleY: 0.9, transformOrigin: 'top center' }}
                                           animate={{ opacity: 1, scaleY: 1 }}
@@ -784,7 +784,7 @@ export function DataTable({
                                   <div className="flex items-center justify-between" style={{ width: '122px' }}>
                                     <span style={{
                                       fontFamily: 'var(--font-family)',
-                                      fontSize: 'var(--font-size-14)',
+                                      fontSize: 'var(--font-size-15)',
                                       letterSpacing: 'var(--letter-spacing-md)',
                                       color: (hoveredRow === row.id || selectedRow === row.id) ? 'var(--primary)' : 'var(--foreground)',
                                       whiteSpace: 'nowrap',
@@ -894,7 +894,7 @@ export function DataTable({
                       >
                         <Star 
                           className="size-[16px]" 
-                          style={{ color: 'var(--icon)' }} 
+                          style={{ color: 'var(--icon-hover)' }} 
                           strokeWidth={1.5}
                           fill={starredItems?.has(row.id) ? 'currentColor' : 'none'}
                         />
@@ -930,17 +930,17 @@ export function DataTable({
 
       {/* Items count tray */}
       <div
-        className="shrink-0 flex items-center px-[20px]"
+        className="shrink-0 flex items-center px-[20px] pb-[2px]"
         style={{
           height: '36px',
-          borderTop: '1px solid var(--border-interactive)',
+          borderTop: '0.5px solid var(--border-interactive)',
         }}
       >
         <span style={{
           fontFamily: 'var(--font-family)',
           fontSize: '12px',
           fontWeight: 'var(--font-weight-regular)',
-          letterSpacing: 'var(--letter-spacing-md)',
+          letterSpacing: 'var(--letter-spacing-lg)',
           color: 'var(--muted-foreground)',
         }}>
           {sortedData.length} {sortedData.length === 1 ? 'item' : 'items'}
