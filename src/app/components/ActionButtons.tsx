@@ -23,14 +23,14 @@ export function ActionButtons({
         {/* Search */}
         <IconButton
           icon={<Search className="shrink-0 size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />}
-          size={32}
+          size={40}
           title="Search"
         />
 
         {/* Notifications */}
         <IconButton
           icon={<Bell className="shrink-0 size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={1.875} />}
-          size={32}
+          size={40}
           title="Notifications"
         />
       </div>
