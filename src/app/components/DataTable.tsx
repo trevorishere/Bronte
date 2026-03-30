@@ -800,7 +800,7 @@ export function DataTable({
                                       className="absolute left-0 bg-background shadow-lg p-[8px] z-50"
                                       style={{
                                         border: '1px solid var(--border-interactive-hover)',
-                                        borderRadius: 'var(--radius-12)',
+                                        borderRadius: 'var(--radius-16)',
                                         top: 'calc(100% + 12px)',
                                         minWidth: '160px',
                                       }}
@@ -817,7 +817,7 @@ export function DataTable({
                                             onAccessLevelChange?.(row, option);
                                             setOpenAccessDropdownId(null);
                                           }}
-                                          className="w-full flex items-center px-[10px] py-[8px] rounded-lg transition-colors"
+                                          className="w-full flex items-center px-[12px] py-[8px] rounded-xl transition-colors"
                                           style={{ background: 'none', border: 'none', cursor: 'pointer' }}
                                           onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
                                           onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
@@ -877,7 +877,7 @@ export function DataTable({
                   </div>
                   
                   {/* Separate icons column */}
-                  <div className="py-[16px]" style={{ flex: '0 0 124px', minWidth: '124px', maxWidth: '124px', paddingLeft: '32px', paddingRight: '20px' }}>
+                  <div className="py-[16px]" style={{ flex: '0 0 116px', minWidth: '116px', maxWidth: '116px', paddingLeft: '24px', paddingRight: '20px' }}>
                     <div className={`flex items-center justify-end gap-[0px] ${(hoveredRow === row.id || openMenuRowId === row.id) ? 'opacity-100' : 'opacity-0'}`} style={{ transition: `opacity var(--transition-duration) var(--transition-timing)` }}>
                       {/* ========================================
                           STAR BUTTON - Uses theme variables
@@ -917,7 +917,10 @@ export function DataTable({
                         onClick={(e) => handleMoreClick(e, row)}
                         ref={el => el && moreButtonRefs.current.set(row.id, el)}
                       >
-                        <MoreHorizontal className="size-[16px] text-secondary" />
+                        <MoreHorizontal 
+                          className="size-[16px]" 
+                          style={{ color: 'var(--text-primary)' }} 
+                          />
                       </button>
                     </div>
                   </div>
