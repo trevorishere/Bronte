@@ -76,13 +76,9 @@ export function SharedPage() {
     }));
   };
 
-  const handleRowClick = (row: RowData) => {
-    console.log('Row clicked (selected):', row);
-  };
+  const handleRowClick = (_row: RowData) => {};
 
-  const handleRowDoubleClick = (row: RowData) => {
-    console.log('Row double-clicked (navigate to):', row);
-  };
+  const handleRowDoubleClick = (_row: RowData) => {};
 
   const handleStarClick = (row: RowData | GridItemData, isStarred: boolean) => {
     if (isStarred) {
@@ -94,9 +90,7 @@ export function SharedPage() {
     }
   };
 
-  const handleMoreClick = (row: RowData) => {
-    console.log('More clicked:', row);
-  };
+  const handleMoreClick = (_row: RowData) => {};
 
   return (
     <div className="flex flex-col h-full overflow-hidden">

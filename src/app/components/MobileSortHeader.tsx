@@ -1,4 +1,5 @@
 import { ArrowUp, ArrowDown, Grid3x3, List } from 'lucide-react';
+import { IconButton } from './IconButton';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -86,19 +87,16 @@ export function MobileSortHeader({
 
         {/* View toggle */}
         {viewMode && onViewModeChange && (
-          <button
-            onClick={() => onViewModeChange(viewMode === 'grid' ? 'list' : 'grid')}
-            className="flex items-center justify-center size-[40px] rounded-full transition-colors"
-            style={{ backgroundColor: 'transparent' }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-          >
-            {viewMode === 'grid' ? (
+          <IconButton
+            icon={viewMode === 'grid' ? (
               <List className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
             ) : (
               <Grid3x3 className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
             )}
-          </button>
+            onClick={() => onViewModeChange(viewMode === 'grid' ? 'list' : 'grid')}
+            size={40}
+            title={viewMode === 'grid' ? 'Switch to list view' : 'Switch to grid view'}
+          />
         )}
       </div>
 

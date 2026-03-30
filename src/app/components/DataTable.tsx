@@ -358,10 +358,8 @@ export function DataTable({
             onRowClick={onRowClick}
             onRowDoubleClick={onRowDoubleClick}
             onStarClick={onStarClick}
-            onMoreClick={onMoreClick}
             starredItems={starredItems}
             viewMode={viewMode}
-            onRename={onRename}
           />
         </div>
       </div>

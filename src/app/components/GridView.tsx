@@ -1,4 +1,5 @@
 import { Star, MoreHorizontal, List } from 'lucide-react';
+import { IconButton } from './IconButton';
 import { useState } from 'react';
 import { WorkspaceIcon } from './WorkspaceIcon';
 import { TeamIcon } from './TeamIcon';
@@ -6,6 +7,7 @@ import { Avatar } from './Avatar';
 import { ProjectIcon } from './ProjectIcon';
 import { DropdownMenu } from './DropdownMenu';
 import { accounts } from '../data/accounts';
+import { getMetadataString } from '../utils/getMetadataString';
 
 export interface GridItemData {
   id: string;
@@ -16,6 +18,8 @@ export interface GridItemData {
   team?: string;
   // Additional metadata
   members?: number;
+  membersCount?: number;
+  sharedBy?: string;
   dateCreated?: string;
   lastModified?: string;
   role?: string;
@@ -102,66 +106,18 @@ export function GridView({
     letterSpacing: 'var(--letter-spacing-md)',
   };
 
-  const renderMetadata = (item: GridItemData) => {
-    // Projects: "Owner Name"
-    if (item.iconType === 'project') {
-      return (
-        <span style={metaTextStyle}>
-          {item.owner}
-        </span>
-      );
-    }
-
-    // Teams: "Y Projects"
-    if (item.iconType === 'team') {
-      const projCount = item.teamProjectCount ?? 0;
-      return (
-        <span style={metaTextStyle}>
-          {projCount} Project{projCount !== 1 ? 's' : ''}
-        </span>
-      );
-    }
-
-    // Workspaces: "X Projects • Y Accounts"
-    if (item.iconType === 'workspace') {
-      const projCount = item.workspaceProjectCount ?? 0;
-      const memberCount = item.workspaceMemberCount ?? 0;
-      return (
-        <span style={metaTextStyle}>
-          {projCount} Project{projCount !== 1 ? 's' : ''} • {memberCount} Account{memberCount !== 1 ? 's' : ''}
-        </span>
-      );
-    }
-
-    // Accounts: "Role • Access Level"
-    if (item.iconType === 'account') {
-      const role = item.role || '';
-      const accessLevel = item.accessLevel || '';
-      return (
-        <span style={metaTextStyle}>
-          {role}{accessLevel ? ` • ${accessLevel}` : ''}
-        </span>
-      );
-    }
-
-    return null;
-  };
-
   return (
     <div className="w-full h-full flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--background)' }}>
 
       {/* Mobile header row — matches MobileSortHeader height/position, toggle on right */}
       {onViewModeChange && (
         <div className="md:hidden shrink-0 px-4 h-[40px] flex items-center justify-end">
-          <button
+          <IconButton
+            icon={<List className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />}
             onClick={() => onViewModeChange('list')}
-            className="flex items-center justify-center size-[40px] rounded-full transition-colors"
-            style={{ backgroundColor: 'transparent' }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-          >
-            <List className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
-          </button>
+            size={40}
+            title="Switch to list view"
+          />
         </div>
       )}
 
@@ -222,7 +178,7 @@ export function GridView({
 
               {/* Metadata and Actions */}
               <div className="flex items-center justify-between">
-                {renderMetadata(item)}
+                {getMetadataString(item, metaTextStyle)}
 
                 {/* Icon Buttons */}
                 <div className="flex gap-[8px] items-center">
@@ -270,11 +226,11 @@ export function GridView({
                         </button>
                       }
                       items={[
-                        { label: 'Open', action: () => console.log('Open', item.name) },
-                        { label: 'Rename', action: () => console.log('Rename', item.name) },
-                        { label: 'Duplicate', action: () => console.log('Duplicate', item.name) },
+                        { label: 'Open', action: () => {} },
+                        { label: 'Rename', action: () => {} },
+                        { label: 'Duplicate', action: () => {} },
                         { type: 'separator' },
-                        { label: 'Delete', action: () => console.log('Delete', item.name) },
+                        { label: 'Delete', action: () => {} },
                       ]}
                     />
                   </div>

@@ -1,4 +1,5 @@
 import { X, Feather, Code2, ShieldUser, Check } from 'lucide-react';
+import { textStyles } from '../utils/textStyles';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from './Button';
@@ -82,15 +83,7 @@ const AUTHORING_ROWS: { id: keyof AuthoringState; label: string }[] = [
   { id: 'contentMgmt', label: 'Content Mgmt' },
 ];
 
-const capsStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-family)',
-  fontSize: '11px',
-  fontWeight: 'var(--font-weight-semibold)',
-  color: 'var(--muted-foreground)',
-  letterSpacing: '0.07em',
-  textTransform: 'uppercase',
-  whiteSpace: 'nowrap',
-};
+const capsStyle: React.CSSProperties = { ...textStyles.caps, color: 'var(--muted-foreground)' };
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 

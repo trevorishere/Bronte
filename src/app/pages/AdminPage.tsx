@@ -195,9 +195,7 @@ export function AdminPage() {
     }));
   };
 
-  const handleRowClick = (row: RowData) => {
-    console.log('Row clicked (selected):', row);
-  };
+  const handleRowClick = (_row: RowData) => {};
 
   const handleRowDoubleClick = (row: RowData) => {
     const pathMap: Record<string, string> = {
@@ -221,9 +219,7 @@ export function AdminPage() {
     }
   };
 
-  const handleMoreClick = (row: RowData) => {
-    console.log('More clicked:', row);
-  };
+  const handleMoreClick = (_row: RowData) => {};
 
   // Reset filters when tab changes
   const handleTabChange = (tabId: string) => {

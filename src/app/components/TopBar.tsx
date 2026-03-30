@@ -1,7 +1,7 @@
-import { ChevronLeft, Grid3x3, List, Search, Bell } from 'lucide-react';
+import { ChevronLeft, Search, Bell } from 'lucide-react';
 import { ReactNode } from 'react';
 import { ActionButtons } from './ActionButtons';
-import { useMobileNav } from '../hooks/useMobileNav';
+import { IconButton } from './IconButton';
 
 interface TopBarProps {
   title?: string;
@@ -10,8 +10,6 @@ interface TopBarProps {
   isDarkMode?: boolean;
   showBackButton?: boolean;
   onBackClick?: () => void;
-  backButtonLabel?: string;
-  pageIcon?: ReactNode;
   viewMode?: 'grid' | 'list';
   onViewModeChange?: (mode: 'grid' | 'list') => void;
   mobileActions?: ReactNode;
@@ -28,8 +26,6 @@ export function TopBar({
   onViewModeChange,
   mobileActions,
 }: TopBarProps) {
-  const { toggleSidebar } = useMobileNav();
-
   const backBtn = (extraClass = '') => (
     <button
       onClick={onBackClick}
@@ -86,22 +82,16 @@ export function TopBar({
         </div>
 
         {/* Search + Bell */}
-        <button
-          className="flex items-center justify-center size-[40px] rounded-full transition-colors shrink-0"
-          style={{ backgroundColor: 'transparent' }}
-          onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
-          onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-        >
-          <Search className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
-        </button>
-        <button
-          className="flex items-center justify-center size-[40px] rounded-full transition-colors shrink-0"
-          style={{ backgroundColor: 'transparent' }}
-          onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
-          onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-        >
-          <Bell className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={1.875} />
-        </button>
+        <IconButton
+          icon={<Search className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />}
+          size={40}
+          title="Search"
+        />
+        <IconButton
+          icon={<Bell className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={1.875} />}
+          size={40}
+          title="Notifications"
+        />
 
         {/* Custom actions only — view toggle lives in MobileSortHeader (list) or GridView header (grid) */}
         {mobileActions && (
@@ -138,7 +128,6 @@ export function TopBar({
           userInitials={userInitials}
           onThemeToggle={onThemeToggle}
           isDarkMode={isDarkMode}
-          onMenuClick={toggleSidebar}
         />
       </div>
     </div>
