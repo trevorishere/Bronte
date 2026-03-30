@@ -414,14 +414,14 @@ export function DataTable({
               if (isLastColumn) {
                 // Numeric right-aligned (e.g. Members, Projects): tight fixed width
                 // Text last column (e.g. Created On): standard fixed width
-                const lastW = lastColIsNumeric ? 90 : 120;
+                const lastW = lastColIsNumeric ? 120 : 180;
                 flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
               } else if (index === 0) {
                 // Name column always gets 3x share so it survives narrowing
-                flexStyle = { flex: '3 1 0px', minWidth: '90px' };
+                flexStyle = { flex: '3 1 0px', minWidth: '120px' };
               } else {
                 // Middle columns share equally
-                flexStyle = { flex: '1 1 0px', minWidth: '120px' };
+                flexStyle = { flex: '1 1 0px', minWidth: '180px' };
               }
 
               return (
@@ -554,12 +554,12 @@ export function DataTable({
                       const lastColIsNumeric = columns[columns.length - 1]?.align === 'right';
 
                       if (isLastColumn) {
-                        const lastW = lastColIsNumeric ? 90 : 120;
+                        const lastW = lastColIsNumeric ? 120 : 180;
                         flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
                       } else if (index === 0) {
-                        flexStyle = { flex: '3 1 0px', minWidth: '90px' };
+                        flexStyle = { flex: '3 1 0px', minWidth: '120px' };
                       } else {
-                        flexStyle = { flex: '1 1 0px', minWidth: '120px' };
+                        flexStyle = { flex: '1 1 0px', minWidth: '180px' };
                       }
 
                       return (
@@ -643,7 +643,7 @@ export function DataTable({
                                   style={{ 
                                     fontFamily: 'var(--font-family)', 
                                     fontSize: 'var(--font-size-15)', 
-                                    fontWeight: 'var(--font-weight-regular)',
+                                    fontWeight: 'var(--font-weight-light)',
                                     letterSpacing: 'var(--letter-spacing-md)',
                                     whiteSpace: 'nowrap', 
                                     overflow: 'hidden', 
@@ -722,9 +722,9 @@ export function DataTable({
                                       >
                                         <span style={{
                                           fontFamily: 'var(--font-family)',
-                                          fontWeight: 600,
+                                          fontWeight: 'var(--font-weight-regular)',
                                           fontSize: '15px',
-                                          letterSpacing: '0.14px',
+                                          letterSpacing: 'var(--letter-spacing-md)',
                                           color: rc?.text,
                                           whiteSpace: 'nowrap',
                                         }}>
@@ -781,7 +781,7 @@ export function DataTable({
                                     setOpenRoleDropdownId(null);
                                   }}
                                 >
-                                  <div className="flex items-center justify-between" style={{ width: '122px' }}>
+                                  <div className="flex items-center justify-between" style={{ width: '160px' }}>
                                     <span style={{
                                       fontFamily: 'var(--font-family)',
                                       fontSize: 'var(--font-size-15)',
@@ -942,8 +942,8 @@ export function DataTable({
         <span style={{
           fontFamily: 'var(--font-family)',
           fontSize: '12px',
-          fontWeight: 'var(--font-weight-regular)',
-          letterSpacing: 'var(--letter-spacing-lg)',
+          fontWeight: 'var(--font-weight-light)',
+          letterSpacing: 'var(--letter-spacing-md)',
           color: 'var(--muted-foreground)',
         }}>
           {sortedData.length} {sortedData.length === 1 ? 'item' : 'items'}
