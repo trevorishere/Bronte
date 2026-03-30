@@ -170,10 +170,9 @@ export function RolesPermissionsTray({
             width: { type: 'spring', stiffness: 320, damping: 32 },
             opacity: { duration: 0.18, ease: 'easeInOut' },
           }}
-          className="shrink-0 overflow-hidden hidden md:flex flex-col m-6"
+          className="shrink-0 overflow-hidden hidden md:flex flex-col"
           style={{
-            border: '1px solid var(--border)',
-            borderRadius: '16px',
+            borderLeft: '1px solid var(--border)',
             backgroundColor: 'color-mix(in srgb, var(--background) 96%, white)',
           }}
         >
@@ -181,7 +180,7 @@ export function RolesPermissionsTray({
 
             {/* ── Header ── */}
             <div
-              className="shrink-0 flex items-center justify-between px-6 py-4"
+              className="shrink-0 flex items-center justify-between px-6 py-6"
               style={{}}
             >
               <div className="flex items-center gap-[10px] min-w-0">
@@ -420,7 +419,7 @@ export function RolesPermissionsTray({
 
             {/* ── Footer ── */}
             <div
-              className="shrink-0 flex items-center justify-between px-6 pt-4 pb-6"
+              className="shrink-0 flex items-center justify-between px-6 py-6"
               style={{}}
             >
               <Button variant="text">Save as Preset</Button>
