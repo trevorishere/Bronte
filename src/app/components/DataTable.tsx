@@ -414,14 +414,14 @@ export function DataTable({
               if (isLastColumn) {
                 // Numeric right-aligned (e.g. Members, Projects): tight fixed width
                 // Text last column (e.g. Created On): standard fixed width
-                const lastW = lastColIsNumeric ? 90 : 180;
+                const lastW = lastColIsNumeric ? 116 : 116;
                 flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
               } else if (index === 0) {
                 // Name column always gets 3x share so it survives narrowing
-                flexStyle = { flex: '3 1 0px', minWidth: '160px' };
+                flexStyle = { flex: '3 1 0px', minWidth: '116px' };
               } else {
                 // Middle columns share equally
-                flexStyle = { flex: '1 1 0px', minWidth: '100px' };
+                flexStyle = { flex: '1 1 0px', minWidth: '116px' };
               }
 
               return (
@@ -508,7 +508,7 @@ export function DataTable({
             })}
           </div>
           {/* Icons column header */}
-          <div style={{ flex: '0 0 124px', minWidth: '124px', maxWidth: '124px', paddingLeft: '32px', paddingRight: '20px' }}></div>
+          <div style={{ flex: '0 0 116px', minWidth: '116px', maxWidth: '116px', paddingLeft: '24px', paddingRight: '20px' }}></div>
         </div>
       </div>
 
@@ -739,8 +739,8 @@ export function DataTable({
                                           className="absolute left-0 bg-background shadow-lg p-[8px] z-50"
                                           style={{
                                             border: '1px solid var(--border-interactive-hover)',
-                                            borderRadius: 'var(--radius-12)',
-                                            top: 'calc(100% + 4px)',
+                                            borderRadius: 'var(--radius-16)',
+                                            top: 'calc(100% + 8px)',
                                             minWidth: '180px',
                                           }}
                                           initial={{ opacity: 0, scaleY: 0.9, transformOrigin: 'top center' }}
@@ -801,7 +801,7 @@ export function DataTable({
                                       style={{
                                         border: '1px solid var(--border-interactive-hover)',
                                         borderRadius: 'var(--radius-12)',
-                                        top: 'calc(100% + 4px)',
+                                        top: 'calc(100% + 12px)',
                                         minWidth: '160px',
                                       }}
                                       initial={{ opacity: 0, scaleY: 0.9, transformOrigin: 'top center' }}
@@ -824,7 +824,7 @@ export function DataTable({
                                         >
                                           <span style={{
                                             fontFamily: 'var(--font-family)',
-                                            fontSize: 'var(--font-size-14)',
+                                            fontSize: 'var(--font-size-15)',
                                             letterSpacing: 'var(--letter-spacing-md)',
                                             color: row[column.key] === option ? 'var(--primary)' : 'var(--foreground)',
                                           }}>
@@ -894,7 +894,7 @@ export function DataTable({
                       >
                         <Star 
                           className="size-[16px]" 
-                          style={{ color: 'var(--icon-hover)' }} 
+                          style={{ color: 'var(--text-primary)' }} 
                           strokeWidth={1.5}
                           fill={starredItems?.has(row.id) ? 'currentColor' : 'none'}
                         />
@@ -917,7 +917,7 @@ export function DataTable({
                         onClick={(e) => handleMoreClick(e, row)}
                         ref={el => el && moreButtonRefs.current.set(row.id, el)}
                       >
-                        <MoreHorizontal className="size-[16px] text-primary" />
+                        <MoreHorizontal className="size-[16px] text-secondary" />
                       </button>
                     </div>
                   </div>
