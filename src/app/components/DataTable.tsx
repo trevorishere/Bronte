@@ -414,14 +414,14 @@ export function DataTable({
               if (isLastColumn) {
                 // Numeric right-aligned (e.g. Members, Projects): tight fixed width
                 // Text last column (e.g. Created On): standard fixed width
-                const lastW = lastColIsNumeric ? 116 : 116;
+                const lastW = lastColIsNumeric ? 90 : 120;
                 flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
               } else if (index === 0) {
                 // Name column always gets 3x share so it survives narrowing
-                flexStyle = { flex: '3 1 0px', minWidth: '116px' };
+                flexStyle = { flex: '3 1 0px', minWidth: '90px' };
               } else {
                 // Middle columns share equally
-                flexStyle = { flex: '1 1 0px', minWidth: '116px' };
+                flexStyle = { flex: '1 1 0px', minWidth: '120px' };
               }
 
               return (
@@ -554,12 +554,12 @@ export function DataTable({
                       const lastColIsNumeric = columns[columns.length - 1]?.align === 'right';
 
                       if (isLastColumn) {
-                        const lastW = lastColIsNumeric ? 90 : 180;
+                        const lastW = lastColIsNumeric ? 90 : 120;
                         flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
                       } else if (index === 0) {
-                        flexStyle = { flex: '3 1 0px', minWidth: '160px' };
+                        flexStyle = { flex: '3 1 0px', minWidth: '90px' };
                       } else {
-                        flexStyle = { flex: '1 1 0px', minWidth: '100px' };
+                        flexStyle = { flex: '1 1 0px', minWidth: '120px' };
                       }
 
                       return (
@@ -894,7 +894,7 @@ export function DataTable({
                       >
                         <Star 
                           className="size-[16px]" 
-                          style={{ color: 'var(--text-primary)' }} 
+                          style={{ color: 'var(--text-foreground)' }} 
                           strokeWidth={1.5}
                           fill={starredItems?.has(row.id) ? 'currentColor' : 'none'}
                         />
@@ -919,7 +919,7 @@ export function DataTable({
                       >
                         <MoreHorizontal 
                           className="size-[16px]" 
-                          style={{ color: 'var(--text-primary)' }} 
+                          style={{ color: 'var(--text-foreground)' }} 
                           />
                       </button>
                     </div>
