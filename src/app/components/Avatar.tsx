@@ -36,6 +36,7 @@ export function Avatar({ name, role = 'Viewer', size = 'medium' }: AvatarProps) 
       size={size}
       backgroundColor={colors.bg}
       borderRadius="round"
+      className="role-color"
     >
       <IconText text={initials} size={size} color="white" />
     </BaseIcon>
@@ -50,8 +51,8 @@ export function RoleBadge({ role }: RoleBadgeProps) {
   const colors = roleColors[role];
 
   return (
-    <div 
-      className="flex gap-[4px] items-center py-[8px] px-[14px] rounded-[16px]"
+    <div
+      className="role-color flex gap-[4px] items-center py-[8px] px-[14px] rounded-[16px]"
       style={{ backgroundColor: colors.badge }}
     >
       <div 

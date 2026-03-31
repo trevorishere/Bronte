@@ -173,27 +173,27 @@ export function DetailPageHeader({ title, badge, icon, metadata, onSettingsClick
       {/* ================================================================ */}
       {/* DESKTOP LAYOUT — horizontal, icon left                          */}
       {/* ================================================================ */}
-      <div className="hidden md:block pl-[40px] pr-[48px] pt-[24px] pb-[32px]">
-        <div className="flex items-start justify-between gap-4">
+      <div className="hidden md:block pl-[40px] pr-[48px] pt-[16px] pb-[20px]">
+        <div className="flex items-center justify-between gap-4">
 
           {/* Left: icon + title + badge + metadata */}
-          <div className="flex items-start gap-8 min-w-0">
+          <div className="flex items-center gap-5 min-w-0">
             {icon && (
-              <div className="shrink-0 mt-1">
-                {icon('large')}
+              <div className="shrink-0">
+                {icon('medium')}
               </div>
             )}
 
-            <div className="flex flex-col items-start gap-3 min-w-0">
+            <div className="flex flex-col items-start gap-2 min-w-0">
               {/* Title + badge */}
-              <div className="flex flex-row items-center gap-[16px]">
+              <div className="flex flex-row items-center gap-[12px]">
                 <h2
                   className="font-bold"
                   style={{
                     fontFamily: 'var(--font-family)',
-                    fontSize: '32px',
+                    fontSize: '22px',
                     color: 'var(--primary)',
-                    letterSpacing: '0.32px',
+                    letterSpacing: '0.22px',
                     lineHeight: 'normal',
                   }}
                 >
@@ -216,7 +216,7 @@ export function DetailPageHeader({ title, badge, icon, metadata, onSettingsClick
           </div>
 
           {/* Right: action buttons */}
-          <div className="shrink-0 flex items-center gap-[8px] pt-2">
+          <div className="shrink-0 flex items-center gap-[8px]">
             <button
               className="flex items-center gap-[6px] h-[32px] px-[12px] rounded-lg transition-colors"
               style={actionBtnStyle}

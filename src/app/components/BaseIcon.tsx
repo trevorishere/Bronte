@@ -8,6 +8,7 @@ export interface BaseIconProps {
   backgroundColor: string;
   borderRadius: 'round' | 'rounded';
   children: ReactNode;
+  className?: string;
 }
 
 // Shared size configuration for all icons
@@ -59,18 +60,19 @@ export const getBorderRadius = (size: IconSize, shape: 'round' | 'rounded'): str
  * BaseIcon - Shared foundation for all icon components
  * Handles consistent sizing, border radius, and layout
  */
-export function BaseIcon({ 
-  size = 'medium', 
-  backgroundColor, 
+export function BaseIcon({
+  size = 'medium',
+  backgroundColor,
   borderRadius,
-  children 
+  children,
+  className = ''
 }: BaseIconProps) {
   const config = iconSizeConfig[size];
   const radius = getBorderRadius(size, borderRadius);
 
   return (
-    <div 
-      className={`${config.containerSize} flex items-center justify-center shrink-0`}
+    <div
+      className={`${config.containerSize} flex items-center justify-center shrink-0 ${className}`}
       style={{ 
         backgroundColor,
         borderRadius: radius
