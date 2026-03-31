@@ -134,7 +134,7 @@ export function DataTable({
   // ========================================
   // SORT HANDLER
   // ========================================
-  // Smart sorting: First click uses column-specific default direction,
+  // Smart sorting:  click uses column-specific default direction,
   // subsequent clicks toggle between asc/desc
   const handleSort = (columnKey: string) => {
     const column = columns.find(col => col.key === columnKey);
@@ -149,8 +149,8 @@ export function DataTable({
     if (sortConfig && sortConfig.key === columnKey && hasBeenClicked) {
       direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
     } else {
-      // First click: set initial direction based on column type
-      // Date columns default to desc (newest first), other columns default to asc (A-Z)
+      //  click: set initial direction based on column type
+      // Date columns default to desc (newest ), other columns default to asc (A-Z)
       direction = isDateColumn(columnKey) ? 'desc' : 'asc';
     }
     
@@ -414,14 +414,14 @@ export function DataTable({
               if (isLastColumn) {
                 // Numeric right-aligned (e.g. Members, Projects): tight fixed width
                 // Text last column (e.g. Created On): standard fixed width
-                const lastW = lastColIsNumeric ? 112 : 160;
+                const lastW = lastColIsNumeric ? 80 : 80;
                 flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
               } else if (index === 0) {
                 // Name column always gets 3x share so it survives narrowing
-                flexStyle = { flex: '3 1 0px', minWidth: '112px' };
+                flexStyle = { flex: '3 1 0px', minWidth: '80px' };
               } else {
                 // Middle columns share equally
-                flexStyle = { flex: '1 1 0px', minWidth: '160px' };
+                flexStyle = { flex: '1 1 0px', minWidth: '80px' };
               }
 
               return (
@@ -431,14 +431,14 @@ export function DataTable({
                   style={{
                     ...flexStyle,
                     fontFamily: 'var(--font-family)',
-                    fontWeight: 'var(--font-weight-medium)',
+                    fontWeight: 'var(--font-weight-semibold)',
                     color: sortConfig?.key === column.key || hoveredHeader === column.key ? 'var(--primary)' : 'var(--muted-foreground)',
                     fontSize: '12px',
                     letterSpacing: 'var(--letter-spacing-lg)',
                     textTransform: 'uppercase',
                     textAlign: column.align || 'left',
-                    paddingLeft: index === 0 ? '20px' : column.align === 'right' ? '12px' : '24px',
-                    paddingRight: column.align === 'right' ? '12px' : '24px',
+                    paddingLeft: index === 0 ? '20px' : column.align === 'right' ? '24px' : '24px',
+                    paddingRight: column.align === 'right' ? '24px' : '24px',
                     position: 'relative',
                     boxSizing: 'border-box',
                     whiteSpace: 'nowrap',
@@ -508,7 +508,7 @@ export function DataTable({
             })}
           </div>
           {/* Icons column header */}
-          <div style={{ flex: '0 0 116px', minWidth: '116px', maxWidth: '116px', paddingLeft: '24px', paddingRight: '20px' }}></div>
+          <div style={{ flex: '0 0 80px', minWidth: '80px', maxWidth: '116px', paddingLeft: '24px', paddingRight: '20px' }}></div>
         </div>
       </div>
 
@@ -554,12 +554,12 @@ export function DataTable({
                       const lastColIsNumeric = columns[columns.length - 1]?.align === 'right';
 
                       if (isLastColumn) {
-                        const lastW = lastColIsNumeric ? 112 : 160;
+                        const lastW = lastColIsNumeric ? 80 : 80;
                         flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
                       } else if (index === 0) {
-                        flexStyle = { flex: '3 1 0px', minWidth: '112px' };
+                        flexStyle = { flex: '3 1 0px', minWidth: '80px' };
                       } else {
-                        flexStyle = { flex: '1 1 0px', minWidth: '160px' };
+                        flexStyle = { flex: '3 1 0px', minWidth: '80px' };
                       }
 
                       return (
@@ -570,10 +570,11 @@ export function DataTable({
                             ...flexStyle,
                             fontFamily: 'var(--font-family)', 
                             fontSize: 'var(--font-size-15)',
+                            fontWeight: 'var(--font-weight-light)',
                             textAlign: column.align || 'left',
                             letterSpacing: 'var(--letter-spacing-md)',
-                            paddingLeft: index === 0 ? '20px' : column.align === 'right' ? '12px' : '24px',
-                            paddingRight: column.align === 'right' ? '12px' : '24px',
+                            paddingLeft: index === 0 ? '20px' : column.align === 'right' ? '24px' : '24px',
+                            paddingRight: column.align === 'right' ? '24px' : '24px',
                             boxSizing: 'border-box'
                           }}
                         >
@@ -639,7 +640,7 @@ export function DataTable({
                               ) : (
                                 // Normal mode - show text (double-click to rename)
                                 <span 
-                                  className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'} flex-1 min-w-[160px] cursor-text`} 
+                                  className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'} flex-1 min-w-[256px] pr-[24px] cursor-text`} 
                                   style={{ 
                                     fontFamily: 'var(--font-family)', 
                                     fontSize: 'var(--font-size-15)', 
@@ -710,9 +711,8 @@ export function DataTable({
                                       }}
                                     >
                                       <div
-                                        className="flex items-center justify-between"
+                                        className="flex items-center justify-between gap-[16px]"
                                         style={{
-                                          width: '122px',
                                           backgroundColor: rc?.text,
                                           borderRadius: '16px',
                                           paddingTop: '5px',
@@ -723,7 +723,7 @@ export function DataTable({
                                       >
                                         <span style={{
                                           fontFamily: 'var(--font-family)',
-                                          fontWeight: 'var(--font-weight-light)',
+                                          fontWeight: 'var(--font-weight-regular)',
                                           fontSize: '15px',
                                           letterSpacing: 'var(--letter-spacing-md)',
                                           color: 'var(--text-foreground)',
@@ -880,7 +880,7 @@ export function DataTable({
                   </div>
                   
                   {/* Separate icons column */}
-                  <div className="py-[16px]" style={{ flex: '0 0 116px', minWidth: '116px', maxWidth: '116px', paddingLeft: '24px', paddingRight: '20px' }}>
+                  <div className="py-[16px]" style={{ flex: '0 0 80px', minWidth: '80px', maxWidth: '116px', paddingLeft: '24px', paddingRight: '20px' }}>
                     <div className={`flex items-center justify-end gap-[0px] ${(hoveredRow === row.id || openMenuRowId === row.id) ? 'opacity-100' : 'opacity-0'}`} style={{ transition: `opacity var(--transition-duration) var(--transition-timing)` }}>
                       {/* ========================================
                           STAR BUTTON - Uses theme variables
@@ -939,15 +939,15 @@ export function DataTable({
         className="shrink-0 flex items-center px-[20px] pb-[2px]"
         style={{
           height: '36px',
-          borderTop: '0.5px solid var(--border-interactive)',
+          borderTop: '1px solid var(--border)',
         }}
       >
         <span style={{
           fontFamily: 'var(--font-family)',
           fontSize: '12px',
-          fontWeight: 'var(--font-weight-light)',
+          fontWeight: 'var(--font-weight-regular)',
           letterSpacing: 'var(--letter-spacing-md)',
-          color: 'var(--muted-foreground)',
+          color: 'var(--text-secondary)',
         }}>
           {sortedData.length} {sortedData.length === 1 ? 'item' : 'items'}
         </span>
