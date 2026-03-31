@@ -67,7 +67,7 @@ export function FilterDropdown({
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        className="flex h-[40px] items-center pr-[8px] transition-colors bg-background group"
+        className="flex h-[40px] items-center pr-[10px] transition-colors bg-background group"
         style={{
           border: `1px solid ${isHovered || isOpen ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}`,
           borderRadius: 'var(--radius-12)',
@@ -147,7 +147,7 @@ export function FilterDropdown({
                     stroke={isHovered || isOpen ? 'var(--foreground)' : 'var(--muted-foreground)'}
                     strokeLinecap="square"
                     strokeLinejoin="round"
-                    strokeWidth="1.5"
+                    strokeWidth="2"
                   />
                 </g>
               </svg>
@@ -184,7 +184,7 @@ export function FilterDropdown({
               <div
                 className="flex items-center gap-[8px] px-[12px] py-[8px] rounded-lg"
                 style={{
-                  border: `1px solid var(--border-interactive)`,
+                  border: `1px solid var(--border)`,
                   backgroundColor: 'var(--background)'
                 }}
               >

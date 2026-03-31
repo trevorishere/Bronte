@@ -380,8 +380,8 @@ export function DataTable({
                     letterSpacing: 'var(--letter-spacing-lg)',
                     textTransform: 'uppercase',
                     textAlign: column.align || 'left',
-                    paddingLeft: '16px',
-                    paddingRight: '16px',
+                    paddingLeft: '20px',
+                    paddingRight: '20px',
                     position: 'relative',
                     boxSizing: 'border-box',
                     whiteSpace: 'nowrap',
@@ -513,11 +513,11 @@ export function DataTable({
                             ...flexStyle,
                             fontFamily: 'var(--font-family)',
                             fontSize: 'var(--font-size-15)',
-                            fontWeight: 'var(--font-weight-light)',
+                            fontWeight: 'var(--font-weight-regular)',
                             textAlign: column.align || 'left',
                             letterSpacing: 'var(--letter-spacing-md)',
-                            paddingLeft: '16px',
-                            paddingRight: '16px',
+                            paddingLeft: '20px',
+                            paddingRight: '20px',
                             boxSizing: 'border-box'
                           }}
                         >
@@ -559,7 +559,7 @@ export function DataTable({
                                 className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'} flex-1 min-w-0`}
                                 style={{
                                   fontFamily: 'var(--font-family)',
-                                  fontSize: 'var(--font-size-15)',
+                                  fontSize: 'var(--font-size-16)',
                                   fontWeight: 'var(--font-weight-medium)',
                                   letterSpacing: 'var(--letter-spacing-md)',
                                   whiteSpace: 'nowrap',
@@ -587,10 +587,10 @@ export function DataTable({
                                         className="cursor-pointer hover:underline min-w-0"
                                         style={{
                                           fontFamily: 'var(--font-family)',
-                                          fontSize: 'var(--font-size-15)',
-                                          fontWeight: 'var(--font-weight-light)',
+                                          fontSize: 'var(--font-size-16)',
+                                          fontWeight: 'var(--font-weight-regular)',
                                           letterSpacing: 'var(--letter-spacing-md)',
-                                          color: 'var(--primary)',
+                                          color: 'var(--foreground)',
                                           whiteSpace: 'nowrap',
                                           overflow: 'hidden',
                                           textOverflow: 'ellipsis',
@@ -603,7 +603,7 @@ export function DataTable({
                                         {row[column.key]}
                                       </span>
                                     ) : (
-                                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-15)', fontWeight: 'var(--font-weight-light)', letterSpacing: 'var(--letter-spacing-md)', color: 'var(--foreground)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-16)', fontWeight: 'var(--font-weight-regular)', letterSpacing: 'var(--letter-spacing-md)', color: 'var(--primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                         {row[column.key]}
                                       </span>
                                     )}
@@ -699,8 +699,8 @@ export function DataTable({
                                   <div className="flex items-center justify-between" style={{ width: '160px' }}>
                                     <span style={{
                                       fontFamily: 'var(--font-family)',
-                                      fontSize: 'var(--font-size-15)',
-                                      fontWeight: 'var(--font-weight-light)',
+                                      fontSize: 'var(--font-size-16)',
+                                      fontWeight: 'var(--font-weight-regular)',
                                       letterSpacing: 'var(--letter-spacing-md)',
                                       color: (hoveredRow === row.id || selectedRow === row.id) ? 'var(--primary)' : 'var(--foreground)',
                                       whiteSpace: 'nowrap',
@@ -760,8 +760,8 @@ export function DataTable({
                                   className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'}`}
                                   style={{
                                     fontFamily: 'var(--font-family)',
-                                    fontSize: 'var(--font-size-15)',
-                                    fontWeight: 'var(--font-weight-light)',
+                                    fontSize: 'var(--font-size-16)',
+                                    fontWeight: 'var(--font-weight-regular)',
                                     letterSpacing: 'var(--letter-spacing-md)',
                                     whiteSpace: 'nowrap',
                                     overflow: 'hidden',
@@ -777,8 +777,8 @@ export function DataTable({
                                 className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'} block min-w-0`}
                                 style={{
                                   fontFamily: 'var(--font-family)',
-                                  fontSize: 'var(--font-size-15)',
-                                  fontWeight: 'var(--font-weight-light)',
+                                  fontSize: 'var(--font-size-16)',
+                                  fontWeight: 'var(--font-weight-regular)',
                                   letterSpacing: 'var(--letter-spacing-md)',
                                   whiteSpace: 'nowrap',
                                   overflow: 'hidden',
@@ -833,7 +833,7 @@ export function DataTable({
                           e.currentTarget.style.backgroundColor = openMenuRowId === row.id ? 'var(--bg-icon-hover)' : 'transparent';
                         }}
                         onClick={(e) => handleMoreClick(e, row)}
-                        ref={el => el && moreButtonRefs.current.set(row.id, el)}
+                        ref={el => { if (el) moreButtonRefs.current.set(row.id, el); }}
                       >
                         <MoreHorizontal
                           className="size-[16px]"
@@ -871,7 +871,7 @@ export function DataTable({
 
       {/* Dropdown Menus */}
       {sortedData.map((row) => {
-        const anchorRef = { current: moreButtonRefs.current.get(row.id) || null };
+        const anchorRef = { current: moreButtonRefs.current.get(row.id) || null } as React.RefObject<HTMLElement>;
         const menuItems = createDefaultMenuItems(
           row.name,
           () => {

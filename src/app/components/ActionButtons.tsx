@@ -22,14 +22,14 @@ export function ActionButtons({
       <div className="hidden md:flex gap-[8px] items-center">
         {/* Search */}
         <IconButton
-          icon={<Search className="shrink-0 size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />}
+          icon={<Search className="shrink-0 size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2.5} />}
           size={40}
           title="Search"
         />
 
         {/* Notifications */}
         <IconButton
-          icon={<Bell className="shrink-0 size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={1.875} />}
+          icon={<Bell className="shrink-0 size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2.5} />}
           size={40}
           title="Notifications"
         />

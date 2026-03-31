@@ -90,10 +90,10 @@ export function DropdownMenu({ items, isOpen, onClose, anchorRef }: DropdownMenu
               }}
               onMouseEnter={() => setHoveredOption(item.id)}
               onMouseLeave={() => setHoveredOption(null)}
-              className="w-full flex items-center gap-3 px-[12px] py-[10px] transition-colors rounded-xl"
+              className="w-full flex items-center gap-4 px-[12px] py-[10px] transition-colors rounded-xl"
               style={{
                 fontFamily: 'var(--font-family)',
-                fontWeight: 'var(--font-weight-regular)',
+                fontWeight: 'var(--font-weight-medium)',
                 fontSize: 'var(--font-size-14)',
                 letterSpacing: 'var(--letter-spacing-md)',
                 lineHeight: 'var(--line-height-20)',

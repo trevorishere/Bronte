@@ -51,7 +51,7 @@ function BreadcrumbNav({ entries, pageIcon }: { entries: BreadcrumbEntry[]; page
 
   return (
     <Breadcrumb>
-      <BreadcrumbList className="text-[14px] md:text-[13px] flex-nowrap">
+      <BreadcrumbList className="text-[16px] md:text-[16px] flex-nowrap">
         {/* First ancestor (when ellipsis applies) */}
         {showEllipsis && firstAncestor && (() => {
           const idx = 0; // firstAncestor is always at index 0 in entries
@@ -98,7 +98,7 @@ function BreadcrumbNav({ entries, pageIcon }: { entries: BreadcrumbEntry[]; page
         })}
 
         {/* Current page — not clickable */}
-        <BreadcrumbItem className="flex items-center gap-[6px]">
+        <BreadcrumbItem className="flex items-center gap-[8px]">
           {pageIcon && <span className="shrink-0">{pageIcon}</span>}
           <BreadcrumbPage
             className="font-medium whitespace-nowrap"
@@ -147,7 +147,7 @@ export function TopBar({
   const backBtn = (extraClass = '') => (
     <button
       onClick={onBackClick}
-      className={`flex items-center gap-[3px] rounded-lg transition-colors group ${extraClass}`}
+      className={`flex items-center gap-[4px] rounded-lg transition-colors group ${extraClass}`}
       style={{ backgroundColor: 'transparent' }}
     >
       <ChevronLeft
@@ -159,7 +159,7 @@ export function TopBar({
         className="transition-colors group-hover:text-[color:var(--primary)]"
         style={{
           fontFamily: 'var(--font-family)',
-          fontWeight: 'var(--font-weight-medium)',
+          fontWeight: 'var(--font-weight-regular)',
           fontSize: '14px',
           color: 'var(--muted-foreground)',
           letterSpacing: 'var(--letter-spacing-md)',
@@ -194,10 +194,10 @@ export function TopBar({
 
   return (
     <div
-      className="h-[72px] shrink-0 w-full"
+      className="h-[64px] shrink-0 w-full"
       style={{
         backgroundColor: 'var(--background)',
-        borderBottom: showBorder ? '1px solid var(--border)' : 'none',
+        borderBottom: /*showBorder ? '1px solid var(--border)' :*/ 'none',
       }}
     >
       {/* ================================================================ */}
@@ -217,10 +217,10 @@ export function TopBar({
               className="truncate text-[24px]"
               style={{
                 fontFamily: 'var(--font-family)',
-                fontWeight: 'bold',
+                fontWeight: 'medium',
                 lineHeight: 'normal',
                 color: 'var(--primary)',
-                letterSpacing: 'var(--letter-spacing-md)',
+                letterSpacing: 'var(--letter-spacing-lg)',
               }}
             >
               {title}
@@ -230,12 +230,12 @@ export function TopBar({
 
         {/* Search + Bell */}
         <IconButton
-          icon={<Search className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />}
+          icon={<Search className="size-[18px]" style={{ color: 'var(--icon)' }} strokeWidth={2.5} />}
           size={40}
           title="Search"
         />
         <IconButton
-          icon={<Bell className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={1.875} />}
+          icon={<Bell className="size-[18px]" style={{ color: 'var(--icon)' }} strokeWidth={2.5} />}
           size={40}
           title="Notifications"
         />
@@ -250,8 +250,8 @@ export function TopBar({
       {/* ================================================================ */}
       {/* DESKTOP LAYOUT                                                   */}
       {/* ================================================================ */}
-      <div className="hidden md:flex items-center justify-between pt-1 pl-[32px] pr-[32px] size-full">
-        <div className="flex items-center flex-1 min-w-0 gap-[10px] overflow-hidden">
+      <div className="hidden md:flex items-center justify-between pt-1 pl-[24px] pr-[32px] size-full">
+        <div className="flex items-center flex-1 min-w-0 gap-[16px] overflow-hidden">
           {hasBreadcrumbs ? (
             <BreadcrumbNav entries={breadcrumbs} pageIcon={pageIcon} />
           ) : showBackButton ? (
@@ -261,13 +261,13 @@ export function TopBar({
             </>
           ) : title ? (
             <h1
-              className="truncate text-[28px]"
+              className="truncate text-[24px]"
               style={{
                 fontFamily: 'var(--font-family)',
-                fontWeight: 'bold',
+                fontWeight: 'regular',
                 lineHeight: 'normal',
                 color: 'var(--primary)',
-                letterSpacing: 'var(--letter-spacing-md)',
+                letterSpacing: 'var(--letter-spacing-lg)',
               }}
             >
               {title}

@@ -1,4 +1,4 @@
-import { Star, Clock, UserRoundPlus, ShieldUser, FolderOpen, X, ChevronsLeftRightEllipsis, Search } from 'lucide-react';
+import { Star, Clock, UserRoundPlus, ShieldUser, FolderOpen, X, ChevronsLeftRightEllipsis, Search, PanelLeftClose } from 'lucide-react';
 import { IconButton } from './IconButton';
 import { getWorkspaceInitials } from './WorkspaceIcon';
 import { useState, useEffect } from 'react';
@@ -84,24 +84,24 @@ export function Sidebar({
     <>
       {/* Logo — Desktop collapsed: only the open chevron */}
       {!isDesktopOpen && (
-        <div className="hidden md:flex h-[72px] shrink-0 items-center px-[12px] w-full">
+        <div className="hidden md:flex h-[64px] shrink-0 items-center px-[12px] w-full">
           <IconButton
-            icon={<ChevronsLeftRightEllipsis className="size-[18px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
+            icon={<PanelLeftClose className="size-[18px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
             onClick={onDesktopToggle}
-            size={44}
-            rounded="xl"
+            size={40}
+            rounded="full"
             title="Open sidebar"
           />
         </div>
       )}
 
       {/* Logo — Full header: always on mobile, desktop only when expanded */}
-      <div className={`h-[72px] shrink-0 w-full ${!isDesktopOpen ? 'flex md:hidden' : 'flex'}`}>
+      <div className={`h-[64px] shrink-0 w-full ${!isDesktopOpen ? 'flex md:hidden' : 'flex'}`}>
         <div className="flex flex-row items-center size-full">
-          <div className="flex items-center pl-[24px] py-[24px] size-full">
-            <div className="h-[26px] shrink-0">
-              <div className="flex gap-[8px] h-full items-center">
-                <div className="flex flex-col justify-center leading-[0] text-[22px] tracking-[0.3px] whitespace-nowrap text-primary" style={{ fontFamily: 'Aleo, serif', fontWeight: 700 }}>
+          <div className="flex items-center pl-[24px] py-[20px] size-full">
+            <div className="h-[40px] shrink-0">
+              <div className="flex gap-[16px] h-full items-center">
+                <div className="flex flex-col justify-center leading-[0] text-[22px] tracking-[0.5px] whitespace-nowrap text-primary" style={{ fontFamily: 'Aleo, serif', fontWeight: 700 }}>
                   <p className="leading-[normal]">Bronte</p>
                 </div>
               </div>
@@ -117,26 +117,26 @@ export function Sidebar({
           />
           {/* Desktop Collapse Button */}
           <IconButton
-            className="hidden md:flex mr-4"
-            icon={<ChevronsLeftRightEllipsis className="size-[18px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
+            className="hidden md:flex mr-2"
+            icon={<PanelLeftClose className="size-[20px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
             onClick={onDesktopToggle}
-            size={32}
-            rounded="xl"
+            size={40}
+            rounded="full"
             title="Collapse sidebar"
           />
         </div>
       </div>
 
       {/* Search field — between header and nav */}
-      <div className="shrink-0 px-[12px] pb-[4px]" style={textFade}>
+      <div className="shrink-0 px-[12px] py-[4px]" style={textFade}>
         <div
-          className="flex items-center gap-[8px] h-[36px] px-[12px]"
+          className="flex items-center gap-[12px] h-[40px] px-[12px]"
           style={{ backgroundColor: 'var(--muted)', borderRadius: 'var(--radius-12)' }}
         >
-          <Search className="size-[16px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
+          <Search className="size-[20px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
           <span style={{
             fontFamily: 'var(--font-family)',
-            fontSize: 'var(--font-size-14)',
+            fontSize: 'var(--font-size-15)',
             color: 'var(--muted-foreground)',
             letterSpacing: 'var(--letter-spacing-md)',
             whiteSpace: 'nowrap',
@@ -150,14 +150,14 @@ export function Sidebar({
       <div className="flex flex-col flex-1 min-h-0 w-full">
         {/* Top Navigation */}
         <div className="shrink-0 w-full">
-          <div className="flex flex-col items-start px-[12px] pt-[4px] pb-[12px] w-full">
+          <div className="flex flex-col items-start gap-[2px] px-[12px] py-[12px] w-full">
             {myWorkspaceItems.map(item => (
               <button
                 key={item.id}
                 onClick={() => handleItemClick(item.id)}
                 onMouseEnter={() => setHoveredItem(item.id)}
                 onMouseLeave={() => setHoveredItem(null)}
-                className="h-[40px] w-full rounded-xl transition-all duration-150 ease-in-out"
+                className="h-[36px] w-full rounded-xl transition-all duration-150 ease-in-out"
                 style={{ backgroundColor: navBg(item.id), maxWidth: !isDesktopOpen ? '44px' : undefined, overflow: 'hidden', transition: 'background-color 150ms ease-in-out, max-width 0.2s ease' }}
               >
                 <div className="flex gap-[12px] items-center p-[12px] size-full">
@@ -168,7 +168,7 @@ export function Sidebar({
                     {item.icon === 'FolderOpen' && <FolderOpen className="size-full" style={{ color: iconColor(item.id) }} />}
                     {item.icon === 'ShieldUser' && <ShieldUser className="size-full" style={{ color: iconColor(item.id) }} />}
                   </div>
-                  <p style={{ fontFamily: 'var(--font-family)', fontWeight: item.fontWeight, lineHeight: 'var(--line-height-20)', fontSize: 'var(--font-size-14)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: 'var(--letter-spacing-md)', textAlign: 'left', color: textColor(item.id), ...textFade }} className="flex-1 min-w-0">
+                  <p style={{ fontFamily: 'var(--font-family)', fontWeight: item.fontWeight, lineHeight: 'var(--line-height-20)', fontSize: 'var(--font-size-15)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: 'var(--letter-spacing-md)', textAlign: 'left', color: textColor(item.id), ...textFade }} className="flex-1 min-w-0">
                     {item.label}
                   </p>
                 </div>
@@ -181,7 +181,7 @@ export function Sidebar({
         <div className="flex-1 min-h-0 w-full overflow-y-auto">
           <div className="flex flex-col items-start px-[12px] pt-[4px] pb-[24px]">
             {teamWorkspaces.length > 0 && (
-              <div className="w-full">
+              <div className="w-full ">
                 <p className="text-muted-foreground" style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-11)', textTransform: 'uppercase', letterSpacing: 'var(--letter-spacing-lg)', padding: '8px 12px', ...textFade }}>
                   Team Workspaces
                 </p>
@@ -191,7 +191,7 @@ export function Sidebar({
                     onClick={() => handleItemClick(workspace.id)}
                     onMouseEnter={() => setHoveredItem(workspace.id)}
                     onMouseLeave={() => setHoveredItem(null)}
-                    className="h-[40px] w-full rounded-xl transition-all duration-150 ease-in-out"
+                    className="h-[36px] w-full rounded-xl transition-all duration-150 ease-in-out"
                     style={{ backgroundColor: navBg(workspace.id), maxWidth: !isDesktopOpen ? '48px' : undefined, overflow: 'hidden', transition: 'background-color 150ms ease-in-out, max-width 0.2s ease' }}
                   >
                     <div className="flex gap-[12px] items-center p-[12px] size-full">
@@ -208,7 +208,7 @@ export function Sidebar({
                         </div>
                       </div>
                       <div className="flex-1 min-w-0" style={textFade}>
-                        <p style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-regular)', lineHeight: 'var(--line-height-20)', fontSize: 'var(--font-size-14)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: 'var(--letter-spacing-md)', textAlign: 'left', color: textColor(workspace.id) }}>
+                        <p style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-20)', fontSize: 'var(--font-size-15)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: 'var(--letter-spacing-md)', textAlign: 'left', color: textColor(workspace.id) }}>
                           {workspace.name}
                         </p>
                       </div>
@@ -222,20 +222,20 @@ export function Sidebar({
 
         {/* Bottom Section: Admin + User Avatar */}
         <div className="shrink-0 w-full">
-          <div className="flex flex-col items-start px-[12px] pt-[8px] pb-[24px] w-full">
+          <div className="flex flex-col items-start px-[12px] w-full">
             {/* Admin nav item */}
             <button
               onClick={() => handleItemClick('admin')}
               onMouseEnter={() => setHoveredItem('admin')}
               onMouseLeave={() => setHoveredItem(null)}
-              className="h-[40px] w-full rounded-xl transition-all duration-150 ease-in-out"
+              className="h-[36px] w-full rounded-xl transition-all duration-150 ease-in-out"
               style={{ backgroundColor: navBg('admin'), maxWidth: !isDesktopOpen ? '44px' : undefined, overflow: 'hidden', transition: 'background-color 150ms ease-in-out, max-width 0.2s ease' }}
             >
               <div className="flex gap-[12px] items-center p-[12px] size-full">
                 <div className="shrink-0 size-[20px]">
                   <ShieldUser className="size-full" style={{ color: iconColor('admin') }} />
                 </div>
-                <p style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-20)', fontSize: 'var(--font-size-14)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: 'var(--letter-spacing-md)', textAlign: 'left', color: textColor('admin'), ...textFade }} className="flex-1 min-w-0">
+                <p style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-20)', fontSize: 'var(--font-size-15)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: 'var(--letter-spacing-md)', textAlign: 'left', color: textColor('admin'), ...textFade }} className="flex-1 min-w-0">
                   Admin
                 </p>
               </div>
@@ -246,19 +246,16 @@ export function Sidebar({
               onClick={() => handleItemClick('account')}
               onMouseEnter={() => setHoveredItem('account')}
               onMouseLeave={() => setHoveredItem(null)}
-              className="h-[52px] w-full rounded-xl transition-all duration-150 ease-in-out mt-2 mb-2"
-              style={{ backgroundColor: navBg('account'), maxWidth: !isDesktopOpen ? '52px' : undefined, overflow: 'hidden', transition: 'background-color 150ms ease-in-out, max-width 0.2s ease' }}
+              className="h-[54px] w-full rounded-xl transition-all duration-150 ease-in-out mt-1 mb-4"
+              style={{ backgroundColor: navBg('account'), maxWidth: !isDesktopOpen ? '54px' : undefined, overflow: 'hidden', transition: 'background-color 150ms ease-in-out, max-width 0.2s ease' }}
             >
-              <div className="flex gap-[10px] items-center px-[10px] py-[8px] size-full">
+              <div className="flex gap-[12px] items-center px-[12px] py-[12px] size-full">
                 <div className="shrink-0 size-[32px] rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-account-avatar)' }}>
                   <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'bold', fontSize: '12px', color: 'white', letterSpacing: '0.5px' }}>LD</span>
                 </div>
                 <div className="flex flex-col min-w-0 flex-1 text-left" style={textFade}>
-                  <p className="truncate" style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)', fontSize: '13px', color: activeItem === 'account' ? 'var(--primary)' : 'var(--foreground)', letterSpacing: 'var(--letter-spacing-md)', lineHeight: '18px' }}>
+                  <p className="truncate" style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)', fontSize: '15px', color: activeItem === 'account' ? 'var(--primary)' : 'var(--foreground)', letterSpacing: 'var(--letter-spacing-md)', lineHeight: '20px' }}>
                     Lena Doe
-                  </p>
-                  <p className="truncate" style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-regular)', fontSize: '11px', color: 'var(--muted-foreground)', letterSpacing: 'var(--letter-spacing-md)', lineHeight: '15px' }}>
-                    lena.doe@university.edu
                   </p>
                 </div>
               </div>
