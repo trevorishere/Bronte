@@ -640,7 +640,7 @@ export function DataTable({
                               ) : (
                                 // Normal mode - show text (double-click to rename)
                                 <span 
-                                  className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'} flex-1 min-w-[256px] pr-[24px] cursor-text`} 
+                                  className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'} flex-1 min-w-0 pr-[24px] cursor-text`} 
                                   style={{ 
                                     fontFamily: 'var(--font-family)', 
                                     fontSize: 'var(--font-size-15)', 
@@ -786,6 +786,7 @@ export function DataTable({
                                     <span style={{
                                       fontFamily: 'var(--font-family)',
                                       fontSize: 'var(--font-size-15)',
+                                      fontWeight: 'var(--font-weight-light)',
                                       letterSpacing: 'var(--letter-spacing-md)',
                                       color: (hoveredRow === row.id || selectedRow === row.id) ? 'var(--primary)' : 'var(--foreground)',
                                       whiteSpace: 'nowrap',
