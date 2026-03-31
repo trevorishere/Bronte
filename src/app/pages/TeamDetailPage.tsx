@@ -222,6 +222,7 @@ export function TeamDetailPage() {
         }
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        pageIcon={<TeamIcon size="small" />}
       />
 
       {/* Team header */}

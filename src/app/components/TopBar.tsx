@@ -13,6 +13,8 @@ interface TopBarProps {
   viewMode?: 'grid' | 'list';
   onViewModeChange?: (mode: 'grid' | 'list') => void;
   mobileActions?: ReactNode;
+  /** Small icon shown alongside the back button on detail pages */
+  pageIcon?: ReactNode;
 }
 
 export function TopBar({
@@ -25,6 +27,7 @@ export function TopBar({
   viewMode,
   onViewModeChange,
   mobileActions,
+  pageIcon,
 }: TopBarProps) {
   const backBtn = (extraClass = '') => (
     <button
@@ -62,9 +65,12 @@ export function TopBar({
       <div className="md:hidden flex items-center gap-1 pt-1 px-[16px] size-full">
 
         {/* Back or root title */}
-        <div className="flex items-center flex-1 min-w-0">
+        <div className="flex items-center flex-1 min-w-0 gap-[10px]">
           {showBackButton ? (
-            backBtn()
+            <>
+              {backBtn()}
+              {pageIcon && <div className="shrink-0">{pageIcon}</div>}
+            </>
           ) : title ? (
             <h1
               className="truncate text-[24px]"
@@ -105,9 +111,12 @@ export function TopBar({
       {/* DESKTOP LAYOUT                                                   */}
       {/* ================================================================ */}
       <div className="hidden md:flex items-center justify-between pt-1 pl-[32px] pr-[32px] size-full">
-        <div className="flex items-center flex-1 min-w-0">
+        <div className="flex items-center flex-1 min-w-0 gap-[10px]">
           {showBackButton ? (
-            backBtn()
+            <>
+              {backBtn()}
+              {pageIcon && <div className="shrink-0">{pageIcon}</div>}
+            </>
           ) : title ? (
             <h1
               className="truncate text-[28px]"

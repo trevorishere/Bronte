@@ -236,6 +236,7 @@ export function AccountDetailPage() {
         onBackClick={() => navigate('/admin')}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        pageIcon={account ? <Avatar name={account.name} role={account.role} size="small" /> : undefined}
       />
 
       {/* Below top bar: content column + tray side by side */}
