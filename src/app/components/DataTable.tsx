@@ -75,28 +75,28 @@ export function DataTable({
   const getDefaultSort = (): SortConfig => {
     // Priority 1: Activity/Recency columns (descending - newest first)
     const activityColumns = ['lastModified', 'dateModified', 'lastActive', 'created', 'dateCreated'];
-    const activityColumn = columns.find(col => 
+    const activityColumn = columns.find(col =>
       col.sortable && activityColumns.includes(col.key)
     );
     if (activityColumn) {
       return { key: activityColumn.key, direction: 'desc' };
     }
-    
+
     // Priority 2: Name column (ascending - A-Z)
     const nameColumns = ['name', 'projectName', 'accountName', 'teamName', 'workspaceName'];
-    const nameColumn = columns.find(col => 
+    const nameColumn = columns.find(col =>
       col.sortable && nameColumns.includes(col.key)
     );
     if (nameColumn) {
       return { key: nameColumn.key, direction: 'asc' };
     }
-    
+
     // Priority 3: First sortable column (ascending - fallback)
     const firstSortableColumn = columns.find(col => col.sortable);
     if (firstSortableColumn) {
       return { key: firstSortableColumn.key, direction: 'asc' };
     }
-    
+
     return null;
   };
 
@@ -116,20 +116,13 @@ export function DataTable({
   const [openMenuRowId, setOpenMenuRowId] = useState<string | null>(null);
   const [openRoleDropdownId, setOpenRoleDropdownId] = useState<string | null>(null);
   const [openAccessDropdownId, setOpenAccessDropdownId] = useState<string | null>(null);
-  
-  // Rename Mode State
-  const [editingRowId, setEditingRowId] = useState<string | null>(null);
-  const [editValue, setEditValue] = useState<string>('');
-  const [originalValue, setOriginalValue] = useState<string>('');
-  
+
   // Rename Modal State
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
   const [rowToRename, setRowToRename] = useState<RowData | null>(null);
-  
+
   // Refs
-  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null); // For double-click detection
   const moreButtonRefs = useRef<Map<string, HTMLButtonElement>>(new Map()); // For dropdown menu positioning
-  const inputRef = useRef<HTMLInputElement>(null); // For rename input focus
 
   // ========================================
   // SORT HANDLER
@@ -141,10 +134,10 @@ export function DataTable({
     if (!column?.sortable) return;
 
     let direction: 'asc' | 'desc';
-    
+
     // Check if this column has been clicked before
     const hasBeenClicked = clickedColumns.has(columnKey);
-    
+
     // If this column is already sorted AND has been clicked before, toggle the direction
     if (sortConfig && sortConfig.key === columnKey && hasBeenClicked) {
       direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
@@ -153,7 +146,7 @@ export function DataTable({
       // Date columns default to desc (newest ), other columns default to asc (A-Z)
       direction = isDateColumn(columnKey) ? 'desc' : 'asc';
     }
-    
+
     // Mark this column as clicked
     setClickedColumns(prev => new Set(prev).add(columnKey));
     setSortConfig({ key: columnKey, direction });
@@ -203,110 +196,6 @@ export function DataTable({
     setOpenMenuRowId(openMenuRowId === row.id ? null : row.id);
   };
 
-  // ========================================
-  // RENAME FUNCTIONALITY
-  // ========================================
-  // Helper functions for file name and extension
-  const getFileNameWithoutExtension = (fullName: string): string => {
-    const lastDotIndex = fullName.lastIndexOf('.');
-    if (lastDotIndex === -1 || lastDotIndex === 0) {
-      return fullName; // No extension or hidden file
-    }
-    return fullName.substring(0, lastDotIndex);
-  };
-
-  const getFileExtension = (fullName: string): string => {
-    const lastDotIndex = fullName.lastIndexOf('.');
-    if (lastDotIndex === -1 || lastDotIndex === 0) {
-      return ''; // No extension or hidden file
-    }
-    return fullName.substring(lastDotIndex);
-  };
-
-  const enterRenameMode = (row: RowData, columnKey: string) => {
-    const fullName = row[columnKey];
-    const nameWithoutExt = getFileNameWithoutExtension(fullName);
-    
-    setEditingRowId(row.id);
-    setEditValue(fullName);
-    setOriginalValue(fullName);
-    
-    // Auto-focus and select the name part (without extension) after a brief delay
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-        const extension = getFileExtension(fullName);
-        if (extension) {
-          // Select only the name part, not the extension
-          inputRef.current.setSelectionRange(0, nameWithoutExt.length);
-        } else {
-          // No extension, select all
-          inputRef.current.select();
-        }
-      }
-    }, 0);
-  };
-
-  const saveRename = (row: RowData) => {
-    if (editValue.trim() && editValue !== originalValue) {
-      onRename?.(row, editValue.trim());
-      toast.success(`Renamed to "${editValue.trim()}"`);
-    }
-    exitRenameMode();
-  };
-
-  const cancelRename = () => {
-    exitRenameMode();
-  };
-
-  const exitRenameMode = () => {
-    setEditingRowId(null);
-    setEditValue('');
-    setOriginalValue('');
-  };
-
-  const handleNameClick = (e: React.MouseEvent, row: RowData, columnKey: string) => {
-    e.stopPropagation();
-    
-    // Clear any existing timeout
-    if (clickTimeoutRef.current) {
-      clearTimeout(clickTimeoutRef.current);
-      clickTimeoutRef.current = null;
-      
-      // This is a double-click - enter rename mode
-      enterRenameMode(row, columnKey);
-    } else {
-      // This might be a single click - wait to see if a second click follows
-      clickTimeoutRef.current = setTimeout(() => {
-        // Single click - select the row
-        handleRowClick(row);
-        clickTimeoutRef.current = null;
-      }, 300);
-    }
-  };
-
-  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, row: RowData) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      e.stopPropagation();
-      saveRename(row);
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      e.stopPropagation();
-      cancelRename();
-    }
-  };
-
-  const handleInputBlur = (row: RowData) => {
-    // Save changes when clicking outside
-    saveRename(row);
-  };
-
-  const handleInputClick = (e: React.MouseEvent) => {
-    // Prevent row selection when clicking on the input
-    e.stopPropagation();
-  };
-
   const handleRowClick = (row: RowData) => {
     // Toggle behavior: clicking the same row deselects it
     if (selectedRow === row.id) {
@@ -345,6 +234,24 @@ export function DataTable({
     return () => document.removeEventListener('click', handleClickOutside);
   }, [openRoleDropdownId, openAccessDropdownId]);
 
+  // ========================================
+  // RESPONSIVE COLUMN HIDING
+  // ========================================
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState<number>(Infinity);
+
+  useEffect(() => {
+    const el = tableContainerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        setContainerWidth(entry.contentRect.width);
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   // Handle clicking on empty space in the table area
   const handleTableAreaClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Only clear selection if clicking directly on the scrollable area (not bubbled from rows)
@@ -359,6 +266,42 @@ export function DataTable({
     }
     return 'var(--background)';
   };
+
+  // Determine which columns to show based on container width
+  const visibleColumns = (() => {
+    const iconColWidth = 116;
+    const nameColMin = 200;
+    const middleColMin = 140;
+    const lastNumericW = 112;
+    const lastTextW = 140;
+    const lastIsNumeric = columns[columns.length - 1]?.align === 'right';
+    const lastW = lastIsNumeric ? lastNumericW : lastTextW;
+    const middleCount = Math.max(0, columns.length - 2);
+    const totalMin = nameColMin + middleCount * middleColMin + lastW + iconColWidth;
+
+    if (containerWidth >= totalMin || columns.length <= 2) return columns;
+
+    // Find candidates to hide
+    const hasCreated = columns.some(c => c.key === 'created' || c.key === 'dateCreated');
+    const numericIndices = columns
+      .map((c, i) => (i > 0 && c.align === 'right' ? i : -1))
+      .filter(i => i >= 0);
+    const hasNumeric = numericIndices.length > 0;
+
+    if (hasCreated && hasNumeric) {
+      // Hide Created On first
+      return columns.filter(c => c.key !== 'created' && c.key !== 'dateCreated');
+    }
+    if (hasNumeric) {
+      // Hide last numeric column
+      const lastNumericIdx = numericIndices[numericIndices.length - 1];
+      return columns.filter((_, i) => i !== lastNumericIdx);
+    }
+    if (hasCreated) {
+      return columns.filter(c => c.key !== 'created' && c.key !== 'dateCreated');
+    }
+    return columns;
+  })();
 
   return (
     <>
@@ -388,7 +331,7 @@ export function DataTable({
       </div>
 
       {/* Desktop Table View - Hidden on mobile */}
-      <div className="hidden md:flex flex-1 flex-col px-[24px] pb-[24px] min-h-0 overflow-hidden">
+      <div ref={tableContainerRef} className="hidden md:flex flex-1 flex-col px-[24px] pb-[24px] min-h-0 overflow-hidden">
       {/* ======================================== */}
       {/* TABLE (header + rows inside the same border) */}
       {/* ======================================== */}
@@ -398,18 +341,18 @@ export function DataTable({
         <div className="w-full flex" style={{ minWidth: '100%' }}>
           {/* Header Columns */}
           <div className="flex flex-1 min-w-0">
-            {columns.map((column, index) => {
-              const totalColumns = columns.length;
+            {visibleColumns.map((column, index) => {
+              const totalColumns = visibleColumns.length;
               let flexStyle: React.CSSProperties = {};
-              
+
               // ========================================
               // COLUMN WIDTH CALCULATION LOGIC
               // ========================================
               // Name column (index 0): Always gets the largest flex share (priority)
               // Middle columns: Equal smaller shares
               // Last column: Compact fixed width — extra tight for right-aligned numeric columns
-              const isLastColumn = index === columns.length - 1;
-              const lastColIsNumeric = columns[columns.length - 1]?.align === 'right';
+              const isLastColumn = index === visibleColumns.length - 1;
+              const lastColIsNumeric = visibleColumns[visibleColumns.length - 1]?.align === 'right';
 
               if (isLastColumn) {
                 // Numeric right-aligned (e.g. Members, Projects): tight fixed width
@@ -418,7 +361,7 @@ export function DataTable({
                 flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
               } else if (index === 0) {
                 // Name column always gets 3x share so it survives narrowing
-                flexStyle = { flex: '3 1 0px', minWidth: '112px' };
+                flexStyle = { flex: '3 1 0px', minWidth: '200px' };
               } else {
                 // Middle columns share equally
                 flexStyle = { flex: '1 1 0px', minWidth: '140px' };
@@ -437,8 +380,8 @@ export function DataTable({
                     letterSpacing: 'var(--letter-spacing-lg)',
                     textTransform: 'uppercase',
                     textAlign: column.align || 'left',
-                    paddingLeft: index === 0 ? '20px' : column.align === 'right' ? '16px' : '24px',
-                    paddingRight: column.align === 'right' ? '16px' : '24px',
+                    paddingLeft: '16px',
+                    paddingRight: '16px',
                     position: 'relative',
                     boxSizing: 'border-box',
                     whiteSpace: 'nowrap',
@@ -519,14 +462,14 @@ export function DataTable({
         <div className="overflow-y-auto w-full h-full" style={{ paddingBottom: '4px' }} onClick={handleTableAreaClick}>
           <div className="w-full" style={{ minWidth: '100%' }}>
             {sortedData.map((row, rowIndex) => {
-              const totalColumns = columns.length;
-              
+              const totalColumns = visibleColumns.length;
+
               return (
                 <div
                   key={row.id}
                   className="cursor-pointer transition-colors flex w-full"
-                  style={{ 
-                    borderBottom: rowIndex === sortedData.length - 1 ? 'none' : '1px solid var(--border-interactive)', 
+                  style={{
+                    borderBottom: rowIndex === sortedData.length - 1 ? 'none' : '1px solid var(--border-interactive)',
                     backgroundColor: getRowBackgroundColor(row.id),
                     minWidth: '100%'
                   }}
@@ -546,18 +489,18 @@ export function DataTable({
                 >
                   {/* Data columns container */}
                   <div className="flex flex-1 min-w-0">
-                    {columns.map((column, index) => {
+                    {visibleColumns.map((column, index) => {
                       let flexStyle: React.CSSProperties = {};
 
                       // Mirror the header column width logic
-                      const isLastColumn = index === columns.length - 1;
-                      const lastColIsNumeric = columns[columns.length - 1]?.align === 'right';
+                      const isLastColumn = index === visibleColumns.length - 1;
+                      const lastColIsNumeric = visibleColumns[visibleColumns.length - 1]?.align === 'right';
 
                       if (isLastColumn) {
                         const lastW = lastColIsNumeric ? 112 : 140;
                         flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
                       } else if (index === 0) {
-                        flexStyle = { flex: '3 1 0px', minWidth: '112px' };
+                        flexStyle = { flex: '3 1 0px', minWidth: '200px' };
                       } else {
                         flexStyle = { flex: '1 1 0px', minWidth: '140px' };
                       }
@@ -566,21 +509,21 @@ export function DataTable({
                         <div
                           key={column.key}
                           className="py-[16px] flex items-center"
-                          style={{ 
+                          style={{
                             ...flexStyle,
-                            fontFamily: 'var(--font-family)', 
+                            fontFamily: 'var(--font-family)',
                             fontSize: 'var(--font-size-15)',
                             fontWeight: 'var(--font-weight-light)',
                             textAlign: column.align || 'left',
                             letterSpacing: 'var(--letter-spacing-md)',
-                            paddingLeft: index === 0 ? '20px' : column.align === 'right' ? '16px' : '24px',
-                            paddingRight: column.align === 'right' ? '16px' : '24px',
+                            paddingLeft: '16px',
+                            paddingRight: '16px',
                             boxSizing: 'border-box'
                           }}
                         >
                           {index === 0 ? (
                             // ========================================
-                            // FIRST COLUMN: Icon + Text (with rename support)
+                            // FIRST COLUMN: Icon + Text
                             // ========================================
                             <div className="flex items-center gap-[16px] min-w-0">
                               {/* Render icon based on iconType */}
@@ -601,9 +544,9 @@ export function DataTable({
                                 // FALLBACK FILE ICON CONTAINER
                                 // Uses theme variables for consistency
                                 // ========================================
-                                <div 
-                                  className="shrink-0 size-[32px] flex items-center justify-center" 
-                                  style={{ 
+                                <div
+                                  className="shrink-0 size-[32px] flex items-center justify-center"
+                                  style={{
                                     backgroundColor: 'var(--bg-icon-container)',
                                     borderRadius: 'var(--radius-8)'
                                   }}
@@ -612,49 +555,20 @@ export function DataTable({
                                   <File className="size-[18px] text-white" />
                                 </div>
                               )}
-                              {editingRowId === row.id ? (
-                                // Rename mode - show input field
-                                <input
-                                  ref={inputRef}
-                                  type="text"
-                                  value={editValue}
-                                  onChange={(e) => setEditValue(e.target.value)}
-                                  onKeyDown={(e) => handleInputKeyDown(e, row)}
-                                  onBlur={() => handleInputBlur(row)}
-                                  onClick={handleInputClick}
-                                  className="flex-1 min-w-0 px-[6px] py-[2px] rounded transition-all"
-                                  style={{
-                                    width: '100%',
-                                    fontFamily: 'var(--font-family)',
-                                    fontWeight: 'var(--font-weight-medium)',
-                                    fontSize: 'var(--font-size-15)',
-                                    letterSpacing: 'var(--letter-spacing-md)',
-                                    lineHeight: 'var(--line-height-20)',
-                                    color: 'var(--foreground)',
-                                    padding: '8px 12px',
-                                    border: '1px solid var(--border-interactive-hover)',
-                                    outline: 'none',
-                                    backgroundColor: 'var(--background)'
-                                  }}
-                                />
-                              ) : (
-                                // Normal mode - show text (double-click to rename)
-                                <span 
-                                  className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'} flex-1 min-w-0 cursor-text`} 
-                                  style={{ 
-                                    fontFamily: 'var(--font-family)', 
-                                    fontSize: 'var(--font-size-15)', 
-                                    fontWeight: 'var(--font-weight-medium)',
-                                    letterSpacing: 'var(--letter-spacing-md)',
-                                    whiteSpace: 'nowrap', 
-                                    overflow: 'hidden', 
-                                    textOverflow: 'ellipsis' 
-                                  }}
-                                  onClick={(e) => handleNameClick(e, row, column.key)}
-                                >
-                                  {row[column.key]}
-                                </span>
-                              )}
+                              <span
+                                className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'} flex-1 min-w-0`}
+                                style={{
+                                  fontFamily: 'var(--font-family)',
+                                  fontSize: 'var(--font-size-15)',
+                                  fontWeight: 'var(--font-weight-medium)',
+                                  letterSpacing: 'var(--letter-spacing-md)',
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis'
+                                }}
+                              >
+                                {row[column.key]}
+                              </span>
                             </div>
                           ) : (
                             // ========================================
@@ -711,7 +625,7 @@ export function DataTable({
                                       }}
                                     >
                                       <div
-                                        className="flex items-center justify-between gap-[16px]"
+                                        className="role-color flex items-center justify-between gap-[16px]"
                                         style={{
                                           backgroundColor: rc?.text,
                                           borderRadius: '16px',
@@ -726,12 +640,12 @@ export function DataTable({
                                           fontWeight: 'var(--font-weight-regular)',
                                           fontSize: '15px',
                                           letterSpacing: 'var(--letter-spacing-md)',
-                                          color: 'var(--text-foreground)',
+                                          color: 'white',
                                           whiteSpace: 'nowrap',
                                         }}>
                                           {row[column.key]}
                                         </span>
-                                        <ChevronDown className="size-[16px]" style={{ color: 'var(--text-foreground)', flexShrink: 0 }} />
+                                        <ChevronDown className="size-[16px]" style={{ color: 'white', flexShrink: 0 }} />
                                       </div>
                                     </button>
                                     <AnimatePresence>
@@ -879,7 +793,7 @@ export function DataTable({
                       );
                     })}
                   </div>
-                  
+
                   {/* Separate icons column */}
                   <div className="py-[16px]" style={{ flex: '0 0 116px', minWidth: '116px', maxWidth: '116px', paddingLeft: '24px', paddingRight: '20px' }}>
                     <div className={`flex items-center justify-end gap-[0px] ${(hoveredRow === row.id || openMenuRowId === row.id) ? 'opacity-100' : 'opacity-0'}`} style={{ transition: `opacity var(--transition-duration) var(--transition-timing)` }}>
@@ -888,7 +802,7 @@ export function DataTable({
                           ========================================*/}
                       <button
                         className="size-[36px] flex items-center justify-center rounded-full"
-                        style={{ 
+                        style={{
                           backgroundColor: 'transparent',
                           transition: `background-color var(--transition-duration) var(--transition-timing)`
                         }}
@@ -896,9 +810,9 @@ export function DataTable({
                         onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                         onClick={(e) => handleStarClick(e, row)}
                       >
-                        <Star 
-                          className="size-[16px]" 
-                          style={{ color: 'var(--text-foreground)' }} 
+                        <Star
+                          className="size-[16px]"
+                          style={{ color: 'var(--text-foreground)' }}
                           strokeWidth={1.5}
                           fill={starredItems?.has(row.id) ? 'currentColor' : 'none'}
                         />
@@ -908,7 +822,7 @@ export function DataTable({
                           ========================================*/}
                       <button
                         className="size-[36px] flex items-center justify-center rounded-full"
-                        style={{ 
+                        style={{
                           backgroundColor: openMenuRowId === row.id ? 'var(--bg-icon-hover)' : 'transparent',
                           transition: `background-color var(--transition-duration) var(--transition-timing)`
                         }}
@@ -921,9 +835,9 @@ export function DataTable({
                         onClick={(e) => handleMoreClick(e, row)}
                         ref={el => el && moreButtonRefs.current.set(row.id, el)}
                       >
-                        <MoreHorizontal 
-                          className="size-[16px]" 
-                          style={{ color: 'var(--text-foreground)' }} 
+                        <MoreHorizontal
+                          className="size-[16px]"
+                          style={{ color: 'var(--text-foreground)' }}
                           />
                       </button>
                     </div>

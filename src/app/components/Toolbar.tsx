@@ -114,50 +114,46 @@ export function Toolbar({
           })}
         </div>
 
-        {/* View Toggle Section - Right Side */}
-        {/* Button Width: 40px each */}
-        {/* Button Height: 40px */}
-        {/* Border: 1px solid, changes on hover */}
-        <div 
-          className="flex h-[40px] overflow-hidden rounded-xl transition-colors" 
-          style={{ border: `1px solid ${isToggleHovered ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}` }}
-          onMouseEnter={() => setIsToggleHovered(true)}
-          onMouseLeave={() => setIsToggleHovered(false)}
-        >
-          {/* List View Button */}
-          <button
-            onClick={() => onViewModeChange?.('list')}
-            className={`flex items-center justify-center size-[40px] pb-[2px] transition-colors ${
-              viewMode === 'list' ? 'bg-background' : 'bg-transparent'
-            }`}
-            style={{
-              borderRight: `1px solid ${isToggleHovered ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}`
-            }}
-            onMouseEnter={() => setHoveredToggle('list')}
-            onMouseLeave={() => setHoveredToggle(null)}
-          >
-            <List 
-              size={18}
-              strokeWidth={2}
-              color={getIconColor('list')}
-            />
-          </button>
+        {/* View Toggle Section + divider - Right Side */}
+        <div className="flex items-center gap-[12px] shrink-0">
+          {/* Divider */}
+          <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--border-interactive)' }} />
 
-          {/* Grid View Button */}
-          <button
-            onClick={() => onViewModeChange?.('grid')}
-            className={`flex items-center justify-center size-[40px] pb-[2px] transition-colors ${
-              viewMode === 'grid' ? 'bg-background' : 'bg-transparent'
-            }`}
-            onMouseEnter={() => setHoveredToggle('grid')}
-            onMouseLeave={() => setHoveredToggle(null)}
+          {/* Toggle buttons */}
+          {/* Button Width: 40px each, Button Height: 40px */}
+          <div
+            className="flex h-[40px] overflow-hidden rounded-xl transition-colors"
+            style={{ border: `1px solid ${isToggleHovered ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}` }}
+            onMouseEnter={() => setIsToggleHovered(true)}
+            onMouseLeave={() => setIsToggleHovered(false)}
           >
-            <Grid3x3 
-              size={18}
-              strokeWidth={2}
-              color={getIconColor('grid')}
-            />
-          </button>
+            {/* List View Button */}
+            <button
+              onClick={() => onViewModeChange?.('list')}
+              className={`flex items-center justify-center size-[40px] pb-[2px] transition-colors ${
+                viewMode === 'list' ? 'bg-background' : 'bg-transparent'
+              }`}
+              style={{
+                borderRight: `1px solid ${isToggleHovered ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}`
+              }}
+              onMouseEnter={() => setHoveredToggle('list')}
+              onMouseLeave={() => setHoveredToggle(null)}
+            >
+              <List size={18} strokeWidth={2} color={getIconColor('list')} />
+            </button>
+
+            {/* Grid View Button */}
+            <button
+              onClick={() => onViewModeChange?.('grid')}
+              className={`flex items-center justify-center size-[40px] pb-[2px] transition-colors ${
+                viewMode === 'grid' ? 'bg-background' : 'bg-transparent'
+              }`}
+              onMouseEnter={() => setHoveredToggle('grid')}
+              onMouseLeave={() => setHoveredToggle(null)}
+            >
+              <Grid3x3 size={18} strokeWidth={2} color={getIconColor('grid')} />
+            </button>
+          </div>
         </div>
       </div>
     </>
