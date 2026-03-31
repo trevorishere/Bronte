@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useOutletContext, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import { DataTableSkeleton, GridSkeleton, useLoadingDelay } from '../components/SkeletonLoader';
@@ -11,6 +11,7 @@ import { projects, workspaces } from '../data/workspaces';
 import { teams } from '../data/teams';
 import { accounts } from '../data/accounts';
 import { useFavorites } from '../contexts/FavoritesContext';
+import { useNavigationContext } from '../contexts/NavigationContext';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -61,6 +62,10 @@ export function AdminPage() {
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const { favorites, addFavorite, removeFavorite } = useFavorites();
   const navigate = useNavigate();
+  const { resetToRoot, setAncestors } = useNavigationContext();
+
+  // Clear breadcrumb trail when landing on admin root
+  useEffect(() => { resetToRoot(); }, []);
 
   // Get data based on active tab
   const getTableData = (): { columns: Column[], data: RowData[], filters: any[] } => {
@@ -209,7 +214,9 @@ export function AdminPage() {
     };
     const path = pathMap[activeTab];
     if (path) {
-      navigate(`/admin/${path}/${row.id}`);
+      const adminAncestor = { label: 'Admin', path: '/admin' };
+      setAncestors([adminAncestor]);
+      navigate(`/admin/${path}/${row.id}`, { state: { breadcrumbs: [adminAncestor] } });
     }
   };
 

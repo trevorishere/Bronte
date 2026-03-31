@@ -1,4 +1,5 @@
-import { useParams, useNavigate, useOutletContext } from 'react-router';
+import { useParams, useNavigate, useOutletContext, useLocation } from 'react-router';
+import { useEffect } from 'react';
 import { ChevronLeft, HelpCircle, Bell, Moon, Sun } from 'lucide-react';
 import { accounts } from '../data/accounts';
 import { projects } from '../data/workspaces';
@@ -14,6 +15,7 @@ import { RolesPermissionsTray } from '../components/RolesPermissionsTray';
 import { TabNav, Tab } from '../components/TabNav';
 import { TopBar } from '../components/TopBar';
 import { useState } from 'react';
+import { useNavigationContext, BreadcrumbEntry } from '../contexts/NavigationContext';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -23,14 +25,27 @@ interface OutletContext {
 export function AccountDetailPage() {
   const { accountId } = useParams<{ accountId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { isDarkMode, onThemeToggle } = useOutletContext<OutletContext>();
   const [activeTab, setActiveTab] = useState('Projects');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const [isTrayOpen, setIsTrayOpen] = useState(false);
+  const { ancestors, setAncestors } = useNavigationContext();
 
   const account = accounts.find(acc => acc.id === accountId);
+
+  // Restore or build ancestor trail on mount / accountId change
+  useEffect(() => {
+    if (!account) return;
+    const stateTrail = (location.state as any)?.breadcrumbs as BreadcrumbEntry[] | undefined;
+    if (stateTrail !== undefined) {
+      setAncestors(stateTrail);
+    } else if (ancestors.length === 0) {
+      setAncestors([{ label: 'Admin', path: '/admin' }]);
+    }
+  }, [accountId]);
 
   if (!account) {
     return (
@@ -232,8 +247,8 @@ export function AccountDetailPage() {
         userInitials="LD"
         onThemeToggle={onThemeToggle}
         isDarkMode={isDarkMode}
-        showBackButton={true}
-        onBackClick={() => navigate('/admin')}
+        breadcrumbs={[...ancestors, { label: account.name, path: `/admin/account/${accountId}` }]}
+        pageIcon={<Avatar name={account.name} role={account.role} size="small" />}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
       />
@@ -284,12 +299,26 @@ export function AccountDetailPage() {
               <GridView
                 data={filteredData as GridItemData[]}
                 onItemClick={(item) => {
-                  if (activeTab === 'Teams') navigate(`/admin/team/${item.id}`);
-                  else if (activeTab === 'Workspaces') navigate(`/admin/workspace/${item.id}`);
+                  const currentEntry = { label: account.name, path: `/admin/account/${accountId}` };
+                  const nextAncestors = [...ancestors, currentEntry];
+                  if (activeTab === 'Teams') {
+                    setAncestors(nextAncestors);
+                    navigate(`/admin/team/${item.id}`, { state: { breadcrumbs: nextAncestors } });
+                  } else if (activeTab === 'Workspaces') {
+                    setAncestors(nextAncestors);
+                    navigate(`/admin/workspace/${item.id}`, { state: { breadcrumbs: nextAncestors } });
+                  }
                 }}
                 onItemDoubleClick={(item) => {
-                  if (activeTab === 'Teams') navigate(`/admin/team/${item.id}`);
-                  else if (activeTab === 'Workspaces') navigate(`/admin/workspace/${item.id}`);
+                  const currentEntry = { label: account.name, path: `/admin/account/${accountId}` };
+                  const nextAncestors = [...ancestors, currentEntry];
+                  if (activeTab === 'Teams') {
+                    setAncestors(nextAncestors);
+                    navigate(`/admin/team/${item.id}`, { state: { breadcrumbs: nextAncestors } });
+                  } else if (activeTab === 'Workspaces') {
+                    setAncestors(nextAncestors);
+                    navigate(`/admin/workspace/${item.id}`, { state: { breadcrumbs: nextAncestors } });
+                  }
                 }}
                 favorites={new Set()}
                 onViewModeChange={setViewMode}
@@ -299,8 +328,15 @@ export function AccountDetailPage() {
                 columns={columns}
                 data={filteredData}
                 onRowClick={(row) => {
-                  if (activeTab === 'Teams') navigate(`/admin/team/${row.id}`);
-                  else if (activeTab === 'Workspaces') navigate(`/admin/workspace/${row.id}`);
+                  const currentEntry = { label: account.name, path: `/admin/account/${accountId}` };
+                  const nextAncestors = [...ancestors, currentEntry];
+                  if (activeTab === 'Teams') {
+                    setAncestors(nextAncestors);
+                    navigate(`/admin/team/${row.id}`, { state: { breadcrumbs: nextAncestors } });
+                  } else if (activeTab === 'Workspaces') {
+                    setAncestors(nextAncestors);
+                    navigate(`/admin/workspace/${row.id}`, { state: { breadcrumbs: nextAncestors } });
+                  }
                 }}
                 viewMode={viewMode}
                 onViewModeChange={setViewMode}

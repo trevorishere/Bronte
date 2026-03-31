@@ -1,4 +1,4 @@
-import { Star, Clock, UserRoundPlus, ShieldUser, FolderOpen, X, ChevronsLeftRightEllipsis } from 'lucide-react';
+import { Star, Clock, UserRoundPlus, ShieldUser, FolderOpen, X, ChevronsLeftRightEllipsis, Search } from 'lucide-react';
 import { IconButton } from './IconButton';
 import { getWorkspaceInitials } from './WorkspaceIcon';
 import { useState, useEffect } from 'react';
@@ -124,6 +124,25 @@ export function Sidebar({
             rounded="xl"
             title="Collapse sidebar"
           />
+        </div>
+      </div>
+
+      {/* Search field — between header and nav */}
+      <div className="shrink-0 px-[12px] pb-[4px]" style={textFade}>
+        <div
+          className="flex items-center gap-[8px] h-[36px] px-[12px]"
+          style={{ backgroundColor: 'var(--muted)', borderRadius: 'var(--radius-12)' }}
+        >
+          <Search className="size-[16px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
+          <span style={{
+            fontFamily: 'var(--font-family)',
+            fontSize: 'var(--font-size-14)',
+            color: 'var(--muted-foreground)',
+            letterSpacing: 'var(--letter-spacing-md)',
+            whiteSpace: 'nowrap',
+          }}>
+            Search...
+          </span>
         </div>
       </div>
 

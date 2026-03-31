@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useOutletContext, useNavigate, useLocation } from 'react-router';
 import { toast } from 'sonner';
 import { TopBar } from '../components/TopBar';
@@ -10,6 +10,7 @@ import { WorkspaceIcon } from '../components/WorkspaceIcon';
 import { projects, workspaces } from '../data/workspaces';
 import { accounts } from '../data/accounts';
 import { useFavorites } from '../contexts/FavoritesContext';
+import { useNavigationContext, BreadcrumbEntry } from '../contexts/NavigationContext';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -33,11 +34,21 @@ export function WorkspacePage() {
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
+  const { ancestors, setAncestors } = useNavigationContext();
+
   // Check if we're in Admin context (from /admin/workspace/:id route)
   const isAdminRoute = location.pathname.startsWith('/admin');
 
-  // Check if we arrived from an account detail page
-  const fromState = location.state as { fromAccount?: string; fromAccountId?: string } | null;
+  // Restore or build ancestor trail on mount / workspaceId change (admin route only)
+  useEffect(() => {
+    if (!isAdminRoute || !workspaceId) return;
+    const stateTrail = (location.state as any)?.breadcrumbs as BreadcrumbEntry[] | undefined;
+    if (stateTrail !== undefined) {
+      setAncestors(stateTrail);
+    } else if (ancestors.length === 0) {
+      setAncestors([{ label: 'Admin', path: '/admin' }]);
+    }
+  }, [workspaceId, isAdminRoute]);
 
   // Find the workspace
   const workspace = workspaces.find(w => w.id === workspaceId);
@@ -116,30 +127,17 @@ export function WorkspacePage() {
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ backgroundColor: 'var(--background)' }}>
       {/* Top bar */}
-      {isAdminRoute ? (
-        <TopBar
-          userInitials="LD"
-          onThemeToggle={onThemeToggle}
-          isDarkMode={isDarkMode}
-          showBackButton={true}
-          onBackClick={() =>
-            fromState?.fromAccountId
-              ? navigate(`/admin/account/${fromState.fromAccountId}`)
-              : navigate('/admin')
-          }
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
-      ) : (
-        <TopBar
-          userInitials="LD"
-          onThemeToggle={onThemeToggle}
-          isDarkMode={isDarkMode}
-          showBackButton={false}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
-      )}
+      <TopBar
+        userInitials="LD"
+        onThemeToggle={onThemeToggle}
+        isDarkMode={isDarkMode}
+        breadcrumbs={isAdminRoute && workspace
+          ? [...ancestors, { label: workspace.name, path: location.pathname }]
+          : undefined
+        }
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+      />
 
       {/* Workspace header */}
       {workspace && (
