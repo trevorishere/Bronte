@@ -414,14 +414,14 @@ export function DataTable({
               if (isLastColumn) {
                 // Numeric right-aligned (e.g. Members, Projects): tight fixed width
                 // Text last column (e.g. Created On): standard fixed width
-                const lastW = lastColIsNumeric ? 80 : 80;
+                const lastW = lastColIsNumeric ? 80 : 88;
                 flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
               } else if (index === 0) {
                 // Name column always gets 3x share so it survives narrowing
                 flexStyle = { flex: '3 1 0px', minWidth: '80px' };
               } else {
                 // Middle columns share equally
-                flexStyle = { flex: '1 1 0px', minWidth: '80px' };
+                flexStyle = { flex: '1 1 0px', minWidth: '88px' };
               }
 
               return (
@@ -437,8 +437,8 @@ export function DataTable({
                     letterSpacing: 'var(--letter-spacing-lg)',
                     textTransform: 'uppercase',
                     textAlign: column.align || 'left',
-                    paddingLeft: index === 0 ? '20px' : column.align === 'right' ? '24px' : '24px',
-                    paddingRight: column.align === 'right' ? '24px' : '24px',
+                    paddingLeft: index === 0 ? '20px' : column.align === 'right' ? '16px' : '24px',
+                    paddingRight: column.align === 'right' ? '16px' : '24px',
                     position: 'relative',
                     boxSizing: 'border-box',
                     whiteSpace: 'nowrap',
@@ -508,7 +508,7 @@ export function DataTable({
             })}
           </div>
           {/* Icons column header */}
-          <div style={{ flex: '0 0 80px', minWidth: '80px', maxWidth: '116px', paddingLeft: '24px', paddingRight: '20px' }}></div>
+          <div style={{ flex: '0 0 116px', minWidth: '116px', maxWidth: '116px', paddingLeft: '24px', paddingRight: '20px' }}></div>
         </div>
       </div>
 
@@ -554,12 +554,12 @@ export function DataTable({
                       const lastColIsNumeric = columns[columns.length - 1]?.align === 'right';
 
                       if (isLastColumn) {
-                        const lastW = lastColIsNumeric ? 80 : 80;
+                        const lastW = lastColIsNumeric ? 80 : 88;
                         flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
                       } else if (index === 0) {
                         flexStyle = { flex: '3 1 0px', minWidth: '80px' };
                       } else {
-                        flexStyle = { flex: '3 1 0px', minWidth: '80px' };
+                        flexStyle = { flex: '1 1 0px', minWidth: '88px' };
                       }
 
                       return (
@@ -573,8 +573,8 @@ export function DataTable({
                             fontWeight: 'var(--font-weight-light)',
                             textAlign: column.align || 'left',
                             letterSpacing: 'var(--letter-spacing-md)',
-                            paddingLeft: index === 0 ? '20px' : column.align === 'right' ? '24px' : '24px',
-                            paddingRight: column.align === 'right' ? '24px' : '24px',
+                            paddingLeft: index === 0 ? '20px' : column.align === 'right' ? '16px' : '24px',
+                            paddingRight: column.align === 'right' ? '16px' : '24px',
                             boxSizing: 'border-box'
                           }}
                         >
@@ -640,7 +640,7 @@ export function DataTable({
                               ) : (
                                 // Normal mode - show text (double-click to rename)
                                 <span 
-                                  className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'} flex-1 min-w-0 pr-[24px] cursor-text`} 
+                                  className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'} flex-1 min-w-0 cursor-text`} 
                                   style={{ 
                                     fontFamily: 'var(--font-family)', 
                                     fontSize: 'var(--font-size-15)', 
@@ -881,7 +881,7 @@ export function DataTable({
                   </div>
                   
                   {/* Separate icons column */}
-                  <div className="py-[16px]" style={{ flex: '0 0 80px', minWidth: '80px', maxWidth: '116px', paddingLeft: '24px', paddingRight: '20px' }}>
+                  <div className="py-[16px]" style={{ flex: '0 0 116px', minWidth: '116px', maxWidth: '116px', paddingLeft: '24px', paddingRight: '20px' }}>
                     <div className={`flex items-center justify-end gap-[0px] ${(hoveredRow === row.id || openMenuRowId === row.id) ? 'opacity-100' : 'opacity-0'}`} style={{ transition: `opacity var(--transition-duration) var(--transition-timing)` }}>
                       {/* ========================================
                           STAR BUTTON - Uses theme variables
