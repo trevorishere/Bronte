@@ -110,8 +110,8 @@
 
   /* Letter spacing */
   --letter-spacing-sm: 0.16px;
-  --letter-spacing-md: 0.3px;
-  --letter-spacing-lg: 0.6px;
+  --letter-spacing-md: 0.4px;
+  --letter-spacing-lg: 0.7px;
 
   /* Border radius */
   --radius-4: 4px;
@@ -140,11 +140,11 @@
 
 .dark {
   --background: #1e1a16; /* Warm very dark brown */
-  --foreground: #d8d0c8; /* Warm light */
+  --foreground: #CCC4BD; /* Warm light */
   --card: #221e1a; /* Warm dark card */
-  --card-foreground: #d8d0c8;
+  --card-foreground: #CCC4BD;
   --popover: #201c18;
-  --popover-foreground: #d8d0c8;
+  --popover-foreground: #CCC4BD;
   --primary: #ede8e2; /* Warm off-white */
   --primary-foreground: #1e1a16;
   --secondary: rgba(255, 255, 255, 0.05);

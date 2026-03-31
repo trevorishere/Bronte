@@ -26,16 +26,16 @@ export const iconSizeConfig = {
     iconSize: 16,
   },
   large: {
-    containerSize: 'size-[72px]',
-    fontSize: '32px',
+    containerSize: 'size-[48px]',
+    fontSize: '20px',
     letterSpacing: '0.5px',
-    iconSize: 32,
+    iconSize: 24,
   },
   'x-large': {
-    containerSize: 'size-[104px]',
-    fontSize: '40px',
+    containerSize: 'size-[64px]',
+    fontSize: '28px',
     letterSpacing: '0.5px',
-    iconSize: 48,
+    iconSize: 32,
   },
 };
 

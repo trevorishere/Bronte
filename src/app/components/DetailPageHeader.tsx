@@ -18,7 +18,7 @@ function MetadataItem({ icon, label }: MetadataItemProps) {
       <p
         style={{
           fontFamily: 'var(--font-family)',
-          fontWeight: 'var(--font-weight-medium)',
+          fontWeight: 'var(--font-weight-regular)',
           fontSize: '14px',
           color: 'var(--muted-foreground)',
           letterSpacing: 'var(--letter-spacing-md)',
@@ -105,7 +105,7 @@ export function DetailPageHeader({ title, badge, icon, metadata, onSettingsClick
         {/* Title + badge */}
         <div className="flex flex-col items-center gap-[6px]">
           <h2
-            className="font-bold leading-tight"
+            className="font-medium leading-tight"
             style={{
               fontFamily: 'var(--font-family)',
               fontSize: '22px',
@@ -173,14 +173,14 @@ export function DetailPageHeader({ title, badge, icon, metadata, onSettingsClick
       {/* ================================================================ */}
       {/* DESKTOP LAYOUT — horizontal, icon left                          */}
       {/* ================================================================ */}
-      <div className="hidden md:block pl-[40px] pr-[48px] pt-[16px] pb-[20px]">
+      <div className="hidden md:block pl-[32px] pr-[32px] pt-[16px] pb-[20px]">
         <div className="flex items-center justify-between gap-4">
 
           {/* Left: icon + title + badge + metadata */}
           <div className="flex items-center gap-5 min-w-0">
             {icon && (
               <div className="shrink-0">
-                {icon('medium')}
+                {icon('large')}
               </div>
             )}
 
@@ -188,12 +188,12 @@ export function DetailPageHeader({ title, badge, icon, metadata, onSettingsClick
               {/* Title + badge */}
               <div className="flex flex-row items-center gap-[12px]">
                 <h2
-                  className="font-bold"
+                  className="font-medium"
                   style={{
                     fontFamily: 'var(--font-family)',
-                    fontSize: '22px',
+                    fontSize: '24px',
                     color: 'var(--primary)',
-                    letterSpacing: '0.22px',
+                    letterSpacing: 'var(--letter-spacing-lg)',
                     lineHeight: 'normal',
                   }}
                 >
@@ -229,13 +229,13 @@ export function DetailPageHeader({ title, badge, icon, metadata, onSettingsClick
             </button>
             <button
               className="flex items-center gap-[6px] h-[32px] px-[12px] rounded-lg transition-colors"
-              style={{ ...actionBtnStyle, backgroundColor: 'var(--primary)', border: 'none', color: 'white' }}
-              onMouseOver={(e) => e.currentTarget.style.opacity = '0.9'}
-              onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
+              style={actionBtnStyle}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               title="New"
             >
               <Plus className="size-[14px]" strokeWidth={2.5} style={{ color: 'white' }} />
-              <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)', fontSize: '14px', letterSpacing: 'var(--letter-spacing-md)', color: 'white' }}>New</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)', fontSize: '14px', letterSpacing: 'var(--letter-spacing-md)', color: 'var(--foreground)' }}>New</span>
             </button>
             <button
               className="flex items-center justify-center size-[32px] rounded-lg transition-colors"
