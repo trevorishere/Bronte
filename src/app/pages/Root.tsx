@@ -5,6 +5,7 @@ import { Sidebar } from '../components/Sidebar';
 import { BottomNav } from '../components/BottomNav';
 import { myWorkspaces, teamWorkspaces } from '../data/workspaces';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
+import { NavigationProvider } from '../contexts/NavigationContext';
 import { useMobileNav } from '../hooks/useMobileNav';
 
 export function Root() {
@@ -64,6 +65,7 @@ export function Root() {
   }, [isDarkMode]);
 
   return (
+    <NavigationProvider>
     <FavoritesProvider>
       <div className="size-full flex bg-background overflow-hidden">
         {/* Sidebar */}
@@ -93,5 +95,6 @@ export function Root() {
         />
       </div>
     </FavoritesProvider>
+    </NavigationProvider>
   );
 }

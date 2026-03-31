@@ -10,7 +10,8 @@ import { EmptyState } from '../components/EmptyState';
 import { DetailPageHeader } from '../components/DetailPageHeader';
 import { TabNav, Tab } from '../components/TabNav';
 import { TopBar } from '../components/TopBar';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigationContext, BreadcrumbEntry } from '../contexts/NavigationContext';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -27,9 +28,20 @@ export function TeamDetailPage() {
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
 
   const location = useLocation();
-  const fromState = location.state as { fromAccount?: string; fromAccountId?: string } | null;
+  const { ancestors, setAncestors } = useNavigationContext();
 
   const team = teams.find(t => t.id === teamId);
+
+  // Restore or build ancestor trail on mount / teamId change
+  useEffect(() => {
+    if (!teamId) return;
+    const stateTrail = (location.state as any)?.breadcrumbs as BreadcrumbEntry[] | undefined;
+    if (stateTrail !== undefined) {
+      setAncestors(stateTrail);
+    } else if (ancestors.length === 0) {
+      setAncestors([{ label: 'Admin', path: '/admin' }]);
+    }
+  }, [teamId]);
 
   if (!team) {
     return (
@@ -214,14 +226,9 @@ export function TeamDetailPage() {
         userInitials="LD"
         onThemeToggle={onThemeToggle}
         isDarkMode={isDarkMode}
-        showBackButton={true}
-        onBackClick={() =>
-          fromState?.fromAccountId
-            ? navigate(`/admin/account/${fromState.fromAccountId}`)
-            : navigate('/admin')
-        }
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        breadcrumbs={[...ancestors, { label: team.name, path: `/admin/team/${teamId}` }]}
         pageIcon={<TeamIcon size="small" />}
       />
 
@@ -273,7 +280,12 @@ export function TeamDetailPage() {
             data={filteredData as GridItemData[]}
             onItemClick={() => {}}
             onItemDoubleClick={(item) => {
-              if (activeTab === 'Members') navigate(`/admin/account/${item.id}`);
+              if (activeTab === 'Members') {
+                const currentEntry = { label: team.name, path: `/admin/team/${teamId}` };
+                const nextAncestors = [...ancestors, currentEntry];
+                setAncestors(nextAncestors);
+                navigate(`/admin/account/${item.id}`, { state: { breadcrumbs: nextAncestors } });
+              }
             }}
             favorites={new Set()}
             onViewModeChange={setViewMode}
@@ -284,7 +296,12 @@ export function TeamDetailPage() {
             data={filteredData}
             onRowClick={() => {}}
             onRowDoubleClick={(row) => {
-              if (activeTab === 'Members') navigate(`/admin/account/${row.id}`);
+              if (activeTab === 'Members') {
+                const currentEntry = { label: team.name, path: `/admin/team/${teamId}` };
+                const nextAncestors = [...ancestors, currentEntry];
+                setAncestors(nextAncestors);
+                navigate(`/admin/account/${row.id}`, { state: { breadcrumbs: nextAncestors } });
+              }
             }}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
