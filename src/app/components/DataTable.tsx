@@ -414,14 +414,14 @@ export function DataTable({
               if (isLastColumn) {
                 // Numeric right-aligned (e.g. Members, Projects): tight fixed width
                 // Text last column (e.g. Created On): standard fixed width
-                const lastW = lastColIsNumeric ? 80 : 88;
+                const lastW = lastColIsNumeric ? 112 : 140;
                 flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
               } else if (index === 0) {
                 // Name column always gets 3x share so it survives narrowing
-                flexStyle = { flex: '3 1 0px', minWidth: '80px' };
+                flexStyle = { flex: '3 1 0px', minWidth: '112px' };
               } else {
                 // Middle columns share equally
-                flexStyle = { flex: '1 1 0px', minWidth: '88px' };
+                flexStyle = { flex: '1 1 0px', minWidth: '140px' };
               }
 
               return (
@@ -554,12 +554,12 @@ export function DataTable({
                       const lastColIsNumeric = columns[columns.length - 1]?.align === 'right';
 
                       if (isLastColumn) {
-                        const lastW = lastColIsNumeric ? 80 : 88;
+                        const lastW = lastColIsNumeric ? 112 : 140;
                         flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
                       } else if (index === 0) {
-                        flexStyle = { flex: '3 1 0px', minWidth: '80px' };
+                        flexStyle = { flex: '3 1 0px', minWidth: '112px' };
                       } else {
-                        flexStyle = { flex: '1 1 0px', minWidth: '88px' };
+                        flexStyle = { flex: '1 1 0px', minWidth: '140px' };
                       }
 
                       return (
