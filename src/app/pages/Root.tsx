@@ -26,7 +26,8 @@ export function Root() {
     if (path === '/favorites') return 'favorites';
     if (path === '/shared') return 'shared';
     if (path === '/admin' || path.startsWith('/admin/')) return 'admin';
-    if (path === '/workspaces' || path.startsWith('/workspace/')) return 'workspaces';
+    if (path === '/workspaces') return 'workspaces';
+    if (path.startsWith('/workspace/')) return path.split('/')[2] || 'workspaces';
     if (path === '/account') return 'account';
     return 'recent';
   };

@@ -54,8 +54,8 @@ export function TabNav({ tabs, activeTab, onTabChange, variant = 'default' }: Ta
                   <p
                     style={{
                       fontFamily: 'var(--font-family)',
-                      fontWeight: fontWeight,
-                      fontSize: fontSize,
+                      fontWeight: "var(--font-weight-medium)",
+                      fontSize: "var(--font-size-15)",
                       letterSpacing: 'var(--letter-spacing-md)',
                       lineHeight: 'var(--line-height-normal)',
                       color: (isActive || isHovered) ? 'var(--primary)' : 'var(--foreground)',

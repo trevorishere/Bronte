@@ -140,16 +140,16 @@
 
 .dark {
   --background: #1e1a16; /* Warm very dark brown */
-  --foreground: #CCC4BD; /* Warm light */
+  --foreground: #BFB8B1; /* Warm light */
   --card: #221e1a; /* Warm dark card */
-  --card-foreground: #CCC4BD;
+  --card-foreground: #BFB8B1;
   --popover: #201c18;
-  --popover-foreground: #CCC4BD;
+  --popover-foreground: #BFB8B1;
   --primary: #ede8e2; /* Warm off-white */
   --primary-foreground: #1e1a16;
   --secondary: rgba(255, 255, 255, 0.05);
   --secondary-foreground: #a09890;
-  --muted: #2c2822; /* Warm dark muted */
+  --muted: #26211B; /* Warm dark muted */
   --muted-foreground: #9a9088;
   --accent: #342e28; /* Warm medium dark */
   --accent-foreground: #ede8e2;
