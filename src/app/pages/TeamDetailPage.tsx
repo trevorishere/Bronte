@@ -8,6 +8,7 @@ import { GridView, GridItemData } from '../components/GridView';
 import { Toolbar } from '../components/Toolbar';
 import { EmptyState } from '../components/EmptyState';
 import { DetailPageHeader } from '../components/DetailPageHeader';
+import { InfoTray, InfoTrayContent } from '../components/InfoTray';
 import { TabNav, Tab } from '../components/TabNav';
 import { TopBar } from '../components/TopBar';
 import { useState, useEffect } from 'react';
@@ -26,6 +27,8 @@ export function TeamDetailPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
+  const [isTrayOpen, setIsTrayOpen] = useState(false);
+  const [trayContent, setTrayContent] = useState<InfoTrayContent | null>(null);
 
   const location = useLocation();
   const { ancestors, setAncestors } = useNavigationContext();
@@ -41,6 +44,12 @@ export function TeamDetailPage() {
     } else if (ancestors.length === 0) {
       setAncestors([{ label: 'Admin', path: '/admin' }]);
     }
+  }, [teamId]);
+
+  // Set default tray content when team loads
+  useEffect(() => {
+    if (!team) return;
+    setTrayContent({ type: 'team', data: { id: team.id, name: team.name, owner: team.owner, created: team.created, membersCount: team.membersCount } });
   }, [teamId]);
 
   if (!team) {
@@ -217,10 +226,24 @@ export function TeamDetailPage() {
     setActiveTab(tab);
     setSelectedFilters({});
     setDateFilters({});
+    if (team) setTrayContent({ type: 'team', data: { id: team.id, name: team.name, owner: team.owner, created: team.created, membersCount: team.membersCount } });
+  };
+
+  const handleSelectionChange = (row: RowData | null) => {
+    if (!row || !team) {
+      setTrayContent({ type: 'team', data: { id: team!.id, name: team!.name, owner: team!.owner, created: team!.created, membersCount: team!.membersCount } });
+      return;
+    }
+    if (activeTab === 'Members') {
+      setTrayContent({ type: 'account', data: row });
+    } else if (activeTab === 'Projects') {
+      setTrayContent({ type: 'project', data: row });
+    }
   };
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+    <div className="flex-1 flex min-h-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       {/* Top bar */}
       <TopBar
         userInitials="LD"
@@ -229,6 +252,7 @@ export function TeamDetailPage() {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         breadcrumbs={[...ancestors, { label: team.name, path: `/admin/team/${teamId}` }]}
+        onInfoClick={() => setIsTrayOpen(v => !v)}
       />
 
       {/* Team header */}
@@ -302,11 +326,19 @@ export function TeamDetailPage() {
                 navigate(`/admin/account/${row.id}`, { state: { breadcrumbs: nextAncestors } });
               }
             }}
+            onSelectionChange={handleSelectionChange}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
           />
         )
       )}
+      </div>
+
+      <InfoTray
+        isOpen={isTrayOpen}
+        onClose={() => setIsTrayOpen(false)}
+        content={trayContent}
+      />
     </div>
   );
 }

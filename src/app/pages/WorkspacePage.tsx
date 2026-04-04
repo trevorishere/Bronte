@@ -7,6 +7,7 @@ import { DataTable, Column, RowData } from '../components/DataTable';
 import { GridView, GridItemData } from '../components/GridView';
 import { DetailPageHeader } from '../components/DetailPageHeader';
 import { WorkspaceIcon } from '../components/WorkspaceIcon';
+import { InfoTray, InfoTrayContent } from '../components/InfoTray';
 import { projects, workspaces } from '../data/workspaces';
 import { accounts } from '../data/accounts';
 import { useFavorites } from '../contexts/FavoritesContext';
@@ -32,6 +33,8 @@ export function WorkspacePage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
+  const [isTrayOpen, setIsTrayOpen] = useState(false);
+  const [trayContent, setTrayContent] = useState<InfoTrayContent | null>(null);
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   const { ancestors, setAncestors } = useNavigationContext();
@@ -49,6 +52,14 @@ export function WorkspacePage() {
       setAncestors([{ label: 'Admin', path: '/admin' }]);
     }
   }, [workspaceId, isAdminRoute]);
+
+  // Set default tray content when workspace loads
+  useEffect(() => {
+    if (!workspace) return;
+    const projectCount = projects.filter(p => p.workspace === workspaceId).length;
+    const memberCount = accounts.filter(a => a.workspaceIds.includes(workspaceId || '')).length;
+    setTrayContent({ type: 'workspace', data: { id: workspace.id, name: workspace.name, owner: workspace.owner, type: workspace.type, created: workspace.created, projectsCount: projectCount, membersCount: memberCount } });
+  }, [workspaceId]);
 
   // Find the workspace
   const workspace = workspaces.find(w => w.id === workspaceId);
@@ -108,6 +119,16 @@ export function WorkspacePage() {
     }));
   };
 
+  const handleSelectionChange = (row: RowData | null) => {
+    if (!row || !workspace) {
+      const projectCount = projects.filter(p => p.workspace === workspaceId).length;
+      const memberCount = accounts.filter(a => a.workspaceIds.includes(workspaceId || '')).length;
+      setTrayContent({ type: 'workspace', data: { id: workspace?.id, name: workspace?.name, owner: workspace?.owner, type: workspace?.type, created: workspace?.created, projectsCount: projectCount, membersCount: memberCount } });
+      return;
+    }
+    setTrayContent({ type: 'project', data: row });
+  };
+
   const handleRowClick = (_row: RowData) => {};
 
   const handleRowDoubleClick = (_row: RowData) => {};
@@ -125,7 +146,8 @@ export function WorkspacePage() {
   const handleMoreClick = (_row: RowData) => {};
 
   return (
-    <div className="flex flex-col h-full overflow-hidden" style={{ backgroundColor: 'var(--background)' }}>
+    <div className="flex-1 flex min-h-0 overflow-hidden" style={{ backgroundColor: 'var(--background)' }}>
+      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       {/* Top bar */}
       <TopBar
         userInitials="LD"
@@ -138,6 +160,7 @@ export function WorkspacePage() {
         title={!isAdminRoute && workspace ? workspace.name : undefined}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        onInfoClick={() => setIsTrayOpen(v => !v)}
       />
 
       {/* Workspace header */}
@@ -180,6 +203,7 @@ export function WorkspacePage() {
           data={filteredData}
           onRowClick={handleRowClick}
           onRowDoubleClick={handleRowDoubleClick}
+          onSelectionChange={handleSelectionChange}
           onStarClick={handleStarClick}
           onMoreClick={handleMoreClick}
           starredItems={favorites}
@@ -187,6 +211,13 @@ export function WorkspacePage() {
           onViewModeChange={setViewMode}
         />
       )}
+      </div>
+
+      <InfoTray
+        isOpen={isTrayOpen}
+        onClose={() => setIsTrayOpen(false)}
+        content={trayContent}
+      />
     </div>
   );
 }
