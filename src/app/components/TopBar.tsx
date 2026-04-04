@@ -1,5 +1,5 @@
 import { ChevronLeft, Plus, Share2, Info } from 'lucide-react';
-import { ReactNode } from 'react';
+import { ReactNode, useRef, useState, useEffect, cloneElement, isValidElement } from 'react';
 import { useNavigate } from 'react-router';
 import { ActionButtons } from './ActionButtons';
 import { IconButton } from './IconButton';
@@ -18,10 +18,15 @@ import type { BreadcrumbEntry } from '../contexts/NavigationContext';
 // Internal BreadcrumbNav component
 // entries = full trail including current page as last item
 // ============================================================
-function BreadcrumbNav({ entries, titleSuffix }: { entries: BreadcrumbEntry[]; titleSuffix?: ReactNode }) {
+function BreadcrumbNav({ entries, titleSuffix, ancMaxLen = 14, badgeIconOnly = false }: {
+  entries: BreadcrumbEntry[];
+  titleSuffix?: ReactNode;
+  ancMaxLen?: number;
+  badgeIconOnly?: boolean;
+}) {
   const navigate = useNavigate();
 
-  const truncate = (label: string, max = 22) =>
+  const truncate = (label: string, max = ancMaxLen) =>
     label.length > max ? label.slice(0, max) + '…' : label;
 
   if (entries.length === 0) return null;
@@ -50,14 +55,14 @@ function BreadcrumbNav({ entries, titleSuffix }: { entries: BreadcrumbEntry[]; t
   };
 
   return (
-    <Breadcrumb>
-      <BreadcrumbList className="text-[16px] md:text-[16px] flex-nowrap">
+    <Breadcrumb className="min-w-0 overflow-hidden">
+      <BreadcrumbList className="text-[16px] md:text-[16px] flex-nowrap min-w-0 overflow-hidden">
         {/* First ancestor (when ellipsis applies) */}
         {showEllipsis && firstAncestor && (() => {
           const idx = 0; // firstAncestor is always at index 0 in entries
           return (
             <>
-              <BreadcrumbItem>
+              <BreadcrumbItem className="shrink-0">
                 <BreadcrumbLink asChild>
                   <button
                     className="whitespace-nowrap"
@@ -68,11 +73,11 @@ function BreadcrumbNav({ entries, titleSuffix }: { entries: BreadcrumbEntry[]; t
                   </button>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
+              <BreadcrumbSeparator className="shrink-0" />
+              <BreadcrumbItem className="shrink-0">
                 <BreadcrumbEllipsis className="size-[16px]" />
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
+              <BreadcrumbSeparator className="shrink-0" />
             </>
           );
         })()}
@@ -82,7 +87,7 @@ function BreadcrumbNav({ entries, titleSuffix }: { entries: BreadcrumbEntry[]; t
           // Find the real index in the full entries array
           const idx = entries.findIndex(e => e.path === entry.path);
           return (
-            <BreadcrumbItem key={entry.path}>
+            <BreadcrumbItem key={entry.path} className="shrink-0">
               <BreadcrumbLink asChild>
                 <button
                   className="whitespace-nowrap"
@@ -97,16 +102,22 @@ function BreadcrumbNav({ entries, titleSuffix }: { entries: BreadcrumbEntry[]; t
           );
         })}
 
-        {/* Current page — not clickable */}
-        <BreadcrumbItem className="flex items-center gap-[8px]">
+        {/* Current page — not clickable, truncates to fill remaining space */}
+        <BreadcrumbItem className="flex items-center gap-[8px] min-w-0 overflow-hidden">
           <BreadcrumbPage
-            className="font-semibold whitespace-nowrap"
+            className="font-semibold truncate min-w-0"
             style={{ fontSize: '28px', color: 'var(--primary)', letterSpacing: 'var(--letter-spacing-lg)', lineHeight: 'normal' }}
             title={current.label}
           >
-            {truncate(current.label, 30)}
+            {current.label}
           </BreadcrumbPage>
-          {titleSuffix && <span className="shrink-0">{titleSuffix}</span>}
+          {titleSuffix && (
+            <span className="shrink-0">
+              {isValidElement(titleSuffix)
+                ? cloneElement(titleSuffix as React.ReactElement<{ iconOnly?: boolean }>, { iconOnly: badgeIconOnly })
+                : titleSuffix}
+            </span>
+          )}
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>
@@ -178,9 +189,26 @@ export function TopBar({
   const hasBreadcrumbs = breadcrumbs && breadcrumbs.length > 0;
   const showBorder = hasBreadcrumbs || showBackButton;
 
+  // Responsive breadcrumb: measure left section width to derive truncation level + badge mode
+  const leftRef = useRef<HTMLDivElement>(null);
+  const [ancMaxLen, setAncMaxLen] = useState(14);
+  const [badgeIconOnly, setBadgeIconOnly] = useState(false);
+
+  useEffect(() => {
+    if (!leftRef.current) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const w = entry.contentRect.width;
+      // Priority: shorten ancestors → collapse badge → title truncates via CSS
+      setAncMaxLen(w < 480 ? 6 : w < 600 ? 10 : 14);
+      setBadgeIconOnly(w < 360);
+    });
+    observer.observe(leftRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   const renderLeft = () => {
     if (hasBreadcrumbs) {
-      return <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} />;
+      return <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} ancMaxLen={ancMaxLen} badgeIconOnly={badgeIconOnly} />;
     }
     if (showBackButton) {
       return backBtn();
@@ -205,7 +233,7 @@ export function TopBar({
       <div className="md:hidden flex items-center gap-1 pt-1 px-[16px] size-full">
         <div className="flex items-center flex-1 min-w-0 gap-[10px] overflow-hidden">
           {hasBreadcrumbs ? (
-            <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} />
+            <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} ancMaxLen={ancMaxLen} badgeIconOnly={badgeIconOnly} />
           ) : showBackButton ? (
             backBtn()
           ) : title ? (
@@ -234,10 +262,10 @@ export function TopBar({
       {/* ================================================================ */}
       {/* DESKTOP LAYOUT                                                   */}
       {/* ================================================================ */}
-      <div className="hidden md:flex items-center justify-between pt-1 pl-[24px] pr-[24px] size-full">
-        <div className="flex items-center flex-1 min-w-0 gap-[16px] overflow-hidden">
+      <div className="hidden md:flex items-center gap-[24px] pt-1 pl-[24px] pr-[24px] size-full">
+        <div ref={leftRef} className="flex items-center flex-1 min-w-0 gap-[16px] overflow-hidden">
           {hasBreadcrumbs ? (
-            <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} />
+            <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} ancMaxLen={ancMaxLen} badgeIconOnly={badgeIconOnly} />
           ) : showBackButton ? (
             backBtn()
           ) : title ? (

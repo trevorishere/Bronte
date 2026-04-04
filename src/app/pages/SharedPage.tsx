@@ -6,6 +6,7 @@ import { Toolbar } from '../components/Toolbar';
 import { DataTable, Column, RowData } from '../components/DataTable';
 import { GridView, GridItemData } from '../components/GridView';
 import { EmptyState } from '../components/EmptyState';
+import { InfoTray, InfoTrayContent } from '../components/InfoTray';
 import { sharedProjects } from '../data/shared';
 import { useFavorites } from '../contexts/FavoritesContext';
 
@@ -23,8 +24,9 @@ const tableColumns: Column[] = [
 const tableData: RowData[] = sharedProjects.map(project => ({
   id: project.id,
   name: project.name,
-  owner: project.sharedBy,
+  owner: project.owner,
   sharedBy: project.sharedBy,
+  dateShared: project.dateShared,
   lastModified: project.lastModified,
   workspace: project.workspace,
   iconType: 'project' as const,
@@ -35,6 +37,8 @@ export function SharedPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
+  const [isTrayOpen, setIsTrayOpen] = useState(false);
+  const [trayContent, setTrayContent] = useState<InfoTrayContent | null>(null);
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   // Get unique shared by users for filter options
@@ -76,6 +80,10 @@ export function SharedPage() {
     }));
   };
 
+  const handleSelectionChange = (row: RowData | null) => {
+    setTrayContent(row ? { type: 'shared-project', data: row } : null);
+  };
+
   const handleRowClick = (_row: RowData) => {};
 
   const handleRowDoubleClick = (_row: RowData) => {};
@@ -93,7 +101,8 @@ export function SharedPage() {
   const handleMoreClick = (_row: RowData) => {};
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex-1 flex min-h-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       <TopBar
         title="Shared with me"
         userInitials="LD"
@@ -101,6 +110,7 @@ export function SharedPage() {
         onThemeToggle={onThemeToggle}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        onInfoClick={() => setIsTrayOpen(v => !v)}
       />
       
       {/* Toolbar - Always visible */}
@@ -145,6 +155,7 @@ export function SharedPage() {
             data={filteredData}
             onRowClick={handleRowClick}
             onRowDoubleClick={handleRowDoubleClick}
+            onSelectionChange={handleSelectionChange}
             onStarClick={handleStarClick}
             onMoreClick={handleMoreClick}
             starredItems={favorites}
@@ -153,6 +164,13 @@ export function SharedPage() {
           />
         )
       )}
+      </div>
+
+      <InfoTray
+        isOpen={isTrayOpen}
+        onClose={() => setIsTrayOpen(false)}
+        content={trayContent}
+      />
     </div>
   );
 }

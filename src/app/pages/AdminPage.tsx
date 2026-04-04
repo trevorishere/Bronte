@@ -7,6 +7,7 @@ import { TabNav, Tab } from '../components/TabNav';
 import { Toolbar } from '../components/Toolbar';
 import { DataTable, Column, RowData } from '../components/DataTable';
 import { GridView, GridItemData } from '../components/GridView';
+import { InfoTray, InfoTrayContent } from '../components/InfoTray';
 import { projects, workspaces } from '../data/workspaces';
 import { teams } from '../data/teams';
 import { accounts } from '../data/accounts';
@@ -60,6 +61,8 @@ export function AdminPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
+  const [isTrayOpen, setIsTrayOpen] = useState(false);
+  const [trayContent, setTrayContent] = useState<InfoTrayContent | null>(null);
   const { favorites, addFavorite, removeFavorite } = useFavorites();
   const navigate = useNavigate();
   const { resetToRoot, setAncestors } = useNavigationContext();
@@ -204,6 +207,21 @@ export function AdminPage() {
     }));
   };
 
+  const handleSelectionChange = (row: RowData | null) => {
+    if (!row) {
+      setTrayContent(null);
+      return;
+    }
+    const typeMap: Record<string, InfoTrayContent['type']> = {
+      projects: 'project',
+      accounts: 'account',
+      teams: 'team',
+      workspaces: 'workspace',
+    };
+    const type = typeMap[activeTab];
+    if (type) setTrayContent({ type, data: row });
+  };
+
   const handleRowClick = (_row: RowData) => {};
 
   const handleRowDoubleClick = (row: RowData) => {
@@ -232,15 +250,17 @@ export function AdminPage() {
 
   const handleMoreClick = (_row: RowData) => {};
 
-  // Reset filters when tab changes
+  // Reset filters and tray when tab changes
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
     setSelectedFilters({});
     setDateFilters({});
+    setTrayContent(null);
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex-1 flex min-h-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       <TopBar
         title="Admin"
         userInitials="LD"
@@ -248,6 +268,7 @@ export function AdminPage() {
         onThemeToggle={onThemeToggle}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        onInfoClick={() => setIsTrayOpen(v => !v)}
       />
       <TabNav
         tabs={tabs}
@@ -276,10 +297,12 @@ export function AdminPage() {
         />
       ) : (
         <DataTable
+          key={activeTab}
           columns={columns}
           data={filteredData}
           onRowClick={handleRowClick}
           onRowDoubleClick={handleRowDoubleClick}
+          onSelectionChange={handleSelectionChange}
           onStarClick={handleStarClick}
           onMoreClick={handleMoreClick}
           starredItems={favorites}
@@ -287,6 +310,13 @@ export function AdminPage() {
           onViewModeChange={setViewMode}
         />
       )}
+      </div>
+
+      <InfoTray
+        isOpen={isTrayOpen}
+        onClose={() => setIsTrayOpen(false)}
+        content={trayContent}
+      />
     </div>
   );
 }

@@ -136,6 +136,14 @@
   --text-white: white;
   --icon-team-bg: #7FA073;
   --icon-workspace-bg: #6BA0D2;
+
+  /* Roles tray + role pill + radio circles */
+  --tray-bg: #F0EDEA;
+  --role-pill-text: rgba(43, 37, 32, 0.8);
+  --radio-unchecked-border: #9a8f86;
+  --radio-checked-bg: #665e56;
+  --radio-checked-border: #665e56;
+  --radio-check-color: #faf7f4;
 }
 
 .dark {
@@ -187,6 +195,14 @@
   --bg-grid-card: #261e1a; /* Warm dark grid card */
   --icon-team-bg: #406831;
   --icon-workspace-bg: #2166A6;
+
+  /* Roles tray + role pill + radio circles */
+  --tray-bg: #241F1A;
+  --role-pill-text: rgba(255, 255, 255, 0.7);
+  --radio-unchecked-border: #9a9088;
+  --radio-checked-bg: #d8d0c8;
+  --radio-checked-border: #d8d0c8;
+  --radio-check-color: #241F1A;
 }
 
 

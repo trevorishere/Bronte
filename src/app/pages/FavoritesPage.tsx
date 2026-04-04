@@ -6,6 +6,7 @@ import { Toolbar } from '../components/Toolbar';
 import { DataTable, Column, RowData } from '../components/DataTable';
 import { GridView, GridItemData } from '../components/GridView';
 import { EmptyState } from '../components/EmptyState';
+import { InfoTray, InfoTrayContent } from '../components/InfoTray';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { projects } from '../data/workspaces';
 
@@ -25,6 +26,8 @@ export function FavoritesPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
+  const [isTrayOpen, setIsTrayOpen] = useState(false);
+  const [trayContent, setTrayContent] = useState<InfoTrayContent | null>(null);
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   // Filter projects to only show favorited ones
@@ -78,6 +81,10 @@ export function FavoritesPage() {
     }));
   };
 
+  const handleSelectionChange = (row: RowData | null) => {
+    setTrayContent(row ? { type: 'project', data: row } : null);
+  };
+
   const handleRowClick = (_row: RowData) => {};
 
   const handleRowDoubleClick = (_row: RowData) => {};
@@ -97,7 +104,8 @@ export function FavoritesPage() {
   const hasData = tableData.length > 0;
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex-1 flex min-h-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       <TopBar
         title="Favorites"
         userInitials="LD"
@@ -105,6 +113,7 @@ export function FavoritesPage() {
         onThemeToggle={onThemeToggle}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        onInfoClick={() => setIsTrayOpen(v => !v)}
       />
       
       {/* Toolbar - Always visible */}
@@ -138,6 +147,7 @@ export function FavoritesPage() {
             data={filteredData}
             onRowClick={handleRowClick}
             onRowDoubleClick={handleRowDoubleClick}
+            onSelectionChange={handleSelectionChange}
             onStarClick={handleStarClick}
             onMoreClick={handleMoreClick}
             starredItems={favorites}
@@ -148,6 +158,13 @@ export function FavoritesPage() {
       ) : (
         <EmptyState message="You currently have no favorite projects yet." />
       )}
+      </div>
+
+      <InfoTray
+        isOpen={isTrayOpen}
+        onClose={() => setIsTrayOpen(false)}
+        content={trayContent}
+      />
     </div>
   );
 }

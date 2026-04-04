@@ -39,6 +39,7 @@ interface DataTableProps {
   onStarClick?: (row: RowData, isStarred: boolean) => void;
   onMoreClick?: (row: RowData) => void;
   onRename?: (row: RowData, newName: string) => void;
+  onSelectionChange?: (row: RowData | null) => void;
   starredItems?: Set<string>;
   viewMode?: 'grid' | 'list';
   onViewModeChange?: (mode: 'grid' | 'list') => void;
@@ -57,6 +58,7 @@ export function DataTable({
   onStarClick,
   onMoreClick,
   onRename,
+  onSelectionChange,
   starredItems,
   viewMode,
   onViewModeChange
@@ -191,9 +193,11 @@ export function DataTable({
     // Toggle behavior: clicking the same row deselects it
     if (selectedRow === row.id) {
       setSelectedRow(null);
+      onSelectionChange?.(null);
       onRowClick?.(row);
     } else {
       setSelectedRow(row.id);
+      onSelectionChange?.(row);
       onRowClick?.(row);
     }
   };
@@ -207,6 +211,7 @@ export function DataTable({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && selectedRow) {
         setSelectedRow(null);
+        onSelectionChange?.(null);
       }
     };
 
@@ -237,6 +242,7 @@ export function DataTable({
     // Only clear selection if clicking directly on the scrollable area (not bubbled from rows)
     if (e.target === e.currentTarget) {
       setSelectedRow(null);
+      onSelectionChange?.(null);
     }
   };
 

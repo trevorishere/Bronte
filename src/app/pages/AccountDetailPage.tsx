@@ -10,7 +10,7 @@ import { GridView, GridItemData } from '../components/GridView';
 import { Toolbar } from '../components/Toolbar';
 import { EmptyState } from '../components/EmptyState';
 import { DetailPageHeader } from '../components/DetailPageHeader';
-import { RolesPermissionsTray } from '../components/RolesPermissionsTray';
+import { InfoTray, InfoTrayContent } from '../components/InfoTray';
 import { TabNav, Tab } from '../components/TabNav';
 import { TopBar } from '../components/TopBar';
 import { useState } from 'react';
@@ -31,6 +31,7 @@ export function AccountDetailPage() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const [isTrayOpen, setIsTrayOpen] = useState(false);
+  const [trayContent, setTrayContent] = useState<InfoTrayContent | null>(null);
   const { ancestors, setAncestors } = useNavigationContext();
 
   const account = accounts.find(acc => acc.id === accountId);
@@ -44,6 +45,8 @@ export function AccountDetailPage() {
     } else if (ancestors.length === 0) {
       setAncestors([{ label: 'Admin', path: '/admin' }]);
     }
+    // Set default tray content to current account
+    setTrayContent({ type: 'account', data: { ...account } });
   }, [accountId]);
 
   if (!account) {
@@ -237,6 +240,22 @@ export function AccountDetailPage() {
     setActiveTab(tab);
     setSelectedFilters({});
     setDateFilters({});
+    // Revert tray to page entity when tab changes
+    setTrayContent({ type: 'account', data: { ...account } });
+  };
+
+  const handleSelectionChange = (row: RowData | null) => {
+    if (!row) {
+      setTrayContent({ type: 'account', data: { ...account } });
+      return;
+    }
+    if (activeTab === 'Projects') {
+      setTrayContent({ type: 'project', data: row });
+    } else if (activeTab === 'Teams') {
+      setTrayContent({ type: 'team', data: row });
+    } else if (activeTab === 'Workspaces') {
+      setTrayContent({ type: 'workspace', data: row });
+    }
   };
 
   return (
@@ -335,6 +354,7 @@ export function AccountDetailPage() {
                   navigate(`/admin/workspace/${row.id}`, { state: { breadcrumbs: nextAncestors } });
                 }
               }}
+              onSelectionChange={handleSelectionChange}
               viewMode={viewMode}
               onViewModeChange={setViewMode}
             />
@@ -342,14 +362,11 @@ export function AccountDetailPage() {
         )}
       </div>
 
-      {/* Roles & Permissions tray — pushes entire left column left */}
-      <RolesPermissionsTray
+      {/* Info tray — pushes entire left column left */}
+      <InfoTray
         isOpen={isTrayOpen}
         onClose={() => setIsTrayOpen(false)}
-        initialRole={account.role}
-        initialAccessLevel={account.accessLevel}
-        accountName={account.name}
-        email={account.email}
+        content={trayContent}
       />
     </div>
   );

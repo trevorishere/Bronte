@@ -46,37 +46,41 @@ export function Avatar({ name, role = 'Creator', size = 'medium' }: AvatarProps)
 
 interface RoleBadgeProps {
   role: Role;
+  iconOnly?: boolean;
 }
 
-export function RoleBadge({ role }: RoleBadgeProps) {
+export function RoleBadge({ role, iconOnly = false }: RoleBadgeProps) {
   const colors = roleColors[role];
   const icon = roleIcons[role];
 
   return (
     <div
-      className="inline-flex items-center gap-[6px] h-[28px] pl-[8px] pr-[12px] rounded-[8px] shrink-0"
+      className="inline-flex items-center justify-center gap-[6px] h-[28px] rounded-[8px] shrink-0"
       style={{
+        paddingLeft: '8px',
+        paddingRight: iconOnly ? '8px' : '12px',
         backgroundColor: colors.rgba,
         border: `1px solid ${colors.border}`,
       }}
     >
-      <span style={{ color: 'white', opacity: 0.7, display: 'flex', alignItems: 'center' }}>
+      <span style={{ color: 'var(--role-pill-text)', display: 'flex', alignItems: 'center' }}>
         {icon}
       </span>
-      <span
-        style={{
-          fontFamily: 'var(--font-family)',
-          fontWeight: 'var(--font-weight-medium)',
-          fontSize: '14px',
-          letterSpacing: '0.3px',
-          color: 'white',
-          opacity: 0.7,
-          whiteSpace: 'nowrap',
-          lineHeight: 'normal',
-        }}
-      >
-        {role}
-      </span>
+      {!iconOnly && (
+        <span
+          style={{
+            fontFamily: 'var(--font-family)',
+            fontWeight: 'var(--font-weight-medium)',
+            fontSize: '14px',
+            letterSpacing: '0.3px',
+            color: 'var(--role-pill-text)',
+            whiteSpace: 'nowrap',
+            lineHeight: 'normal',
+          }}
+        >
+          {role}
+        </span>
+      )}
     </div>
   );
 }

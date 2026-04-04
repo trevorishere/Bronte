@@ -6,6 +6,7 @@ import { Toolbar } from '../components/Toolbar';
 import { DataTable, Column, RowData } from '../components/DataTable';
 import { GridView, GridItemData } from '../components/GridView';
 import { DataTableSkeleton, GridSkeleton, useLoadingDelay } from '../components/SkeletonLoader';
+import { InfoTray, InfoTrayContent } from '../components/InfoTray';
 import { projects } from '../data/workspaces';
 import { useFavorites } from '../contexts/FavoritesContext';
 
@@ -45,6 +46,8 @@ export function RecentPage() {
   const isLoading = useLoadingDelay(600);
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
+  const [isTrayOpen, setIsTrayOpen] = useState(false);
+  const [trayContent, setTrayContent] = useState<InfoTrayContent | null>(null);
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   // Get unique owners for filter options
@@ -86,6 +89,10 @@ export function RecentPage() {
     }));
   };
 
+  const handleSelectionChange = (row: RowData | null) => {
+    setTrayContent(row ? { type: 'project', data: row } : null);
+  };
+
   const handleRowClick = (_row: RowData) => {};
 
   const handleRowDoubleClick = (_row: RowData) => {};
@@ -103,7 +110,8 @@ export function RecentPage() {
   const handleMoreClick = (_row: RowData) => {};
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex-1 flex min-h-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       <TopBar
         title="Recent"
         userInitials="LD"
@@ -111,6 +119,7 @@ export function RecentPage() {
         onThemeToggle={onThemeToggle}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        onInfoClick={() => setIsTrayOpen(v => !v)}
       />
       <Toolbar
         viewMode={viewMode}
@@ -141,6 +150,7 @@ export function RecentPage() {
           data={filteredData}
           onRowClick={handleRowClick}
           onRowDoubleClick={handleRowDoubleClick}
+          onSelectionChange={handleSelectionChange}
           onStarClick={handleStarClick}
           onMoreClick={handleMoreClick}
           starredItems={favorites}
@@ -148,6 +158,13 @@ export function RecentPage() {
           onViewModeChange={setViewMode}
         />
       )}
+      </div>
+
+      <InfoTray
+        isOpen={isTrayOpen}
+        onClose={() => setIsTrayOpen(false)}
+        content={trayContent}
+      />
     </div>
   );
 }
