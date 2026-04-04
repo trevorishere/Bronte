@@ -1,6 +1,5 @@
 import { useParams, useNavigate, useOutletContext, useLocation } from 'react-router';
 import { useEffect } from 'react';
-import { ChevronLeft, HelpCircle, Bell, Moon, Sun } from 'lucide-react';
 import { accounts } from '../data/accounts';
 import { projects } from '../data/workspaces';
 import { teams } from '../data/teams';
@@ -241,119 +240,117 @@ export function AccountDetailPage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-      {/* Top bar — full width, unaffected by tray */}
-      <TopBar
-        userInitials="LD"
-        onThemeToggle={onThemeToggle}
-        isDarkMode={isDarkMode}
-        breadcrumbs={[...ancestors, { label: account.name, path: `/admin/account/${accountId}` }]}
-        pageIcon={<Avatar name={account.name} role={account.role} size="small" />}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-      />
+    <div className="flex-1 flex min-h-0 overflow-hidden">
+      {/* Left column: TopBar + all content — tray pushes this left */}
+      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+        <TopBar
+          userInitials="LD"
+          onThemeToggle={onThemeToggle}
+          isDarkMode={isDarkMode}
+          breadcrumbs={[...ancestors, { label: account.name, path: `/admin/account/${accountId}` }]}
+          titleSuffix={<RoleBadge role={account.role} />}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          onInfoClick={() => setIsTrayOpen(prev => !prev)}
+        />
 
-      {/* Below top bar: content column + tray side by side */}
-      <div className="flex flex-1 min-h-0 overflow-hidden">
-        {/* Content column */}
-        <div className="flex-1 flex flex-col min-h-0 overflow-hidden" style={{ borderRight: isTrayOpen ? '1px solid var(--border)' : 'none' }}>
-          {/* Account header */}
-          <DetailPageHeader
-            title={account.name}
-            badge={<RoleBadge role={account.role} />}
-            icon={(size) => <Avatar size={size} name={account.name} role={account.role} />}
-            metadata={[
-              { icon: 'email', label: account.email },
-              { icon: 'calendar', label: `Joined ${account.created}` }
-            ]}
-            onSettingsClick={() => setIsTrayOpen(prev => !prev)}
+        {/* Account header */}
+        <DetailPageHeader
+          title={account.name}
+          badge={<RoleBadge role={account.role} />}
+          icon={(size) => <Avatar size={size} name={account.name} role={account.role} />}
+          metadata={[
+            { icon: 'email', label: account.email },
+            { icon: 'calendar', label: `Joined ${account.created}` }
+          ]}
+          onSettingsClick={() => setIsTrayOpen(prev => !prev)}
+        />
+
+        {/* Tabs */}
+        <TabNav
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          variant="detail"
+        />
+
+        {/* Toolbar */}
+        <Toolbar
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          filters={getFilters()}
+          selectedFilters={selectedFilters}
+          onFilterChange={handleFilterChange}
+          dateFilters={dateFilters}
+          onDateFilterChange={handleDateFilterChange}
+        />
+
+        {/* Content area */}
+        {data.length === 0 ? (
+          <EmptyState
+            title={`No ${activeTab.toLowerCase()} found`}
+            description={`This account is not associated with any ${activeTab.toLowerCase()}.`}
           />
-
-          {/* Tabs */}
-          <TabNav
-            tabs={tabs}
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-            variant="detail"
-          />
-
-          {/* Toolbar */}
-          <Toolbar
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            filters={getFilters()}
-            selectedFilters={selectedFilters}
-            onFilterChange={handleFilterChange}
-            dateFilters={dateFilters}
-            onDateFilterChange={handleDateFilterChange}
-          />
-
-          {/* Content area */}
-          {data.length === 0 ? (
-            <EmptyState
-              title={`No ${activeTab.toLowerCase()} found`}
-              description={`This account is not associated with any ${activeTab.toLowerCase()}.`}
+        ) : (
+          viewMode === 'grid' ? (
+            <GridView
+              data={filteredData as GridItemData[]}
+              onItemClick={(item) => {
+                const currentEntry = { label: account.name, path: `/admin/account/${accountId}` };
+                const nextAncestors = [...ancestors, currentEntry];
+                if (activeTab === 'Teams') {
+                  setAncestors(nextAncestors);
+                  navigate(`/admin/team/${item.id}`, { state: { breadcrumbs: nextAncestors } });
+                } else if (activeTab === 'Workspaces') {
+                  setAncestors(nextAncestors);
+                  navigate(`/admin/workspace/${item.id}`, { state: { breadcrumbs: nextAncestors } });
+                }
+              }}
+              onItemDoubleClick={(item) => {
+                const currentEntry = { label: account.name, path: `/admin/account/${accountId}` };
+                const nextAncestors = [...ancestors, currentEntry];
+                if (activeTab === 'Teams') {
+                  setAncestors(nextAncestors);
+                  navigate(`/admin/team/${item.id}`, { state: { breadcrumbs: nextAncestors } });
+                } else if (activeTab === 'Workspaces') {
+                  setAncestors(nextAncestors);
+                  navigate(`/admin/workspace/${item.id}`, { state: { breadcrumbs: nextAncestors } });
+                }
+              }}
+              favorites={new Set()}
+              onViewModeChange={setViewMode}
             />
           ) : (
-            viewMode === 'grid' ? (
-              <GridView
-                data={filteredData as GridItemData[]}
-                onItemClick={(item) => {
-                  const currentEntry = { label: account.name, path: `/admin/account/${accountId}` };
-                  const nextAncestors = [...ancestors, currentEntry];
-                  if (activeTab === 'Teams') {
-                    setAncestors(nextAncestors);
-                    navigate(`/admin/team/${item.id}`, { state: { breadcrumbs: nextAncestors } });
-                  } else if (activeTab === 'Workspaces') {
-                    setAncestors(nextAncestors);
-                    navigate(`/admin/workspace/${item.id}`, { state: { breadcrumbs: nextAncestors } });
-                  }
-                }}
-                onItemDoubleClick={(item) => {
-                  const currentEntry = { label: account.name, path: `/admin/account/${accountId}` };
-                  const nextAncestors = [...ancestors, currentEntry];
-                  if (activeTab === 'Teams') {
-                    setAncestors(nextAncestors);
-                    navigate(`/admin/team/${item.id}`, { state: { breadcrumbs: nextAncestors } });
-                  } else if (activeTab === 'Workspaces') {
-                    setAncestors(nextAncestors);
-                    navigate(`/admin/workspace/${item.id}`, { state: { breadcrumbs: nextAncestors } });
-                  }
-                }}
-                favorites={new Set()}
-                onViewModeChange={setViewMode}
-              />
-            ) : (
-              <DataTable
-                columns={columns}
-                data={filteredData}
-                onRowClick={(row) => {
-                  const currentEntry = { label: account.name, path: `/admin/account/${accountId}` };
-                  const nextAncestors = [...ancestors, currentEntry];
-                  if (activeTab === 'Teams') {
-                    setAncestors(nextAncestors);
-                    navigate(`/admin/team/${row.id}`, { state: { breadcrumbs: nextAncestors } });
-                  } else if (activeTab === 'Workspaces') {
-                    setAncestors(nextAncestors);
-                    navigate(`/admin/workspace/${row.id}`, { state: { breadcrumbs: nextAncestors } });
-                  }
-                }}
-                viewMode={viewMode}
-                onViewModeChange={setViewMode}
-              />
-            )
-          )}
-        </div>
-
-        {/* Roles & Permissions tray — pushes content left */}
-        <RolesPermissionsTray
-          isOpen={isTrayOpen}
-          onClose={() => setIsTrayOpen(false)}
-          initialRole={account.role}
-          initialAccessLevel={account.accessLevel}
-          accountName={account.name}
-        />
+            <DataTable
+              columns={columns}
+              data={filteredData}
+              onRowClick={(row) => {
+                const currentEntry = { label: account.name, path: `/admin/account/${accountId}` };
+                const nextAncestors = [...ancestors, currentEntry];
+                if (activeTab === 'Teams') {
+                  setAncestors(nextAncestors);
+                  navigate(`/admin/team/${row.id}`, { state: { breadcrumbs: nextAncestors } });
+                } else if (activeTab === 'Workspaces') {
+                  setAncestors(nextAncestors);
+                  navigate(`/admin/workspace/${row.id}`, { state: { breadcrumbs: nextAncestors } });
+                }
+              }}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+            />
+          )
+        )}
       </div>
+
+      {/* Roles & Permissions tray — pushes entire left column left */}
+      <RolesPermissionsTray
+        isOpen={isTrayOpen}
+        onClose={() => setIsTrayOpen(false)}
+        initialRole={account.role}
+        initialAccessLevel={account.accessLevel}
+        accountName={account.name}
+        email={account.email}
+      />
     </div>
   );
 }

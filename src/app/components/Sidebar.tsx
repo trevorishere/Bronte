@@ -1,4 +1,4 @@
-import { Star, Clock, UserRoundPlus, ShieldUser, FolderOpen, X, ChevronsLeftRightEllipsis, Search, PanelLeftClose } from 'lucide-react';
+import { Star, Clock, UserRoundPlus, ShieldUser, Search, PanelLeftClose, X } from 'lucide-react';
 import { IconButton } from './IconButton';
 import { getWorkspaceInitials } from './WorkspaceIcon';
 import { useState, useEffect } from 'react';
@@ -23,9 +23,9 @@ interface SidebarProps {
 }
 
 const myWorkspaceItems = [
-  { id: 'recent', label: 'Recent', icon: 'Clock', fontWeight: 'var(--font-weight-medium)' },
-  { id: 'favorites', label: 'Favorites', icon: 'Star', fontWeight: 'var(--font-weight-medium)' },
-  { id: 'shared', label: 'Shared', icon: 'UserRoundPlus', fontWeight: 'var(--font-weight-medium)' },
+  { id: 'recent',    label: 'Recent',    icon: 'Clock' },
+  { id: 'favorites', label: 'Favorites', icon: 'Star' },
+  { id: 'shared',    label: 'Shared',    icon: 'UserRoundPlus' },
 ];
 
 const COLLAPSED_WIDTH = 68;
@@ -74,219 +74,301 @@ export function Sidebar({
     : hoveredItem === id ? 'var(--bg-nav-hover)'
     : 'transparent';
 
-  // Fade style for text elements — fade out when sidebar is collapsed on desktop
   const textFade: React.CSSProperties = {
     opacity: isDesktopOpen ? 1 : 0,
     transition: 'opacity 0.12s ease',
   };
 
   const sidebarBody = (
-    <>
-      {/* Logo — Desktop collapsed: only the open chevron */}
-      {!isDesktopOpen && (
-        <div className="hidden md:flex h-[64px] shrink-0 items-center px-[12px] w-full">
-          <IconButton
-            icon={<PanelLeftClose className="size-[18px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
-            onClick={onDesktopToggle}
-            size={40}
-            rounded="full"
-            title="Open sidebar"
-          />
-        </div>
-      )}
+    <div className="flex flex-col h-full pt-[20px] pb-[24px]">
 
-      {/* Logo — Full header: always on mobile, desktop only when expanded */}
-      <div className={`h-[64px] shrink-0 w-full ${!isDesktopOpen ? 'flex md:hidden' : 'flex'}`}>
-        <div className="flex flex-row items-center size-full">
-          <div className="flex items-center pl-[24px] py-[20px] size-full">
-            <div className="h-[40px] shrink-0">
-              <div className="flex gap-[16px] h-full items-center">
-                <div className="flex flex-col justify-center leading-[0] text-[22px] tracking-[0.5px] whitespace-nowrap text-primary" style={{ fontFamily: 'Aleo, serif', fontWeight: 700 }}>
-                  <p className="leading-[normal]">Bronte</p>
-                </div>
-              </div>
-            </div>
+      {/* ── HEADER ───────────────────────────────────────────────── */}
+      <div className="shrink-0 w-full pl-[16px]">
+        {/* Desktop collapsed: just the re-open button */}
+        {!isDesktopOpen && (
+          <div className="hidden md:flex h-[40px] items-center mb-[12px]">
+            <IconButton
+              icon={<PanelLeftClose className="size-[20px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
+              onClick={onDesktopToggle}
+              size={40}
+              rounded="full"
+              title="Open sidebar"
+            />
           </div>
-          {/* Mobile Close Button */}
+        )}
+
+        {/* Logo row — always on mobile, only when expanded on desktop */}
+        <div className={`flex items-center justify-between pb-[12px] pl-[12px] ${!isDesktopOpen ? 'flex md:hidden' : 'flex'}`}>
+          <div
+            className="h-[40px] flex items-center"
+            style={{ fontFamily: 'Aleo, serif', fontWeight: 700, fontSize: '22px', letterSpacing: '0.3px', color: 'var(--primary)', whiteSpace: 'nowrap' }}
+          >
+            Bronte
+          </div>
+          {/* Mobile close */}
           <IconButton
-            className="md:hidden mr-4"
-            icon={<X className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />}
+            className="md:hidden"
+            icon={<X className="size-[20px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
             onClick={onMobileClose}
-            size={32}
+            size={40}
             title="Close sidebar"
           />
-          {/* Desktop Collapse Button */}
-          <IconButton
-            className="hidden md:flex mr-2"
-            icon={<PanelLeftClose className="size-[20px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
-            onClick={onDesktopToggle}
-            size={40}
-            rounded="full"
-            title="Collapse sidebar"
-          />
+          {/* Desktop collapse */}
+          <div className="hidden md:flex items-center justify-center w-[52px] h-[40px]">
+            <IconButton
+              icon={<PanelLeftClose className="size-[20px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
+              onClick={onDesktopToggle}
+              size={40}
+              rounded="full"
+              title="Collapse sidebar"
+            />
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="pr-[16px]" style={textFade}>
+          <div
+            className="flex items-center gap-[12px] px-[12px] py-[10px] rounded-[12px] transition-colors duration-150"
+            style={{
+              border: '1px solid var(--border-interactive)',
+              cursor: 'default',
+              backgroundColor: hoveredItem === 'search' ? 'var(--bg-nav-hover)' : 'transparent',
+            }}
+            onMouseEnter={() => setHoveredItem('search')}
+            onMouseLeave={() => setHoveredItem(null)}
+          >
+            <Search className="size-[20px] shrink-0" style={{ color: hoveredItem === 'search' ? 'var(--icon-nav-hover)' : 'var(--muted-foreground)' }} strokeWidth={2} />
+            <span style={{
+              fontFamily: 'var(--font-family)',
+              fontWeight: 'var(--font-weight-medium)',
+              fontSize: 'var(--font-size-15)',
+              letterSpacing: '0.3px',
+              color: hoveredItem === 'search' ? 'var(--primary)' : 'var(--muted-foreground)',
+              whiteSpace: 'nowrap',
+              lineHeight: '20px',
+              transition: 'color 150ms ease',
+            }}>
+              Search
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Search field — between header and nav */}
-      <div className="shrink-0 px-[12px] py-[4px]" style={textFade}>
-        <div
-          className="flex items-center gap-[12px] h-[40px] px-[12px]"
-          style={{ backgroundColor: 'var(--muted)', borderRadius: 'var(--radius-12)' }}
-        >
-          <Search className="size-[20px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
-          <span style={{
-            fontFamily: 'var(--font-family)',
-            fontSize: 'var(--font-size-15)',
-            color: 'var(--muted-foreground)',
-            letterSpacing: 'var(--letter-spacing-md)',
-            whiteSpace: 'nowrap',
-          }}>
-            Search...
-          </span>
+      {/* ── TOP NAV (Recent / Favorites / Shared) ────────────────── */}
+      <div className="shrink-0 w-full pt-[12px] px-[16px]">
+        <div className="flex flex-col gap-px">
+          {myWorkspaceItems.map(item => (
+            <button
+              key={item.id}
+              onClick={() => handleItemClick(item.id)}
+              onMouseEnter={() => setHoveredItem(item.id)}
+              onMouseLeave={() => setHoveredItem(null)}
+              className="w-full rounded-[12px] transition-colors duration-150"
+              style={{
+                backgroundColor: navBg(item.id),
+                maxWidth: !isDesktopOpen ? '44px' : undefined,
+                overflow: 'hidden',
+              }}
+            >
+              <div className="flex gap-[12px] items-center px-[12px] py-[10px]">
+                <div className="shrink-0 size-[20px]">
+                  {item.icon === 'Clock'         && <Clock         className="size-full" style={{ color: iconColor(item.id) }} />}
+                  {item.icon === 'Star'          && <Star          className="size-full" style={{ color: iconColor(item.id) }} />}
+                  {item.icon === 'UserRoundPlus' && <UserRoundPlus className="size-full" style={{ color: iconColor(item.id) }} />}
+                </div>
+                <p style={{
+                  fontFamily: 'var(--font-family)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontSize: 'var(--font-size-15)',
+                  letterSpacing: '0.3px',
+                  lineHeight: '20px',
+                  color: textColor(item.id),
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  textAlign: 'left',
+                  ...textFade,
+                }} className="flex-1 min-w-0">
+                  {item.label}
+                </p>
+              </div>
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Navigation Items */}
-      <div className="flex flex-col flex-1 min-h-0 w-full">
-        {/* Top Navigation */}
-        <div className="shrink-0 w-full">
-          <div className="flex flex-col items-start gap-[2px] px-[12px] py-[12px] w-full">
-            {myWorkspaceItems.map(item => (
+      {/* ── TEAM WORKSPACES ──────────────────────────────────────── */}
+      <div className="flex-1 min-h-0 w-full overflow-y-auto">
+        {teamWorkspaces.length > 0 && (
+          <div className="flex flex-col gap-px px-[16px] py-[10px]">
+            {/* Section label */}
+            <div className="flex items-center h-[32px]" style={textFade}>
+              <p style={{
+                fontFamily: 'var(--font-family)',
+                fontWeight: 'var(--font-weight-semibold)',
+                fontSize: 'var(--font-size-11)',
+                letterSpacing: '0.6px',
+                textTransform: 'uppercase',
+                color: 'var(--muted-foreground)',
+                whiteSpace: 'nowrap',
+              }}>
+                Team Workspaces
+              </p>
+            </div>
+
+            {teamWorkspaces.map((workspace) => (
               <button
-                key={item.id}
-                onClick={() => handleItemClick(item.id)}
-                onMouseEnter={() => setHoveredItem(item.id)}
+                key={workspace.id}
+                onClick={() => handleItemClick(workspace.id)}
+                onMouseEnter={() => setHoveredItem(workspace.id)}
                 onMouseLeave={() => setHoveredItem(null)}
-                className="h-[36px] w-full rounded-xl transition-all duration-150 ease-in-out"
-                style={{ backgroundColor: navBg(item.id), maxWidth: !isDesktopOpen ? '44px' : undefined, overflow: 'hidden', transition: 'background-color 150ms ease-in-out, max-width 0.2s ease' }}
+                className="w-full rounded-[12px] transition-colors duration-150"
+                style={{
+                  backgroundColor: navBg(workspace.id),
+                  maxWidth: !isDesktopOpen ? '48px' : undefined,
+                  overflow: 'hidden',
+                }}
               >
-                <div className="flex gap-[12px] items-center p-[12px] size-full">
-                  <div className="shrink-0 size-[20px]">
-                    {item.icon === 'Clock' && <Clock className="size-full" style={{ color: iconColor(item.id) }} />}
-                    {item.icon === 'Star' && <Star className="size-full" style={{ color: iconColor(item.id) }} />}
-                    {item.icon === 'UserRoundPlus' && <UserRoundPlus className="size-full" style={{ color: iconColor(item.id) }} />}
-                    {item.icon === 'FolderOpen' && <FolderOpen className="size-full" style={{ color: iconColor(item.id) }} />}
-                    {item.icon === 'ShieldUser' && <ShieldUser className="size-full" style={{ color: iconColor(item.id) }} />}
+                <div className="flex gap-[10px] items-center pl-[10px] pr-[12px] py-[8px]">
+                  {/* Workspace icon: 24×24 rounded-rect with initials */}
+                  <div className="shrink-0 size-[24px] relative">
+                    <svg className="size-full" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="3" y="3" width="18" height="18" rx="4" stroke={iconColor(workspace.id)} strokeWidth="1.5" />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <p style={{
+                        fontFamily: 'var(--font-family)',
+                        fontWeight: 'var(--font-weight-semibold)',
+                        fontSize: 'var(--font-size-8)',
+                        letterSpacing: '0.3px',
+                        color: iconColor(workspace.id),
+                        whiteSpace: 'nowrap',
+                      }}>
+                        {getWorkspaceInitials(workspace.name)}
+                      </p>
+                    </div>
                   </div>
-                  <p style={{ fontFamily: 'var(--font-family)', fontWeight: item.fontWeight, lineHeight: 'var(--line-height-20)', fontSize: 'var(--font-size-15)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: 'var(--letter-spacing-md)', textAlign: 'left', color: textColor(item.id), ...textFade }} className="flex-1 min-w-0">
-                    {item.label}
-                  </p>
+                  <div className="flex-1 min-w-0" style={textFade}>
+                    <p style={{
+                      fontFamily: 'var(--font-family)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      fontSize: 'var(--font-size-15)',
+                      letterSpacing: '0.3px',
+                      lineHeight: '20px',
+                      color: textColor(workspace.id),
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      textAlign: 'left',
+                    }}>
+                      {workspace.name}
+                    </p>
+                  </div>
                 </div>
               </button>
             ))}
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* Workspace Sections - Scrollable */}
-        <div className="flex-1 min-h-0 w-full overflow-y-auto">
-          <div className="flex flex-col items-start px-[12px] pt-[4px] pb-[24px]">
-            {teamWorkspaces.length > 0 && (
-              <div className="w-full ">
-                <p className="text-muted-foreground" style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-11)', textTransform: 'uppercase', letterSpacing: 'var(--letter-spacing-lg)', padding: '8px 12px', ...textFade }}>
-                  Team Workspaces
+      {/* ── BOTTOM (Admin + User) ────────────────────────────────── */}
+      <div className="shrink-0 w-full px-[16px]">
+        <div className="flex flex-col gap-px">
+          {/* Admin */}
+          <button
+            onClick={() => handleItemClick('admin')}
+            onMouseEnter={() => setHoveredItem('admin')}
+            onMouseLeave={() => setHoveredItem(null)}
+            className="w-full rounded-[12px] transition-colors duration-150"
+            style={{
+              backgroundColor: navBg('admin'),
+              maxWidth: !isDesktopOpen ? '44px' : undefined,
+              overflow: 'hidden',
+            }}
+          >
+            <div className="flex gap-[12px] items-center px-[12px] py-[9px]">
+              <div className="shrink-0 size-[20px]">
+                <ShieldUser className="size-full" style={{ color: iconColor('admin') }} />
+              </div>
+              <p style={{
+                fontFamily: 'var(--font-family)',
+                fontWeight: 'var(--font-weight-medium)',
+                fontSize: '14px',
+                letterSpacing: '0.3px',
+                lineHeight: '20px',
+                color: textColor('admin'),
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                textAlign: 'left',
+                ...textFade,
+              }} className="flex-1 min-w-0">
+                Admin
+              </p>
+            </div>
+          </button>
+
+          {/* User */}
+          <button
+            onClick={() => handleItemClick('account')}
+            onMouseEnter={() => setHoveredItem('account')}
+            onMouseLeave={() => setHoveredItem(null)}
+            className="w-full rounded-[12px] transition-colors duration-150"
+            style={{
+              backgroundColor: navBg('account'),
+              maxWidth: !isDesktopOpen ? '48px' : undefined,
+              overflow: 'hidden',
+            }}
+          >
+            <div className="flex gap-[10px] items-center pl-[10px] pr-[12px] py-[8px]">
+              <div
+                className="shrink-0 size-[24px] rounded-full flex items-center justify-center"
+                style={{ backgroundColor: 'var(--bg-account-avatar)' }}
+              >
+                <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'bold', fontSize: '9px', color: 'white', letterSpacing: '0.5px' }}>LD</span>
+              </div>
+              <div className="flex-1 min-w-0" style={textFade}>
+                <p className="truncate" style={{
+                  fontFamily: 'var(--font-family)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontSize: 'var(--font-size-15)',
+                  letterSpacing: '0.3px',
+                  lineHeight: '18px',
+                  color: textColor('account'),
+                  textAlign: 'left',
+                }}>
+                  Lena Doe
                 </p>
-                {teamWorkspaces.map((workspace) => (
-                  <button
-                    key={workspace.id}
-                    onClick={() => handleItemClick(workspace.id)}
-                    onMouseEnter={() => setHoveredItem(workspace.id)}
-                    onMouseLeave={() => setHoveredItem(null)}
-                    className="h-[36px] w-full rounded-xl transition-all duration-150 ease-in-out"
-                    style={{ backgroundColor: navBg(workspace.id), maxWidth: !isDesktopOpen ? '48px' : undefined, overflow: 'hidden', transition: 'background-color 150ms ease-in-out, max-width 0.2s ease' }}
-                  >
-                    <div className="flex gap-[12px] items-center p-[12px] size-full">
-                      <div className="shrink-0 size-[24px]">
-                        <div className="relative size-full">
-                          <svg className="size-full" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="3" y="3" width="18" height="18" rx="4" stroke={iconColor(workspace.id)} strokeWidth="1.5" />
-                          </svg>
-                          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                            <p style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-8)', letterSpacing: 'var(--letter-spacing-md)', whiteSpace: 'nowrap', color: iconColor(workspace.id) }}>
-                              {getWorkspaceInitials(workspace.name)}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0" style={textFade}>
-                        <p style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-20)', fontSize: 'var(--font-size-15)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: 'var(--letter-spacing-md)', textAlign: 'left', color: textColor(workspace.id) }}>
-                          {workspace.name}
-                        </p>
-                      </div>
-                    </div>
-                  </button>
-                ))}
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* Bottom Section: Admin + User Avatar */}
-        <div className="shrink-0 w-full">
-          <div className="flex flex-col items-start px-[12px] w-full">
-            {/* Admin nav item */}
-            <button
-              onClick={() => handleItemClick('admin')}
-              onMouseEnter={() => setHoveredItem('admin')}
-              onMouseLeave={() => setHoveredItem(null)}
-              className="h-[36px] w-full rounded-xl transition-all duration-150 ease-in-out"
-              style={{ backgroundColor: navBg('admin'), maxWidth: !isDesktopOpen ? '44px' : undefined, overflow: 'hidden', transition: 'background-color 150ms ease-in-out, max-width 0.2s ease' }}
-            >
-              <div className="flex gap-[12px] items-center p-[12px] size-full">
-                <div className="shrink-0 size-[20px]">
-                  <ShieldUser className="size-full" style={{ color: iconColor('admin') }} />
-                </div>
-                <p style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-20)', fontSize: 'var(--font-size-15)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: 'var(--letter-spacing-md)', textAlign: 'left', color: textColor('admin'), ...textFade }} className="flex-1 min-w-0">
-                  Admin
-                </p>
-              </div>
-            </button>
-
-            {/* User Avatar — 16px top padding */}
-            <button
-              onClick={() => handleItemClick('account')}
-              onMouseEnter={() => setHoveredItem('account')}
-              onMouseLeave={() => setHoveredItem(null)}
-              className="h-[54px] w-full rounded-xl transition-all duration-150 ease-in-out mt-1 mb-4"
-              style={{ backgroundColor: navBg('account'), maxWidth: !isDesktopOpen ? '54px' : undefined, overflow: 'hidden', transition: 'background-color 150ms ease-in-out, max-width 0.2s ease' }}
-            >
-              <div className="flex gap-[12px] items-center px-[12px] py-[12px] size-full">
-                <div className="shrink-0 size-[32px] rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-account-avatar)' }}>
-                  <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'bold', fontSize: '12px', color: 'white', letterSpacing: '0.5px' }}>LD</span>
-                </div>
-                <div className="flex flex-col min-w-0 flex-1 text-left" style={textFade}>
-                  <p className="truncate" style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)', fontSize: '15px', color: activeItem === 'account' ? 'var(--primary)' : 'var(--foreground)', letterSpacing: 'var(--letter-spacing-md)', lineHeight: '20px' }}>
-                    Lena Doe
-                  </p>
-                </div>
-              </div>
-            </button>
-          </div>
+            </div>
+          </button>
         </div>
       </div>
-    </>
+
+    </div>
   );
 
   return (
     <>
       {/* Mobile Backdrop */}
       {isMobileOpen && (
-        <div className="md:hidden fixed inset-0 bg-black/50 z-40 transition-opacity" onClick={onMobileClose} />
+        <div className="md:hidden fixed inset-0 bg-black/50 z-40" onClick={onMobileClose} />
       )}
 
-      {/* Desktop: spring-animated width collapse */}
+      {/* Desktop: spring-animated width */}
       <motion.div
-        className="hidden md:flex flex-col shrink-0 overflow-hidden h-full bg-sidebar relative"
+        className="hidden md:flex flex-col shrink-0 overflow-hidden h-full bg-sidebar"
         animate={{ width: isDesktopOpen ? EXPANDED_WIDTH : COLLAPSED_WIDTH }}
         initial={false}
         transition={{ type: 'spring', stiffness: 320, damping: 32 }}
         style={{ borderRight: '1px solid var(--border-interactive)' }}
       >
-        <div style={{ width: EXPANDED_WIDTH, height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ width: EXPANDED_WIDTH, height: '100%' }}>
           {sidebarBody}
         </div>
       </motion.div>
 
-      {/* Mobile: fixed position with translate animation */}
+      {/* Mobile: slide-in */}
       <div
         className={`
           flex flex-col h-full w-[280px] shrink-0 bg-sidebar z-50

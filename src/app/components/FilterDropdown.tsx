@@ -1,6 +1,28 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Check, Search } from 'lucide-react';
+import { X, Check, Search, ListFilter } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+
+function ChevronIcon({ isOpen, isActive }: { isOpen: boolean; isActive: boolean }) {
+  return (
+    <div className="flex items-center justify-center shrink-0 size-[14px]">
+      <svg
+        className="block size-full transition-transform"
+        fill="none"
+        preserveAspectRatio="none"
+        viewBox="0 0 14 14"
+        style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+      >
+        <path
+          d="M3 5L7 9L11 5"
+          stroke={isActive ? 'var(--foreground)' : 'var(--muted-foreground)'}
+          strokeLinecap="square"
+          strokeLinejoin="round"
+          strokeWidth="2"
+        />
+      </svg>
+    </div>
+  );
+}
 
 interface FilterDropdownProps {
   label: string;
@@ -67,38 +89,43 @@ export function FilterDropdown({
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        className="flex h-[40px] items-center pr-[10px] transition-colors bg-background group"
+        className="flex h-[40px] items-center pr-[12px] transition-colors bg-background group"
         style={{
           border: `1px solid ${isHovered || isOpen ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}`,
           borderRadius: 'var(--radius-12)',
-          paddingLeft: selectedValue ? '4px' : '16px',
+          paddingLeft: selectedValue ? '6px' : '0px',
           minWidth: 'fit-content'
         }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="flex items-center min-w-0" style={{ gap: '12px' }}>
-          {selectedValue ? (
-            // Show pill when item is selected - 32px height
+        {selectedValue ? (
+          /* ── SELECTED: icon inside chip ── */
+          <div className="flex items-center h-[40px] shrink-0" style={{ gap: '12px' }}>
+            {/* Chip with filter icon inside */}
             <div
-              className="flex items-center gap-[12px] pl-[12px] pr-[8px]"
+              className="flex items-center gap-[8px] pl-[6px] pr-[8px] shrink-0"
               style={{
                 backgroundColor: 'var(--muted)',
                 border: '1px solid var(--border-interactive)',
                 borderRadius: '8px',
-                height: '30px',
-                maxWidth: '200px'
+                height: '28px',
+                maxWidth: '220px'
               }}
             >
+              <ListFilter
+                className="size-[16px] shrink-0"
+                style={{ color: 'var(--foreground)' }}
+                strokeWidth={2}
+              />
               <span
                 className="truncate"
                 style={{
                   fontFamily: 'var(--font-family)',
-                  fontWeight: 'var(--font-weight-semibold)',
-                  fontSize: 'var(--font-size-14)',
-                  color: 'var(--secondary-foreground)',
-                  paddingTop: '1px',
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontSize: 'var(--font-size-15)',
+                  color: 'var(--foreground)',
                   whiteSpace: 'nowrap'
                 }}
               >
@@ -106,54 +133,44 @@ export function FilterDropdown({
               </span>
               <div
                 onClick={clearSelection}
-                className="flex items-center justify-center size-[14px] rounded-full hover:bg-background transition-colors cursor-pointer shrink-0"
+                className="flex items-center justify-center size-[12px] rounded-full hover:opacity-70 transition-opacity cursor-pointer shrink-0"
               >
-                <X className="size-[12px]" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2} />
+                <X className="size-[10px]" style={{ color: 'var(--foreground)' }} strokeWidth={2.5} />
               </div>
             </div>
-          ) : (
-            // Show label when nothing is selected
-            <div
-              className={`${isHovered || isOpen ? 'text-foreground' : 'secondary-foreground'}`}
-              style={{
-                fontFamily: 'var(--font-family)',
-                fontWeight: 'var(--font-weight-regular)',
-                lineHeight: 'var(--line-height-20)',
-                fontSize: 'var(--font-size-14)',
-                letterSpacing: 'var(--letter-spacing-md)',
-                whiteSpace: 'nowrap',
-                textAlign: 'left'
-              }}
-            >
-              {label}
+            {/* Chevron */}
+            <ChevronIcon isOpen={isOpen} isActive={isHovered || isOpen} />
+          </div>
+        ) : (
+          /* ── UNSELECTED: icon in its own padded wrapper ── */
+          <div className="flex items-center h-[40px] shrink-0">
+            {/* Filter icon wrapper */}
+            <div className="flex items-center justify-center shrink-0" style={{ paddingLeft: '12px', paddingRight: '8px', paddingTop: '12px', paddingBottom: '12px' }}>
+              <ListFilter
+                className="size-[16px] shrink-0"
+                style={{ color: 'var(--foreground)' }}
+                strokeWidth={2}
+              />
             </div>
-          )}
-
-          {/* Chevron */}
-          <div className="flex items-center justify-center shrink-0 size-[20px]">
-            <div className="shrink-0 size-[16px]">
-              <svg
-                className="block size-full transition-transform"
-                fill="none"
-                preserveAspectRatio="none"
-                viewBox="0 0 16 16"
+            {/* Label + chevron */}
+            <div className="flex items-center shrink-0" style={{ gap: '12px' }}>
+              <span
                 style={{
-                  transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+                  fontFamily: 'var(--font-family)',
+                  fontWeight: 'var(--font-weight-regular)',
+                  lineHeight: 'var(--line-height-20)',
+                  fontSize: 'var(--font-size-15)',
+                  letterSpacing: 'var(--letter-spacing-md)',
+                  color: 'var(--foreground)',
+                  whiteSpace: 'nowrap'
                 }}
               >
-                <g>
-                  <path
-                    d="M4 6L8 10L12 6"
-                    stroke={isHovered || isOpen ? 'var(--foreground)' : 'var(--muted-foreground)'}
-                    strokeLinecap="square"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                  />
-                </g>
-              </svg>
+                {label}
+              </span>
+              <ChevronIcon isOpen={isOpen} isActive={isHovered || isOpen} />
             </div>
           </div>
-        </div>
+        )}
       </button>
 
       {/* Dropdown Menu - separate shape */}
@@ -198,7 +215,7 @@ export function FilterDropdown({
                   style={{
                     fontFamily: 'var(--font-family)',
                     fontWeight: 'var(--font-weight-regular)',
-                    fontSize: 'var(--font-size-14)',
+                    fontSize: 'var(--font-size-15)',
                     lineHeight: 'var(--line-height-20)',
                     color: 'var(--foreground)'
                   }}
@@ -234,7 +251,7 @@ export function FilterDropdown({
                         style={{
                           fontFamily: 'var(--font-family)',
                           fontWeight: 'var(--font-weight-regular)',
-                          fontSize: 'var(--font-size-14)',
+                          fontSize: 'var(--font-size-15)',
                           lineHeight: 'var(--line-height-20)',
                           textAlign: 'left'
                         }}
@@ -253,7 +270,7 @@ export function FilterDropdown({
                   style={{
                     fontFamily: 'var(--font-family)',
                     fontWeight: 'var(--font-weight-regular)',
-                    fontSize: 'var(--font-size-14)',
+                    fontSize: 'var(--font-size-15)',
                     lineHeight: 'var(--line-height-20)',
                     color: 'var(--foreground)',
                     opacity: 0.5

@@ -171,9 +171,9 @@ export function DetailPageHeader({ title, badge, icon, metadata, onSettingsClick
       </div>
 
       {/* ================================================================ */}
-      {/* DESKTOP LAYOUT — horizontal, icon left                          */}
+      {/* DESKTOP LAYOUT — hidden; title shown in TopBar, actions in Toolbar */}
       {/* ================================================================ */}
-      <div className="hidden md:block pl-[32px] pr-[32px] pt-[16px] pb-[20px]">
+      <div className="hidden pl-[32px] pr-[32px] pt-[16px] pb-[20px]">
         <div className="flex items-center justify-between gap-4">
 
           {/* Left: icon + title + badge + metadata */}

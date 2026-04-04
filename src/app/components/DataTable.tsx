@@ -1,17 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
-import { Star, MoreHorizontal, ArrowUp, ArrowDown, File, ChevronDown } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
+import { Star, MoreHorizontal, ArrowUp, ArrowDown, File } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router';
 import { DropdownMenu, createDefaultMenuItems } from './DropdownMenu';
-import { Avatar, RoleBadge, roleColors } from './Avatar';
+import { Avatar, RoleBadge } from './Avatar';
 import { TeamIcon } from './TeamIcon';
 import { WorkspaceIcon } from './WorkspaceIcon';
 import { ProjectIcon } from './ProjectIcon';
 import { RenameModal } from './RenameModal';
 import { MobileCardView } from './MobileCardView';
 import { MobileSortHeader } from './MobileSortHeader';
-import { accounts, AccessLevel } from '../data/accounts';
+import { accounts } from '../data/accounts';
 
 // ========================================
 // TYPE DEFINITIONS
@@ -31,8 +30,6 @@ export interface RowData {
   [key: string]: any;
 }
 
-const ROLE_OPTIONS = ['Admin', 'Owner', 'Manager', 'Creator', 'Viewer', 'Member', 'Developer', 'Editor'] as const;
-const ACCESS_LEVEL_OPTIONS: AccessLevel[] = ['Super Admin', 'Owner', 'Editor', 'Viewer', 'None'];
 
 interface DataTableProps {
   columns: Column[];
@@ -42,8 +39,6 @@ interface DataTableProps {
   onStarClick?: (row: RowData, isStarred: boolean) => void;
   onMoreClick?: (row: RowData) => void;
   onRename?: (row: RowData, newName: string) => void;
-  onRoleChange?: (row: RowData, newRole: string) => void;
-  onAccessLevelChange?: (row: RowData, newLevel: string) => void;
   starredItems?: Set<string>;
   viewMode?: 'grid' | 'list';
   onViewModeChange?: (mode: 'grid' | 'list') => void;
@@ -62,8 +57,6 @@ export function DataTable({
   onStarClick,
   onMoreClick,
   onRename,
-  onRoleChange,
-  onAccessLevelChange,
   starredItems,
   viewMode,
   onViewModeChange
@@ -114,8 +107,6 @@ export function DataTable({
     return defaultSort ? new Set([defaultSort.key]) : new Set();
   });
   const [openMenuRowId, setOpenMenuRowId] = useState<string | null>(null);
-  const [openRoleDropdownId, setOpenRoleDropdownId] = useState<string | null>(null);
-  const [openAccessDropdownId, setOpenAccessDropdownId] = useState<string | null>(null);
 
   // Rename Modal State
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
@@ -222,17 +213,6 @@ export function DataTable({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedRow]);
-
-  useEffect(() => {
-    const handleClickOutside = () => {
-      setOpenRoleDropdownId(null);
-      setOpenAccessDropdownId(null);
-    };
-    if (openRoleDropdownId || openAccessDropdownId) {
-      document.addEventListener('click', handleClickOutside);
-    }
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, [openRoleDropdownId, openAccessDropdownId]);
 
   // ========================================
   // RESPONSIVE COLUMN HIDING
@@ -530,7 +510,7 @@ export function DataTable({
                               {row.iconType === 'user' || row.iconType === 'account' ? (
                                 <Avatar
                                   name={row.name}
-                                  role={accounts.find(acc => acc.name === row.name)?.role || row.role || 'Viewer'}
+                                  role={accounts.find(acc => acc.name === row.name)?.role || row.role || 'Creator'}
                                   size="medium"
                                 />
                               ) : row.iconType === 'team' ? (
@@ -612,146 +592,19 @@ export function DataTable({
                               })()
                             ) :
                             column.key === 'role' ? (
-                              (() => {
-                                const rc = roleColors[row[column.key] as keyof typeof roleColors];
-                                return (
-                                  <div className="relative">
-                                    <button
-                                      style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setOpenRoleDropdownId(openRoleDropdownId === row.id ? null : row.id);
-                                        setOpenAccessDropdownId(null);
-                                      }}
-                                    >
-                                      <div
-                                        className="role-color flex items-center justify-between gap-[16px]"
-                                        style={{
-                                          backgroundColor: rc?.text,
-                                          borderRadius: '16px',
-                                          paddingTop: '5px',
-                                          paddingBottom: '6px',
-                                          paddingLeft: '16px',
-                                          paddingRight: '12px',
-                                        }}
-                                      >
-                                        <span style={{
-                                          fontFamily: 'var(--font-family)',
-                                          fontWeight: 'var(--font-weight-regular)',
-                                          fontSize: '15px',
-                                          letterSpacing: 'var(--letter-spacing-md)',
-                                          color: 'white',
-                                          whiteSpace: 'nowrap',
-                                        }}>
-                                          {row[column.key]}
-                                        </span>
-                                        <ChevronDown className="size-[16px]" style={{ color: 'white', flexShrink: 0 }} />
-                                      </div>
-                                    </button>
-                                    <AnimatePresence>
-                                      {openRoleDropdownId === row.id && (
-                                        <motion.div
-                                          className="absolute left-0 bg-background shadow-lg p-[8px] z-50"
-                                          style={{
-                                            border: '1px solid var(--border-interactive-hover)',
-                                            borderRadius: 'var(--radius-16)',
-                                            top: 'calc(100% + 8px)',
-                                            minWidth: '180px',
-                                          }}
-                                          initial={{ opacity: 0, scaleY: 0.9, transformOrigin: 'top center' }}
-                                          animate={{ opacity: 1, scaleY: 1 }}
-                                          exit={{ opacity: 0, scaleY: 0.9 }}
-                                          transition={{ duration: 0.15, type: 'spring', stiffness: 400, damping: 28 }}
-                                        >
-                                          {ROLE_OPTIONS.map(option => (
-                                            <button
-                                              key={option}
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                onRoleChange?.(row, option);
-                                                setOpenRoleDropdownId(null);
-                                              }}
-                                              className="w-full flex items-center px-[4px] py-[4px] rounded-lg transition-colors"
-                                              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-                                              onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
-                                              onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                                            >
-                                              <RoleBadge role={option as any} />
-                                            </button>
-                                          ))}
-                                        </motion.div>
-                                      )}
-                                    </AnimatePresence>
-                                  </div>
-                                );
-                              })()
+                              <RoleBadge role={row[column.key] as any} />
                             ) :
                             column.key === 'accessLevel' ? (
-                              <div className="relative">
-                                <button
-                                  style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setOpenAccessDropdownId(openAccessDropdownId === row.id ? null : row.id);
-                                    setOpenRoleDropdownId(null);
-                                  }}
-                                >
-                                  <div className="flex items-center justify-between" style={{ width: '160px' }}>
-                                    <span style={{
-                                      fontFamily: 'var(--font-family)',
-                                      fontSize: 'var(--font-size-16)',
-                                      fontWeight: 'var(--font-weight-regular)',
-                                      letterSpacing: 'var(--letter-spacing-md)',
-                                      color: (hoveredRow === row.id || selectedRow === row.id) ? 'var(--primary)' : 'var(--foreground)',
-                                      whiteSpace: 'nowrap',
-                                    }}>
-                                      {row[column.key]}
-                                    </span>
-                                    <ChevronDown className="size-[16px]" style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
-                                  </div>
-                                </button>
-                                <AnimatePresence>
-                                  {openAccessDropdownId === row.id && (
-                                    <motion.div
-                                      className="absolute left-0 bg-background shadow-lg p-[8px] z-50"
-                                      style={{
-                                        border: '1px solid var(--border-interactive-hover)',
-                                        borderRadius: 'var(--radius-16)',
-                                        top: 'calc(100% + 12px)',
-                                        minWidth: '160px',
-                                      }}
-                                      initial={{ opacity: 0, scaleY: 0.9, transformOrigin: 'top center' }}
-                                      animate={{ opacity: 1, scaleY: 1 }}
-                                      exit={{ opacity: 0, scaleY: 0.9 }}
-                                      transition={{ duration: 0.15, type: 'spring', stiffness: 400, damping: 28 }}
-                                    >
-                                      {ACCESS_LEVEL_OPTIONS.map(option => (
-                                        <button
-                                          key={option}
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            onAccessLevelChange?.(row, option);
-                                            setOpenAccessDropdownId(null);
-                                          }}
-                                          className="w-full flex items-center px-[12px] py-[8px] rounded-xl transition-colors"
-                                          style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-                                          onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
-                                          onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                                        >
-                                          <span style={{
-                                            fontFamily: 'var(--font-family)',
-                                            fontSize: 'var(--font-size-15)',
-                                            letterSpacing: 'var(--letter-spacing-md)',
-                                            color: row[column.key] === option ? 'var(--primary)' : 'var(--foreground)',
-                                          }}>
-                                            {option}
-                                          </span>
-                                        </button>
-                                      ))}
-                                    </motion.div>
-                                  )}
-                                </AnimatePresence>
-                              </div>
+                              <span style={{
+                                fontFamily: 'var(--font-family)',
+                                fontSize: 'var(--font-size-16)',
+                                fontWeight: 'var(--font-weight-regular)',
+                                letterSpacing: 'var(--letter-spacing-md)',
+                                color: (hoveredRow === row.id || selectedRow === row.id) ? 'var(--primary)' : 'var(--foreground)',
+                                whiteSpace: 'nowrap',
+                              }}>
+                                {row[column.key]}
+                              </span>
                             ) :
                             column.align === 'right' ? (
                               // Right-aligned columns - use flex justify-end to match header
