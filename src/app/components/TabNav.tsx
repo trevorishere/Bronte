@@ -23,7 +23,7 @@ export function TabNav({ tabs, activeTab, onTabChange, variant = 'default' }: Ta
 
   return (
     <div 
-      className="h-[64px] shrink-0 w-full px-4 md:px-[24px] mb-[12px]"
+      className="h-[64px] shrink-0 w-full px-4 md:px-[24px]"
       style={{ borderBottom: '1px solid var(--border-interactive)' }}
     >
       <div className="flex h-full items-end overflow-x-auto scrollbar-hide">

@@ -1,5 +1,5 @@
-import { Grid3x3, List } from 'lucide-react';
-import { useState } from 'react';
+import { LayoutGrid, List } from 'lucide-react';
+import { useState, ReactNode } from 'react';
 import { FilterDropdown } from './FilterDropdown';
 import { DateFilterDropdown } from './DateFilterDropdown';
 
@@ -21,9 +21,11 @@ interface ToolbarProps {
   onFilterChange?: (filterLabel: string, values: string[]) => void;
   dateFilters?: Record<string, { start: Date | null; end: Date | null }>;
   onDateFilterChange?: (filterLabel: string, start: Date | null, end: Date | null) => void;
+  /** Desktop-only action buttons rendered to the right of filters */
+  actionButtons?: ReactNode;
 }
 
-export function Toolbar({ 
+export function Toolbar({
   viewMode = 'list',
   onViewModeChange,
   filters = [
@@ -34,7 +36,8 @@ export function Toolbar({
   selectedFilters = {},
   onFilterChange,
   dateFilters = {},
-  onDateFilterChange
+  onDateFilterChange,
+  actionButtons
 }: ToolbarProps) {
   const [isToggleHovered, setIsToggleHovered] = useState(false);
   const [hoveredToggle, setHoveredToggle] = useState<'list' | 'grid' | null>(null);
@@ -82,10 +85,10 @@ export function Toolbar({
       {/* Layout: Filter Buttons (left) + View Toggle (right)             */}
       {/* Gap: 8px between filter buttons                                 */}
       {/* ================================================================ */}
-      <div className="hidden md:flex h-[104px] shrink-0 w-full pl-[28px] pr-[48px] items-center justify-between">
-        
+      <div className="hidden md:flex h-[104px] shrink-0 w-full px-[24px] items-center justify-between gap-[16px]">
+
         {/* Filter Buttons Section - Left Side */}
-        <div className="flex flex-wrap gap-[8px] items-center">
+        <div className="flex flex-wrap gap-[8px] items-center flex-1 min-w-0">
           {filters.map((filter) => {
             if ('type' in filter && filter.type === 'date') {
               const dateFilter = dateFilters[filter.label] || { start: null, end: null };
@@ -114,27 +117,27 @@ export function Toolbar({
           })}
         </div>
 
-        {/* View Toggle Section + divider - Right Side */}
+        {/* Right Side: action buttons + view toggle */}
         <div className="flex items-center gap-[12px] shrink-0">
-          {/* Divider */}
-          <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--border-interactive)' }} />
+          {/* Page action buttons (Share, New, etc.) */}
+          {actionButtons && (
+            <>
+              {actionButtons}
+            </>
+          )}
 
           {/* Toggle buttons */}
-          {/* Button Width: 40px each, Button Height: 40px */}
           <div
-            className="flex h-[40px] overflow-hidden rounded-xl transition-colors"
-            style={{ border: `1px solid ${isToggleHovered ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}` }}
-            onMouseEnter={() => setIsToggleHovered(true)}
-            onMouseLeave={() => setIsToggleHovered(false)}
+            className="flex items-center p-[4px] rounded-[12px] gap-[4px]"
+            style={{ border: `1px solid var(--border-interactive)` }}
           >
             {/* List View Button */}
             <button
               onClick={() => onViewModeChange?.('list')}
-              className={`flex items-center justify-center size-[40px] pb-[2px] transition-colors ${
-                viewMode === 'list' ? 'bg-background' : 'bg-transparent'
-              }`}
+              className="flex items-center justify-center size-[32px] rounded-[8px] p-[6px] transition-colors"
               style={{
-                borderRight: `1px solid ${isToggleHovered ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}`
+                backgroundColor: viewMode === 'list' ? 'var(--muted)' : 'transparent',
+                border: viewMode === 'list' ? '1px solid var(--border-interactive)' : '1px solid transparent',
               }}
               onMouseEnter={() => setHoveredToggle('list')}
               onMouseLeave={() => setHoveredToggle(null)}
@@ -145,13 +148,15 @@ export function Toolbar({
             {/* Grid View Button */}
             <button
               onClick={() => onViewModeChange?.('grid')}
-              className={`flex items-center justify-center size-[40px] pb-[2px] transition-colors ${
-                viewMode === 'grid' ? 'bg-background' : 'bg-transparent'
-              }`}
+              className="flex items-center justify-center size-[32px] rounded-[8px] p-[6px] transition-colors"
+              style={{
+                backgroundColor: viewMode === 'grid' ? 'var(--muted)' : 'transparent',
+                border: viewMode === 'grid' ? '1px solid var(--border-interactive)' : '1px solid transparent',
+              }}
               onMouseEnter={() => setHoveredToggle('grid')}
               onMouseLeave={() => setHoveredToggle(null)}
             >
-              <Grid3x3 size={18} strokeWidth={2} color={getIconColor('grid')} />
+              <LayoutGrid size={18} strokeWidth={2} color={getIconColor('grid')} />
             </button>
           </div>
         </div>

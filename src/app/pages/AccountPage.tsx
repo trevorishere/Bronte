@@ -3,14 +3,9 @@ import { Mail, ShieldUser, HelpCircle, ChevronRight, LogOut, BookOpen, MessageSq
 import { TopBar } from '../components/TopBar';
 
 const roleColors: Record<string, { bg: string; text: string; badge: string }> = {
-  Admin: { bg: '#934790', text: '#934790', badge: 'rgba(147,71,144,0.15)' },
-  Owner: { bg: '#7669aa', text: '#7669aa', badge: 'rgba(118,105,170,0.15)' },
-  Manager: { bg: '#ac4e4f', text: '#ac4e4f', badge: 'rgba(172,78,79,0.15)' },
-  Creator: { bg: '#5165b5', text: '#5165b5', badge: 'rgba(81,101,181,0.15)' },
-  Viewer: { bg: '#4b8f6c', text: '#4b8f6c', badge: 'rgba(75,143,108,0.15)' },
-  Member: { bg: '#ac9445', text: '#ac9445', badge: 'rgba(172,148,69,0.15)' },
-  Developer: { bg: '#b97930', text: '#b97930', badge: 'rgba(185,121,48,0.15)' },
-  Editor: { bg: '#39869c', text: '#39869c', badge: 'rgba(57,134,156,0.15)' },
+  Admin:     { bg: '#934790', text: '#934790', badge: 'rgba(147,71,144,0.3)' },
+  Developer: { bg: '#ce5b29', text: '#ce5b29', badge: 'rgba(206,91,41,0.3)' },
+  Creator:   { bg: '#068aaf', text: '#068aaf', badge: 'rgba(6,138,175,0.3)' },
 };
 
 interface OutletContext {
@@ -359,7 +354,7 @@ export function AccountPage() {
           <div className="flex flex-col md:flex-row gap-4 mb-4">
 
             {/* Admin Section */}
-            {(currentUser.role === 'Admin' || currentUser.role === 'Owner') && (
+            {currentUser.role === 'Admin' && (
               <div className="flex-1 min-w-0">
                 <SectionLabel title="Administration" />
                 <div

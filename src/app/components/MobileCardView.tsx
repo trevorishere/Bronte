@@ -35,7 +35,7 @@ export function MobileCardView({
     const iconType = row.iconType || 'user';
     if (iconType === 'user' || iconType === 'account') {
       const account = accounts.find(acc => acc.name === (row.name || row.accountName || row.teamName));
-      const role = row.role || account?.role || 'Viewer';
+      const role = row.role || account?.role || 'Creator';
       return <Avatar size={size} name={row.name || row.accountName || row.teamName} role={role as any} />;
     } else if (iconType === 'team') {
       return <TeamIcon size={size} />;

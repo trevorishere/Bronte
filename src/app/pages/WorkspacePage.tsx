@@ -135,6 +135,7 @@ export function WorkspacePage() {
           ? [...ancestors, { label: workspace.name, path: location.pathname }]
           : undefined
         }
+        title={!isAdminRoute && workspace ? workspace.name : undefined}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
       />

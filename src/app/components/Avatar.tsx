@@ -1,30 +1,31 @@
+import { ShieldCheck, Code2, PenLine } from 'lucide-react';
 import { BaseIcon, IconText, IconSize } from './BaseIcon';
+
+export type Role = 'Admin' | 'Developer' | 'Creator';
 
 interface AvatarProps {
   name: string;
-  role?: 'Admin' | 'Owner' | 'Manager' | 'Creator' | 'Viewer' | 'Member' | 'Developer' | 'Editor';
+  role?: Role;
   size?: IconSize;
 }
 
-// Role color mapping based on Figma imports
-export const roleColors = {
-  Admin: { bg: '#934790', text: '#934790', badge: 'rgba(147,71,144,0.1)' },
-  Owner: { bg: '#7669aa', text: '#7669aa', badge: 'rgba(118,105,170,0.1)' },
-  Manager: { bg: '#ac4e4f', text: '#ac4e4f', badge: 'rgba(172,78,79,0.1)' },
-  Creator: { bg: '#5165b5', text: '#5165b5', badge: 'rgba(81,101,181,0.1)' },
-  Viewer: { bg: '#4b8f6c', text: '#4b8f6c', badge: 'rgba(75,143,108,0.1)' },
-  Member: { bg: '#ac9445', text: '#ac9445', badge: 'rgba(172,148,69,0.1)' },
-  Developer: { bg: '#b97930', text: '#b97930', badge: 'rgba(185,121,48,0.1)' },
-  Editor: { bg: '#39869c', text: '#39869c', badge: 'rgba(57,134,156,0.1)' },
+// Role color mapping — 3 canonical roles
+export const roleColors: Record<Role, { bg: string; border: string; rgba: string }> = {
+  Admin:     { bg: '#934790', border: '#934790', rgba: 'rgba(147,71,144,0.3)' },
+  Developer: { bg: '#ce5b29', border: '#ce5b29', rgba: 'rgba(206,91,41,0.3)' },
+  Creator:   { bg: '#068aaf', border: '#068aaf', rgba: 'rgba(6,138,175,0.3)' },
 };
 
-export function Avatar({ name, role = 'Viewer', size = 'medium' }: AvatarProps) {
-  // Get initials from name (first letter of first and last name)
+const roleIcons: Record<Role, React.ReactNode> = {
+  Admin:     <ShieldCheck className="size-[14px] shrink-0" strokeWidth={2} />,
+  Developer: <Code2      className="size-[14px] shrink-0" strokeWidth={2} />,
+  Creator:   <PenLine    className="size-[14px] shrink-0" strokeWidth={2} />,
+};
+
+export function Avatar({ name, role = 'Creator', size = 'medium' }: AvatarProps) {
   const getInitials = (fullName: string): string => {
     const parts = fullName.trim().split(' ');
-    if (parts.length === 1) {
-      return parts[0].substring(0, 2).toUpperCase();
-    }
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
 
@@ -44,27 +45,38 @@ export function Avatar({ name, role = 'Viewer', size = 'medium' }: AvatarProps) 
 }
 
 interface RoleBadgeProps {
-  role: 'Admin' | 'Owner' | 'Manager' | 'Creator' | 'Viewer' | 'Member' | 'Developer' | 'Editor';
+  role: Role;
 }
 
 export function RoleBadge({ role }: RoleBadgeProps) {
   const colors = roleColors[role];
+  const icon = roleIcons[role];
 
   return (
     <div
-      className="role-color flex gap-[4px] items-center py-[8px] px-[14px] rounded-[16px]"
-      style={{ backgroundColor: colors.badge }}
+      className="inline-flex items-center gap-[6px] h-[28px] pl-[8px] pr-[12px] rounded-[8px] shrink-0"
+      style={{
+        backgroundColor: colors.rgba,
+        border: `1px solid ${colors.border}`,
+      }}
     >
-      <div 
-        className="flex flex-col font-medium justify-center leading-none not-italic relative shrink-0 text-[14px] whitespace-nowrap"
-        style={{ 
+      <span style={{ color: 'white', opacity: 0.7, display: 'flex', alignItems: 'center' }}>
+        {icon}
+      </span>
+      <span
+        style={{
           fontFamily: 'var(--font-family)',
-          color: colors.text,
-          letterSpacing: '0.14px'
+          fontWeight: 'var(--font-weight-medium)',
+          fontSize: '14px',
+          letterSpacing: '0.3px',
+          color: 'white',
+          opacity: 0.7,
+          whiteSpace: 'nowrap',
+          lineHeight: 'normal',
         }}
       >
-        <p className="leading-none">{role}</p>
-      </div>
+        {role}
+      </span>
     </div>
   );
 }

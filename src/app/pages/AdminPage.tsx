@@ -34,8 +34,8 @@ const projectColumns: Column[] = [
 
 const accountColumns: Column[] = [
   { key: 'name', label: 'Account Name', sortable: true, width: 'w-[400px]' },
-  { key: 'role', label: 'Role', sortable: true, width: 'w-[200px]' },
-  { key: 'accessLevel', label: 'Access Level', sortable: true, width: 'w-[200px]' },
+  { key: 'role', label: 'Role', sortable: true, width: 'w-[160px]' },
+  { key: 'accessLevel', label: 'Access Level', sortable: true, width: 'w-[160px]' },
   { key: 'created', label: 'Created On', sortable: true, width: 'w-[200px]' },
 ];
 

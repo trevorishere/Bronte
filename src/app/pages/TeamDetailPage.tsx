@@ -89,8 +89,8 @@ export function TeamDetailPage() {
         return {
           columns: [
             { key: 'name', label: 'Name', sortable: true, width: 'w-[400px]' },
-            { key: 'role', label: 'Role', sortable: true, width: 'w-[200px]' },
-            { key: 'accessLevel', label: 'Access Level', sortable: true, width: 'w-[200px]' },
+            { key: 'role', label: 'Role', sortable: true, width: 'w-[160px]' },
+            { key: 'accessLevel', label: 'Access Level', sortable: true, width: 'w-[160px]' },
             { key: 'created', label: 'Created On', sortable: true, width: 'w-[200px]' },
           ] as Column[],
           data: teamMembers.map(account => ({
@@ -229,7 +229,6 @@ export function TeamDetailPage() {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         breadcrumbs={[...ancestors, { label: team.name, path: `/admin/team/${teamId}` }]}
-        pageIcon={<TeamIcon size="small" />}
       />
 
       {/* Team header */}

@@ -1,5 +1,27 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Calendar, X } from 'lucide-react';
+import { Calendar, X, ListFilter } from 'lucide-react';
+
+function ChevronIcon({ isOpen, isActive }: { isOpen: boolean; isActive: boolean }) {
+  return (
+    <div className="flex items-center justify-center shrink-0 size-[14px]">
+      <svg
+        className="block size-full transition-transform"
+        fill="none"
+        preserveAspectRatio="none"
+        viewBox="0 0 14 14"
+        style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+      >
+        <path
+          d="M3 5L7 9L11 5"
+          stroke={isActive ? 'var(--foreground)' : 'var(--muted-foreground)'}
+          strokeLinecap="square"
+          strokeLinejoin="round"
+          strokeWidth="2"
+        />
+      </svg>
+    </div>
+  );
+}
 import { DateRangePicker } from './DateRangePicker';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -81,8 +103,8 @@ export function DateFilterDropdown({
         style={{
           border: `1px solid ${isHovered || isOpen ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}`,
           borderRadius: 'var(--radius-12)',
-          paddingLeft: hasSelection ? '4px' : '16px',
-          paddingRight: '8px',
+          paddingLeft: hasSelection ? '6px' : '0px',
+          paddingRight: '12px',
           height: '40px',
           minWidth: 'fit-content',
           cursor: 'pointer'
@@ -90,88 +112,75 @@ export function DateFilterDropdown({
         aria-expanded={isOpen}
         aria-haspopup="dialog"
       >
-        <div className="flex items-center min-w-0" style={{ gap: '12px' }}>
-          {hasSelection ? (
-            // Show pill when dates are selected - matches Owner filter selected state
+        {hasSelection ? (
+          /* ── SELECTED: icon + calendar inside chip ── */
+          <div className="flex items-center h-[40px] shrink-0" style={{ gap: '12px' }}>
             <div
-              className="flex items-center gap-[12px] pr-[8px] pl-[12px]"
+              className="flex items-center gap-[8px] pl-[6px] pr-[8px] shrink-0"
               style={{
                 backgroundColor: 'var(--muted)',
                 border: '1px solid var(--border-interactive)',
                 borderRadius: '8px',
-                height: '30px',
-                maxWidth: '200px'
+                height: '28px',
+                maxWidth: '240px'
               }}
             >
-              <Calendar className="size-[16px] shrink-0" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2} />
+              <ListFilter
+                className="size-[16px] shrink-0"
+                style={{ color: 'var(--foreground)' }}
+                strokeWidth={2}
+              />
+              <Calendar className="size-[14px] shrink-0" style={{ color: 'var(--foreground)' }} strokeWidth={2} />
               <span
                 className="truncate"
                 style={{
                   fontFamily: 'var(--font-family)',
-                  fontWeight: 'var(--font-weight-regular)',
-                  fontSize: 'var(--font-size-13)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontSize: 'var(--font-size-15)',
                   letterSpacing: 'var(--letter-spacing-md)',
-                  color: 'var(--secondary-foreground)',
-                  paddingTop: '1px',
+                  color: 'var(--foreground)',
                   whiteSpace: 'nowrap'
                 }}
               >
                 {formatDateRange()}
               </span>
               <div
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDateChange(null, null);
-                }}
-                className="flex items-center justify-center size-[14px] rounded-full hover:bg-background transition-colors cursor-pointer shrink-0"
+                onClick={(e) => { e.stopPropagation(); onDateChange(null, null); }}
+                className="flex items-center justify-center size-[12px] rounded-full hover:opacity-70 transition-opacity cursor-pointer shrink-0"
               >
-                <X className="size-[12px]" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2} />
+                <X className="size-[10px]" style={{ color: 'var(--foreground)' }} strokeWidth={2.5} />
               </div>
             </div>
-          ) : (
-            // Show label when nothing is selected - matches Owner filter default state
-            <div
-              className={`${isHovered || isOpen ? 'text-foreground' : 'secondary-foreground'}`}
-              style={{
-                fontFamily: 'var(--font-family)',
-                fontWeight: 'var(--font-weight-regular)',
-                lineHeight: 'var(--line-height-20)',
-                fontSize: 'var(--font-size-14)',
-                letterSpacing: 'var(--letter-spacing-md)',
-                whiteSpace: 'nowrap',
-                paddingBottom: '1px',
-                textAlign: 'left'
-              }}
-            >
-              {label}
+            <ChevronIcon isOpen={isOpen} isActive={isHovered || isOpen} />
+          </div>
+        ) : (
+          /* ── UNSELECTED: icon in padded wrapper ── */
+          <div className="flex items-center h-[40px] shrink-0">
+            <div className="flex items-center justify-center shrink-0" style={{ paddingLeft: '12px', paddingRight: '8px', paddingTop: '12px', paddingBottom: '12px' }}>
+              <ListFilter
+                className="size-[16px] shrink-0"
+                style={{ color: 'var(--foreground)' }}
+                strokeWidth={2}
+              />
             </div>
-          )}
-
-          {/* Chevron - matches Owner filter chevron */}
-          <div className="flex items-center justify-center shrink-0 size-[20px]">
-            <div className="shrink-0 size-[16px]">
-              <svg
-                className="block size-full transition-transform"
-                fill="none"
-                preserveAspectRatio="none"
-                viewBox="0 0 16 16"
+            <div className="flex items-center shrink-0" style={{ gap: '12px' }}>
+              <span
                 style={{
-                  transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+                  fontFamily: 'var(--font-family)',
+                  fontWeight: 'var(--font-weight-regular)',
+                  lineHeight: 'var(--line-height-20)',
+                  fontSize: 'var(--font-size-15)',
+                  letterSpacing: 'var(--letter-spacing-md)',
+                  color: 'var(--foreground)',
+                  whiteSpace: 'nowrap'
                 }}
               >
-                <g>
-                  <path
-                    d="M4 6L8 10L12 6"
-                    stroke={isHovered || isOpen ? 'var(--foreground)' : 'var(--muted-foreground)'}
-                    strokeLinecap="square"
-                    strokeLinejoin="round"
-                    strokeWidth="1.5"
-                  />
-                </g>
-              </svg>
+                {label}
+              </span>
+              <ChevronIcon isOpen={isOpen} isActive={isHovered || isOpen} />
             </div>
           </div>
-        </div>
+        )}
       </button>
 
       <AnimatePresence>

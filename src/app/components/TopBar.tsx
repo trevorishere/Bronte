@@ -1,4 +1,4 @@
-import { ChevronLeft, Search, Bell } from 'lucide-react';
+import { ChevronLeft, Plus, Share2, Info } from 'lucide-react';
 import { ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 import { ActionButtons } from './ActionButtons';
@@ -18,7 +18,7 @@ import type { BreadcrumbEntry } from '../contexts/NavigationContext';
 // Internal BreadcrumbNav component
 // entries = full trail including current page as last item
 // ============================================================
-function BreadcrumbNav({ entries, pageIcon }: { entries: BreadcrumbEntry[]; pageIcon?: ReactNode }) {
+function BreadcrumbNav({ entries, titleSuffix }: { entries: BreadcrumbEntry[]; titleSuffix?: ReactNode }) {
   const navigate = useNavigate();
 
   const truncate = (label: string, max = 22) =>
@@ -99,13 +99,14 @@ function BreadcrumbNav({ entries, pageIcon }: { entries: BreadcrumbEntry[]; page
 
         {/* Current page — not clickable */}
         <BreadcrumbItem className="flex items-center gap-[8px]">
-          {pageIcon && <span className="shrink-0">{pageIcon}</span>}
           <BreadcrumbPage
-            className="font-medium whitespace-nowrap"
+            className="font-semibold whitespace-nowrap"
+            style={{ fontSize: '28px', color: 'var(--primary)', letterSpacing: 'var(--letter-spacing-lg)', lineHeight: 'normal' }}
             title={current.label}
           >
-            {truncate(current.label)}
+            {truncate(current.label, 30)}
           </BreadcrumbPage>
+          {titleSuffix && <span className="shrink-0">{titleSuffix}</span>}
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>
@@ -125,10 +126,12 @@ interface TopBarProps {
   viewMode?: 'grid' | 'list';
   onViewModeChange?: (mode: 'grid' | 'list') => void;
   mobileActions?: ReactNode;
-  /** Small icon shown next to the current page label in the breadcrumb */
-  pageIcon?: ReactNode;
+  /** Node rendered after the current page label in the breadcrumb (e.g. a role pill) */
+  titleSuffix?: ReactNode;
   /** Full breadcrumb trail including current page as last item. When provided, replaces the back button. */
   breadcrumbs?: BreadcrumbEntry[];
+  /** Called when the Info button is clicked */
+  onInfoClick?: () => void;
 }
 
 export function TopBar({
@@ -141,8 +144,9 @@ export function TopBar({
   viewMode,
   onViewModeChange,
   mobileActions,
-  pageIcon,
+  titleSuffix,
   breadcrumbs,
+  onInfoClick,
 }: TopBarProps) {
   const backBtn = (extraClass = '') => (
     <button
@@ -176,15 +180,10 @@ export function TopBar({
 
   const renderLeft = () => {
     if (hasBreadcrumbs) {
-      return <BreadcrumbNav entries={breadcrumbs} pageIcon={pageIcon} />;
+      return <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} />;
     }
     if (showBackButton) {
-      return (
-        <>
-          {backBtn()}
-          {pageIcon && <div className="shrink-0">{pageIcon}</div>}
-        </>
-      );
+      return backBtn();
     }
     if (title) {
       return null; // title rendered separately per breakpoint
@@ -206,12 +205,9 @@ export function TopBar({
       <div className="md:hidden flex items-center gap-1 pt-1 px-[16px] size-full">
         <div className="flex items-center flex-1 min-w-0 gap-[10px] overflow-hidden">
           {hasBreadcrumbs ? (
-            <BreadcrumbNav entries={breadcrumbs} pageIcon={pageIcon} />
+            <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} />
           ) : showBackButton ? (
-            <>
-              {backBtn()}
-              {pageIcon && <div className="shrink-0">{pageIcon}</div>}
-            </>
+            backBtn()
           ) : title ? (
             <h1
               className="truncate text-[24px]"
@@ -228,18 +224,6 @@ export function TopBar({
           ) : null}
         </div>
 
-        {/* Search + Bell */}
-        <IconButton
-          icon={<Search className="size-[18px]" style={{ color: 'var(--icon)' }} strokeWidth={2.5} />}
-          size={40}
-          title="Search"
-        />
-        <IconButton
-          icon={<Bell className="size-[18px]" style={{ color: 'var(--icon)' }} strokeWidth={2.5} />}
-          size={40}
-          title="Notifications"
-        />
-
         {mobileActions && (
           <div className="flex items-center gap-1 shrink-0">
             {mobileActions}
@@ -250,21 +234,17 @@ export function TopBar({
       {/* ================================================================ */}
       {/* DESKTOP LAYOUT                                                   */}
       {/* ================================================================ */}
-      <div className="hidden md:flex items-center justify-between pt-1 pl-[24px] pr-[32px] size-full">
+      <div className="hidden md:flex items-center justify-between pt-1 pl-[24px] pr-[24px] size-full">
         <div className="flex items-center flex-1 min-w-0 gap-[16px] overflow-hidden">
           {hasBreadcrumbs ? (
-            <BreadcrumbNav entries={breadcrumbs} pageIcon={pageIcon} />
+            <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} />
           ) : showBackButton ? (
-            <>
-              {backBtn()}
-              {pageIcon && <div className="shrink-0">{pageIcon}</div>}
-            </>
+            backBtn()
           ) : title ? (
             <h1
-              className="truncate text-[24px]"
+              className="truncate text-[28px] font-semibold"
               style={{
                 fontFamily: 'var(--font-family)',
-                fontWeight: 'regular',
                 lineHeight: 'normal',
                 color: 'var(--primary)',
                 letterSpacing: 'var(--letter-spacing-lg)',
@@ -275,11 +255,39 @@ export function TopBar({
           ) : null}
         </div>
 
-        <ActionButtons
-          userInitials={userInitials}
-          onThemeToggle={onThemeToggle}
-          isDarkMode={isDarkMode}
-        />
+        {/* Top bar actions: Add, Share, Info */}
+        <div className="flex items-center gap-[8px] shrink-0">
+          <button
+            className="flex items-center gap-[8px] h-[40px] rounded-[12px] transition-colors"
+            style={{ border: '1px solid var(--border-interactive)', paddingLeft: '11px', paddingRight: '13px', paddingTop: '1px', paddingBottom: '1px', backgroundColor: 'transparent', cursor: 'pointer' }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            title="Add"
+          >
+            <Plus className="size-[18px] shrink-0" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2.5} />
+            <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: '15px', letterSpacing: '0.32px', color: 'var(--secondary-foreground)', whiteSpace: 'nowrap' }}>Add…</span>
+          </button>
+          <button
+            className="flex items-center gap-[8px] h-[40px] rounded-[12px] transition-colors"
+            style={{ border: '1px solid var(--border-interactive)', paddingLeft: '11px', paddingRight: '13px', paddingTop: '1px', paddingBottom: '1px', backgroundColor: 'transparent', cursor: 'pointer' }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            title="Share"
+          >
+            <Share2 className="size-[18px] shrink-0" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2} />
+            <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: '15px', letterSpacing: '0.32px', color: 'var(--secondary-foreground)', whiteSpace: 'nowrap' }}>Share</span>
+          </button>
+          <button
+            className="flex items-center justify-center size-[40px] rounded-[12px] transition-colors"
+            style={{ border: '1px solid var(--border-interactive)', paddingLeft: '13px', paddingRight: '13px', paddingTop: '1px', paddingBottom: '1px', backgroundColor: 'transparent', cursor: 'pointer' }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            title="Info"
+            onClick={onInfoClick}
+          >
+            <Info className="size-[18px] shrink-0" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2} />
+          </button>
+        </div>
       </div>
     </div>
   );

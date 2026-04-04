@@ -87,7 +87,7 @@ export function GridView({
         {item.iconType === 'account' && (
           <Avatar
             name={item.name}
-            role={accounts.find(acc => acc.name === item.name)?.role || item.role || 'Viewer'}
+            role={accounts.find(acc => acc.name === item.name)?.role || item.role || 'Creator'}
             size="x-large"
           />
         )}
