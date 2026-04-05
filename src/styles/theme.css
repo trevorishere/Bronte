@@ -157,7 +157,7 @@
   --primary-foreground: #1e1a16;
   --secondary: rgba(255, 255, 255, 0.05);
   --secondary-foreground: #a09890;
-  --muted: #26211B; /* Warm dark muted */
+  --muted: #262422; /* Warm dark muted */
   --muted-foreground: #9a9088;
   --accent: #342e28; /* Warm medium dark */
   --accent-foreground: #ede8e2;
@@ -179,7 +179,7 @@
 
   /* Dark mode specific custom properties */
   --bg-nav-hover: rgba(44, 40, 34, 0.5);
-  --bg-row-selected: #2c2822;
+  --bg-row-selected: #2E2B29;
   --border-interactive: #4a4440;
   --border-interactive-hover: #6a6460;
   --bg-icon-container: #d58c6f;
