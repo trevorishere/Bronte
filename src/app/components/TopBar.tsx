@@ -143,6 +143,8 @@ interface TopBarProps {
   breadcrumbs?: BreadcrumbEntry[];
   /** Called when the Info button is clicked */
   onInfoClick?: () => void;
+  /** Called when the Share button is clicked */
+  onShareClick?: () => void;
   /** Hide the Share action button */
   hideShare?: boolean;
   /** Hide the Info (ⓘ) action button */
@@ -162,6 +164,7 @@ export function TopBar({
   titleSuffix,
   breadcrumbs,
   onInfoClick,
+  onShareClick,
   hideShare = false,
   hideInfo = false,
 }: TopBarProps) {
@@ -307,6 +310,7 @@ export function TopBar({
             onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
             onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             title="Share"
+            onClick={onShareClick}
           >
             <Share2 className="size-[18px] shrink-0" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2} />
             <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: '15px', letterSpacing: '0.32px', color: 'var(--secondary-foreground)', whiteSpace: 'nowrap' }}>Share</span>

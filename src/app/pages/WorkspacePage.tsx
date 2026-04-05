@@ -13,6 +13,8 @@ import { accounts } from '../data/accounts';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useNavigationContext, BreadcrumbEntry } from '../contexts/NavigationContext';
 import { useInfoTray } from '../contexts/InfoTrayContext';
+import { useSharedMembers } from '../contexts/SharedMembersContext';
+import { ShareModal } from '../components/ShareModal';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -35,6 +37,8 @@ export function WorkspacePage() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const { setIsTrayOpen, setTrayContent } = useInfoTray();
+  const { addSharedMembers, getExtraCount } = useSharedMembers();
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   const { ancestors, setAncestors } = useNavigationContext();
@@ -53,13 +57,14 @@ export function WorkspacePage() {
     }
   }, [workspaceId, isAdminRoute]);
 
-  // Set tray content to this workspace on navigation
+  // Set tray content to this workspace on navigation or when shared members change
   useEffect(() => {
     if (!workspace) return;
     const projectCount = projects.filter(p => p.workspace === workspaceId).length;
-    const memberCount = accounts.filter(a => a.workspaceIds.includes(workspaceId || '')).length;
-    setTrayContent({ type: 'workspace', data: { id: workspace.id, name: workspace.name, owner: workspace.owner, type: workspace.type, created: workspace.created, projectsCount: projectCount, membersCount: memberCount } });
-  }, [workspaceId]);
+    const baseMemberCount = accounts.filter(a => a.workspaceIds.includes(workspaceId || '')).length;
+    const totalMemberCount = baseMemberCount + getExtraCount(workspaceId || '');
+    setTrayContent({ type: 'workspace', data: { id: workspace.id, name: workspace.name, owner: workspace.owner, type: workspace.type, created: workspace.created, projectsCount: projectCount, membersCount: totalMemberCount } });
+  }, [workspaceId, getExtraCount(workspaceId || '')]);
 
   // Find the workspace
   const workspace = workspaces.find(w => w.id === workspaceId);
@@ -67,8 +72,8 @@ export function WorkspacePage() {
   // Filter projects for this workspace
   const workspaceProjects = projects.filter(p => p.workspace === workspaceId);
 
-  // Count members for this workspace
-  const memberCount = accounts.filter(a => a.workspaceIds.includes(workspaceId || '')).length;
+  // Count members for this workspace (base + shared)
+  const memberCount = accounts.filter(a => a.workspaceIds.includes(workspaceId || '')).length + getExtraCount(workspaceId || '');
 
   // Get unique owners for filter options
   const uniqueOwners = Array.from(new Set(workspaceProjects.map(p => p.owner))).sort();
@@ -155,6 +160,7 @@ export function WorkspacePage() {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         onInfoClick={() => setIsTrayOpen(v => !v)}
+        onShareClick={() => setIsShareOpen(true)}
       />
 
       {/* Workspace header */}
@@ -205,6 +211,17 @@ export function WorkspacePage() {
           onViewModeChange={setViewMode}
         />
       )}
+
+      <ShareModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        entityName={workspace?.name ?? 'Workspace'}
+        entityId={workspaceId ?? ''}
+        onShare={(ids) => {
+          addSharedMembers(workspaceId ?? '', ids);
+          toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`);
+        }}
+      />
     </div>
   );
 }

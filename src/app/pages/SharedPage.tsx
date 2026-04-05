@@ -7,6 +7,7 @@ import { DataTable, Column, RowData } from '../components/DataTable';
 import { GridView, GridItemData } from '../components/GridView';
 import { EmptyState } from '../components/EmptyState';
 import { useInfoTray } from '../contexts/InfoTrayContext';
+import { ShareModal } from '../components/ShareModal';
 import { sharedProjects } from '../data/shared';
 import { useFavorites } from '../contexts/FavoritesContext';
 
@@ -38,6 +39,7 @@ export function SharedPage() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const { setIsTrayOpen, setTrayContent } = useInfoTray();
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   // Get unique shared by users for filter options
@@ -109,6 +111,7 @@ export function SharedPage() {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         onInfoClick={() => setIsTrayOpen(v => !v)}
+        onShareClick={() => setIsShareOpen(true)}
       />
       
       {/* Toolbar - Always visible */}
@@ -162,6 +165,14 @@ export function SharedPage() {
           />
         )
       )}
+
+      <ShareModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        entityName="Shared with me"
+        entityId="shared"
+        onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
+      />
     </div>
   );
 }
