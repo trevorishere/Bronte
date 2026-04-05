@@ -147,7 +147,7 @@
 }
 
 .dark {
-  --background: #1e1a16; /* Warm very dark brown */
+  --background: #211F1D; /* Warm very dark brown */
   --foreground: #BFB8B1; /* Warm light */
   --card: #221e1a; /* Warm dark card */
   --card-foreground: #BFB8B1;
@@ -197,7 +197,7 @@
   --icon-workspace-bg: #2166A6;
 
   /* Roles tray + role pill + radio circles */
-  --tray-bg: #241F1A;
+  --tray-bg: #262421;
   --role-pill-text: rgba(255, 255, 255, 0.7);
   --radio-unchecked-border: #9a9088;
   --radio-checked-bg: #d8d0c8;
