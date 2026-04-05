@@ -221,7 +221,7 @@ export function TopBar({
 
   return (
     <div
-      className="h-[64px] shrink-0 w-full"
+      className="shrink-0 w-full"
       style={{
         backgroundColor: 'var(--background)',
         borderBottom: /*showBorder ? '1px solid var(--border)' :*/ 'none',
@@ -230,7 +230,7 @@ export function TopBar({
       {/* ================================================================ */}
       {/* MOBILE LAYOUT                                                    */}
       {/* ================================================================ */}
-      <div className="md:hidden flex items-center gap-1 pt-1 px-[16px] size-full">
+      <div className="md:hidden flex items-center gap-1 pt-[20px] pb-[12px] px-[16px] w-full">
         <div className="flex items-center flex-1 min-w-0 gap-[10px] overflow-hidden">
           {hasBreadcrumbs ? (
             <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} ancMaxLen={ancMaxLen} badgeIconOnly={badgeIconOnly} />
@@ -261,7 +261,7 @@ export function TopBar({
       {/* ================================================================ */}
       {/* DESKTOP LAYOUT                                                   */}
       {/* ================================================================ */}
-      <div className="hidden md:flex items-center gap-[24px] pt-1 pl-[24px] pr-[24px] size-full">
+      <div className="hidden md:flex items-center gap-[24px] pt-[20px] pb-[12px] pl-[24px] pr-[24px] w-full">
         <div ref={leftRef} className="flex items-center flex-1 min-w-0 gap-[16px] overflow-hidden">
           {hasBreadcrumbs ? (
             <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} ancMaxLen={ancMaxLen} badgeIconOnly={badgeIconOnly} />
