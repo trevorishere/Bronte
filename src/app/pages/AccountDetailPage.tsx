@@ -264,6 +264,7 @@ export function AccountDetailPage() {
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           onInfoClick={() => setIsTrayOpen(prev => !prev)}
+          hideShare
         />
 
       {/* Account header */}

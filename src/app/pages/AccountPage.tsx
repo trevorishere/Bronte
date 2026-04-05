@@ -245,6 +245,8 @@ export function AccountPage() {
         title="Account"
         isDarkMode={isDarkMode}
         onThemeToggle={onThemeToggle}
+        hideShare
+        hideInfo
       />
 
       <div

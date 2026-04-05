@@ -143,6 +143,10 @@ interface TopBarProps {
   breadcrumbs?: BreadcrumbEntry[];
   /** Called when the Info button is clicked */
   onInfoClick?: () => void;
+  /** Hide the Share action button */
+  hideShare?: boolean;
+  /** Hide the Info (ⓘ) action button */
+  hideInfo?: boolean;
 }
 
 export function TopBar({
@@ -158,6 +162,8 @@ export function TopBar({
   titleSuffix,
   breadcrumbs,
   onInfoClick,
+  hideShare = false,
+  hideInfo = false,
 }: TopBarProps) {
   const backBtn = (extraClass = '') => (
     <button
@@ -294,6 +300,7 @@ export function TopBar({
             <Plus className="size-[18px] shrink-0" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2.5} />
             <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: '15px', letterSpacing: '0.32px', color: 'var(--secondary-foreground)', whiteSpace: 'nowrap' }}>Add…</span>
           </button>
+          {!hideShare && (
           <button
             className="flex items-center gap-[8px] h-[40px] rounded-[12px] transition-colors"
             style={{ border: '1px solid var(--border-interactive)', paddingLeft: '11px', paddingRight: '13px', paddingTop: '1px', paddingBottom: '1px', backgroundColor: 'transparent', cursor: 'pointer' }}
@@ -304,6 +311,8 @@ export function TopBar({
             <Share2 className="size-[18px] shrink-0" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2} />
             <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: '15px', letterSpacing: '0.32px', color: 'var(--secondary-foreground)', whiteSpace: 'nowrap' }}>Share</span>
           </button>
+          )}
+          {!hideInfo && (
           <button
             className="flex items-center justify-center size-[40px] rounded-[12px] transition-colors"
             style={{ border: '1px solid var(--border-interactive)', paddingLeft: '13px', paddingRight: '13px', paddingTop: '1px', paddingBottom: '1px', backgroundColor: 'transparent', cursor: 'pointer' }}
@@ -314,6 +323,7 @@ export function TopBar({
           >
             <Info className="size-[18px] shrink-0" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2} />
           </button>
+          )}
         </div>
       </div>
     </div>
