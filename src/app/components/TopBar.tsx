@@ -105,8 +105,8 @@ function BreadcrumbNav({ entries, titleSuffix, ancMaxLen = 14, badgeIconOnly = f
         {/* Current page — not clickable, truncates to fill remaining space */}
         <BreadcrumbItem className="flex items-center gap-[8px] min-w-0 overflow-hidden">
           <BreadcrumbPage
-            className="font-semibold truncate min-w-0"
-            style={{ fontSize: '28px', color: 'var(--primary)', letterSpacing: 'var(--letter-spacing-lg)', lineHeight: 'normal' }}
+            className="font-medium truncate min-w-0"
+            style={{ fontSize: '24px', color: 'var(--primary)', letterSpacing: 'var(--letter-spacing-lg)', lineHeight: 'normal' }}
             title={current.label}
           >
             {current.label}
@@ -238,10 +238,9 @@ export function TopBar({
             backBtn()
           ) : title ? (
             <h1
-              className="truncate text-[24px]"
+              className="truncate text-[24px] font-medium"
               style={{
                 fontFamily: 'var(--font-family)',
-                fontWeight: 'medium',
                 lineHeight: 'normal',
                 color: 'var(--primary)',
                 letterSpacing: 'var(--letter-spacing-lg)',
@@ -270,7 +269,7 @@ export function TopBar({
             backBtn()
           ) : title ? (
             <h1
-              className="truncate text-[28px] font-semibold"
+              className="truncate text-[24px] font-medium"
               style={{
                 fontFamily: 'var(--font-family)',
                 lineHeight: 'normal',
