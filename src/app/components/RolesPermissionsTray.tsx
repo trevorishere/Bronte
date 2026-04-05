@@ -127,7 +127,7 @@ export function RolesPermissionsTray({
             opacity: { duration: 0.18, ease: 'easeInOut' },
           }}
           className="shrink-0 overflow-hidden hidden md:flex flex-col"
-          style={{ borderLeft: `1px solid var(--border)`, backgroundColor: '#241F1A' }}
+          style={{ borderLeft: `1px solid var(--border)`, backgroundColor: 'var(--tray-bg)' }}
         >
           <div className="flex flex-col h-full" style={{ minWidth: 380 }}>
 
@@ -471,12 +471,12 @@ function RadioCircle({ checked, onClick }: { checked: boolean; onClick: () => vo
       onMouseLeave={() => setHovered(false)}
       className="size-[22px] rounded-full flex items-center justify-center transition-colors shrink-0"
       style={{
-        border: `1.5px solid ${checked ? '#d8d0c8' : hovered ? '#d8d0c8' : '#9a9088'}`,
-        backgroundColor: checked ? '#d8d0c8' : 'transparent',
+        border: `1.5px solid ${checked ? 'var(--radio-checked-border)' : hovered ? 'var(--radio-checked-border)' : 'var(--radio-unchecked-border)'}`,
+        backgroundColor: checked ? 'var(--radio-checked-bg)' : 'transparent',
         cursor: 'pointer',
       }}
     >
-      {checked && <Check className="size-[11px]" style={{ color: '#241F1A' }} strokeWidth={3} />}
+      {checked && <Check className="size-[11px]" style={{ color: 'var(--radio-check-color)' }} strokeWidth={3} />}
     </button>
   );
 }
