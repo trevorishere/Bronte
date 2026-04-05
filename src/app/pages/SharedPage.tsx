@@ -6,7 +6,7 @@ import { Toolbar } from '../components/Toolbar';
 import { DataTable, Column, RowData } from '../components/DataTable';
 import { GridView, GridItemData } from '../components/GridView';
 import { EmptyState } from '../components/EmptyState';
-import { InfoTray, InfoTrayContent } from '../components/InfoTray';
+import { useInfoTray } from '../contexts/InfoTrayContext';
 import { sharedProjects } from '../data/shared';
 import { useFavorites } from '../contexts/FavoritesContext';
 
@@ -37,8 +37,7 @@ export function SharedPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
-  const [isTrayOpen, setIsTrayOpen] = useState(false);
-  const [trayContent, setTrayContent] = useState<InfoTrayContent | null>(null);
+  const { setIsTrayOpen, setTrayContent } = useInfoTray();
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   // Get unique shared by users for filter options
@@ -81,12 +80,7 @@ export function SharedPage() {
   };
 
   const handleSelectionChange = (row: RowData | null) => {
-    setTrayContent(row ? { type: 'shared-project', data: row } : null);
-  };
-
-  const defaultTrayContent: InfoTrayContent = {
-    type: 'page',
-    data: { name: 'Shared with me', section: 'Projects', count: filteredData.length },
+    if (row) setTrayContent({ type: 'shared-project', data: row });
   };
 
   const handleRowClick = (_row: RowData) => {};
@@ -106,8 +100,7 @@ export function SharedPage() {
   const handleMoreClick = (_row: RowData) => {};
 
   return (
-    <div className="flex-1 flex min-h-0 overflow-hidden">
-      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+    <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       <TopBar
         title="Shared with me"
         userInitials="LD"
@@ -169,13 +162,6 @@ export function SharedPage() {
           />
         )
       )}
-      </div>
-
-      <InfoTray
-        isOpen={isTrayOpen}
-        onClose={() => setIsTrayOpen(false)}
-        content={trayContent ?? defaultTrayContent}
-      />
     </div>
   );
 }

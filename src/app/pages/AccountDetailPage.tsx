@@ -10,11 +10,12 @@ import { GridView, GridItemData } from '../components/GridView';
 import { Toolbar } from '../components/Toolbar';
 import { EmptyState } from '../components/EmptyState';
 import { DetailPageHeader } from '../components/DetailPageHeader';
-import { InfoTray, InfoTrayContent } from '../components/InfoTray';
+import { InfoTrayContent } from '../components/InfoTray';
 import { TabNav, Tab } from '../components/TabNav';
 import { TopBar } from '../components/TopBar';
 import { useState } from 'react';
 import { useNavigationContext, BreadcrumbEntry } from '../contexts/NavigationContext';
+import { useInfoTray } from '../contexts/InfoTrayContext';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -30,8 +31,7 @@ export function AccountDetailPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
-  const [isTrayOpen, setIsTrayOpen] = useState(false);
-  const [trayContent, setTrayContent] = useState<InfoTrayContent | null>(null);
+  const { setIsTrayOpen, setTrayContent } = useInfoTray();
   const { ancestors, setAncestors } = useNavigationContext();
 
   const account = accounts.find(acc => acc.id === accountId);
@@ -45,8 +45,7 @@ export function AccountDetailPage() {
     } else if (ancestors.length === 0) {
       setAncestors([{ label: 'Admin', path: '/admin' }]);
     }
-    // Reset tray on navigation (same-route param change) then set page default
-    setIsTrayOpen(false);
+    // Set tray content to this account on navigation
     setTrayContent({ type: 'account', data: { ...account } });
   }, [accountId]);
 
@@ -241,15 +240,10 @@ export function AccountDetailPage() {
     setActiveTab(tab);
     setSelectedFilters({});
     setDateFilters({});
-    // Revert tray to page entity when tab changes
-    setTrayContent({ type: 'account', data: { ...account } });
   };
 
   const handleSelectionChange = (row: RowData | null) => {
-    if (!row) {
-      setTrayContent({ type: 'account', data: { ...account } });
-      return;
-    }
+    if (!row) return;
     if (activeTab === 'Projects') {
       setTrayContent({ type: 'project', data: row });
     } else if (activeTab === 'Teams') {
@@ -260,9 +254,7 @@ export function AccountDetailPage() {
   };
 
   return (
-    <div className="flex-1 flex min-h-0 overflow-hidden">
-      {/* Left column: TopBar + all content — tray pushes this left */}
-      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+    <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
         <TopBar
           userInitials="LD"
           onThemeToggle={onThemeToggle}
@@ -274,17 +266,17 @@ export function AccountDetailPage() {
           onInfoClick={() => setIsTrayOpen(prev => !prev)}
         />
 
-        {/* Account header */}
-        <DetailPageHeader
-          title={account.name}
-          badge={<RoleBadge role={account.role} />}
-          icon={(size) => <Avatar size={size} name={account.name} role={account.role} />}
-          metadata={[
-            { icon: 'email', label: account.email },
-            { icon: 'calendar', label: `Joined ${account.created}` }
-          ]}
-          onSettingsClick={() => setIsTrayOpen(prev => !prev)}
-        />
+      {/* Account header */}
+      <DetailPageHeader
+        title={account.name}
+        badge={<RoleBadge role={account.role} />}
+        icon={(size) => <Avatar size={size} name={account.name} role={account.role} />}
+        metadata={[
+          { icon: 'email', label: account.email },
+          { icon: 'calendar', label: `Joined ${account.created}` }
+        ]}
+        onSettingsClick={() => setIsTrayOpen(prev => !prev)}
+      />
 
         {/* Tabs */}
         <TabNav
@@ -361,14 +353,6 @@ export function AccountDetailPage() {
             />
           )
         )}
-      </div>
-
-      {/* Info tray — pushes entire left column left */}
-      <InfoTray
-        isOpen={isTrayOpen}
-        onClose={() => setIsTrayOpen(false)}
-        content={trayContent}
-      />
     </div>
   );
 }

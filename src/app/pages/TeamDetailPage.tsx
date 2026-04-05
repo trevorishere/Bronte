@@ -8,11 +8,12 @@ import { GridView, GridItemData } from '../components/GridView';
 import { Toolbar } from '../components/Toolbar';
 import { EmptyState } from '../components/EmptyState';
 import { DetailPageHeader } from '../components/DetailPageHeader';
-import { InfoTray, InfoTrayContent } from '../components/InfoTray';
+import { InfoTrayContent } from '../components/InfoTray';
 import { TabNav, Tab } from '../components/TabNav';
 import { TopBar } from '../components/TopBar';
 import { useState, useEffect } from 'react';
 import { useNavigationContext, BreadcrumbEntry } from '../contexts/NavigationContext';
+import { useInfoTray } from '../contexts/InfoTrayContext';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -27,8 +28,7 @@ export function TeamDetailPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
-  const [isTrayOpen, setIsTrayOpen] = useState(false);
-  const [trayContent, setTrayContent] = useState<InfoTrayContent | null>(null);
+  const { setIsTrayOpen, setTrayContent } = useInfoTray();
 
   const location = useLocation();
   const { ancestors, setAncestors } = useNavigationContext();
@@ -46,10 +46,9 @@ export function TeamDetailPage() {
     }
   }, [teamId]);
 
-  // Reset tray on navigation then set page default
+  // Set tray content to this team on navigation
   useEffect(() => {
     if (!team) return;
-    setIsTrayOpen(false);
     setTrayContent({ type: 'team', data: { id: team.id, name: team.name, owner: team.owner, created: team.created, membersCount: team.membersCount } });
   }, [teamId]);
 
@@ -227,14 +226,10 @@ export function TeamDetailPage() {
     setActiveTab(tab);
     setSelectedFilters({});
     setDateFilters({});
-    if (team) setTrayContent({ type: 'team', data: { id: team.id, name: team.name, owner: team.owner, created: team.created, membersCount: team.membersCount } });
   };
 
   const handleSelectionChange = (row: RowData | null) => {
-    if (!row || !team) {
-      setTrayContent({ type: 'team', data: { id: team!.id, name: team!.name, owner: team!.owner, created: team!.created, membersCount: team!.membersCount } });
-      return;
-    }
+    if (!row) return;
     if (activeTab === 'Members') {
       setTrayContent({ type: 'account', data: row });
     } else if (activeTab === 'Projects') {
@@ -243,8 +238,7 @@ export function TeamDetailPage() {
   };
 
   return (
-    <div className="flex-1 flex min-h-0 overflow-hidden">
-      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+    <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       {/* Top bar */}
       <TopBar
         userInitials="LD"
@@ -333,13 +327,6 @@ export function TeamDetailPage() {
           />
         )
       )}
-      </div>
-
-      <InfoTray
-        isOpen={isTrayOpen}
-        onClose={() => setIsTrayOpen(false)}
-        content={trayContent}
-      />
     </div>
   );
 }
