@@ -6,9 +6,9 @@ import { Toolbar } from '../components/Toolbar';
 import { DataTable, Column, RowData } from '../components/DataTable';
 import { GridView, GridItemData } from '../components/GridView';
 import { DataTableSkeleton, GridSkeleton, useLoadingDelay } from '../components/SkeletonLoader';
-import { InfoTray, InfoTrayContent } from '../components/InfoTray';
 import { projects } from '../data/workspaces';
 import { useFavorites } from '../contexts/FavoritesContext';
+import { useInfoTray } from '../contexts/InfoTrayContext';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -46,8 +46,7 @@ export function RecentPage() {
   const isLoading = useLoadingDelay(600);
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
-  const [isTrayOpen, setIsTrayOpen] = useState(false);
-  const [trayContent, setTrayContent] = useState<InfoTrayContent | null>(null);
+  const { setIsTrayOpen, setTrayContent } = useInfoTray();
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   // Get unique owners for filter options
@@ -90,7 +89,7 @@ export function RecentPage() {
   };
 
   const handleSelectionChange = (row: RowData | null) => {
-    setTrayContent(row ? { type: 'project', data: row } : null);
+    if (row) setTrayContent({ type: 'project', data: row });
   };
 
   const handleRowClick = (_row: RowData) => {};
@@ -110,8 +109,7 @@ export function RecentPage() {
   const handleMoreClick = (_row: RowData) => {};
 
   return (
-    <div className="flex-1 flex min-h-0 overflow-hidden">
-      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+    <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       <TopBar
         title="Recent"
         userInitials="LD"
@@ -158,13 +156,6 @@ export function RecentPage() {
           onViewModeChange={setViewMode}
         />
       )}
-      </div>
-
-      <InfoTray
-        isOpen={isTrayOpen}
-        onClose={() => setIsTrayOpen(false)}
-        content={trayContent}
-      />
     </div>
   );
 }

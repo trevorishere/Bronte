@@ -7,12 +7,13 @@ import { TabNav, Tab } from '../components/TabNav';
 import { Toolbar } from '../components/Toolbar';
 import { DataTable, Column, RowData } from '../components/DataTable';
 import { GridView, GridItemData } from '../components/GridView';
-import { InfoTray, InfoTrayContent } from '../components/InfoTray';
+import { InfoTrayContent } from '../components/InfoTray';
 import { projects, workspaces } from '../data/workspaces';
 import { teams } from '../data/teams';
 import { accounts } from '../data/accounts';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useNavigationContext } from '../contexts/NavigationContext';
+import { useInfoTray } from '../contexts/InfoTrayContext';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -61,8 +62,7 @@ export function AdminPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
-  const [isTrayOpen, setIsTrayOpen] = useState(false);
-  const [trayContent, setTrayContent] = useState<InfoTrayContent | null>(null);
+  const { setIsTrayOpen, setTrayContent } = useInfoTray();
   const { favorites, addFavorite, removeFavorite } = useFavorites();
   const navigate = useNavigate();
   const { resetToRoot, setAncestors } = useNavigationContext();
@@ -208,10 +208,7 @@ export function AdminPage() {
   };
 
   const handleSelectionChange = (row: RowData | null) => {
-    if (!row) {
-      setTrayContent(null);
-      return;
-    }
+    if (!row) return;
     const typeMap: Record<string, InfoTrayContent['type']> = {
       projects: 'project',
       accounts: 'account',
@@ -250,17 +247,15 @@ export function AdminPage() {
 
   const handleMoreClick = (_row: RowData) => {};
 
-  // Reset filters and tray when tab changes
+  // Reset filters when tab changes (tray content stays sticky)
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
     setSelectedFilters({});
     setDateFilters({});
-    setTrayContent(null);
   };
 
   return (
-    <div className="flex-1 flex min-h-0 overflow-hidden">
-      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+    <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       <TopBar
         title="Admin"
         userInitials="LD"
@@ -310,13 +305,6 @@ export function AdminPage() {
           onViewModeChange={setViewMode}
         />
       )}
-      </div>
-
-      <InfoTray
-        isOpen={isTrayOpen}
-        onClose={() => setIsTrayOpen(false)}
-        content={trayContent}
-      />
     </div>
   );
 }

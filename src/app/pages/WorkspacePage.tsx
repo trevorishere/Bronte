@@ -7,11 +7,12 @@ import { DataTable, Column, RowData } from '../components/DataTable';
 import { GridView, GridItemData } from '../components/GridView';
 import { DetailPageHeader } from '../components/DetailPageHeader';
 import { WorkspaceIcon } from '../components/WorkspaceIcon';
-import { InfoTray, InfoTrayContent } from '../components/InfoTray';
+import { InfoTrayContent } from '../components/InfoTray';
 import { projects, workspaces } from '../data/workspaces';
 import { accounts } from '../data/accounts';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useNavigationContext, BreadcrumbEntry } from '../contexts/NavigationContext';
+import { useInfoTray } from '../contexts/InfoTrayContext';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -33,8 +34,7 @@ export function WorkspacePage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
-  const [isTrayOpen, setIsTrayOpen] = useState(false);
-  const [trayContent, setTrayContent] = useState<InfoTrayContent | null>(null);
+  const { setIsTrayOpen, setTrayContent } = useInfoTray();
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   const { ancestors, setAncestors } = useNavigationContext();
@@ -53,7 +53,7 @@ export function WorkspacePage() {
     }
   }, [workspaceId, isAdminRoute]);
 
-  // Set default tray content when workspace loads
+  // Set tray content to this workspace on navigation
   useEffect(() => {
     if (!workspace) return;
     const projectCount = projects.filter(p => p.workspace === workspaceId).length;
@@ -120,12 +120,7 @@ export function WorkspacePage() {
   };
 
   const handleSelectionChange = (row: RowData | null) => {
-    if (!row || !workspace) {
-      const projectCount = projects.filter(p => p.workspace === workspaceId).length;
-      const memberCount = accounts.filter(a => a.workspaceIds.includes(workspaceId || '')).length;
-      setTrayContent({ type: 'workspace', data: { id: workspace?.id, name: workspace?.name, owner: workspace?.owner, type: workspace?.type, created: workspace?.created, projectsCount: projectCount, membersCount: memberCount } });
-      return;
-    }
+    if (!row) return;
     setTrayContent({ type: 'project', data: row });
   };
 
@@ -146,8 +141,7 @@ export function WorkspacePage() {
   const handleMoreClick = (_row: RowData) => {};
 
   return (
-    <div className="flex-1 flex min-h-0 overflow-hidden" style={{ backgroundColor: 'var(--background)' }}>
-      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+    <div className="flex-1 flex flex-col min-h-0 overflow-hidden" style={{ backgroundColor: 'var(--background)' }}>
       {/* Top bar */}
       <TopBar
         userInitials="LD"
@@ -211,13 +205,6 @@ export function WorkspacePage() {
           onViewModeChange={setViewMode}
         />
       )}
-      </div>
-
-      <InfoTray
-        isOpen={isTrayOpen}
-        onClose={() => setIsTrayOpen(false)}
-        content={trayContent}
-      />
     </div>
   );
 }

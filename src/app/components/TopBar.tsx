@@ -105,8 +105,8 @@ function BreadcrumbNav({ entries, titleSuffix, ancMaxLen = 14, badgeIconOnly = f
         {/* Current page — not clickable, truncates to fill remaining space */}
         <BreadcrumbItem className="flex items-center gap-[8px] min-w-0 overflow-hidden">
           <BreadcrumbPage
-            className="font-semibold truncate min-w-0"
-            style={{ fontSize: '28px', color: 'var(--primary)', letterSpacing: 'var(--letter-spacing-lg)', lineHeight: 'normal' }}
+            className="font-medium truncate min-w-0"
+            style={{ fontSize: '24px', color: 'var(--primary)', letterSpacing: 'var(--letter-spacing-lg)', lineHeight: 'normal' }}
             title={current.label}
           >
             {current.label}
@@ -143,6 +143,10 @@ interface TopBarProps {
   breadcrumbs?: BreadcrumbEntry[];
   /** Called when the Info button is clicked */
   onInfoClick?: () => void;
+  /** Hide the Share action button */
+  hideShare?: boolean;
+  /** Hide the Info (ⓘ) action button */
+  hideInfo?: boolean;
 }
 
 export function TopBar({
@@ -158,6 +162,8 @@ export function TopBar({
   titleSuffix,
   breadcrumbs,
   onInfoClick,
+  hideShare = false,
+  hideInfo = false,
 }: TopBarProps) {
   const backBtn = (extraClass = '') => (
     <button
@@ -221,7 +227,7 @@ export function TopBar({
 
   return (
     <div
-      className="h-[64px] shrink-0 w-full"
+      className="shrink-0 w-full"
       style={{
         backgroundColor: 'var(--background)',
         borderBottom: /*showBorder ? '1px solid var(--border)' :*/ 'none',
@@ -230,7 +236,7 @@ export function TopBar({
       {/* ================================================================ */}
       {/* MOBILE LAYOUT                                                    */}
       {/* ================================================================ */}
-      <div className="md:hidden flex items-center gap-1 pt-1 px-[16px] size-full">
+      <div className="md:hidden flex items-center gap-1 pt-[20px] pb-[12px] px-[16px] w-full">
         <div className="flex items-center flex-1 min-w-0 gap-[10px] overflow-hidden">
           {hasBreadcrumbs ? (
             <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} ancMaxLen={ancMaxLen} badgeIconOnly={badgeIconOnly} />
@@ -238,10 +244,9 @@ export function TopBar({
             backBtn()
           ) : title ? (
             <h1
-              className="truncate text-[24px]"
+              className="truncate text-[24px] font-medium"
               style={{
                 fontFamily: 'var(--font-family)',
-                fontWeight: 'medium',
                 lineHeight: 'normal',
                 color: 'var(--primary)',
                 letterSpacing: 'var(--letter-spacing-lg)',
@@ -262,7 +267,7 @@ export function TopBar({
       {/* ================================================================ */}
       {/* DESKTOP LAYOUT                                                   */}
       {/* ================================================================ */}
-      <div className="hidden md:flex items-center gap-[24px] pt-1 pl-[24px] pr-[24px] size-full">
+      <div className="hidden md:flex items-center gap-[24px] pt-[20px] pb-[12px] pl-[24px] pr-[24px] w-full">
         <div ref={leftRef} className="flex items-center flex-1 min-w-0 gap-[16px] overflow-hidden">
           {hasBreadcrumbs ? (
             <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} ancMaxLen={ancMaxLen} badgeIconOnly={badgeIconOnly} />
@@ -270,7 +275,7 @@ export function TopBar({
             backBtn()
           ) : title ? (
             <h1
-              className="truncate text-[28px] font-semibold"
+              className="truncate text-[24px] font-medium"
               style={{
                 fontFamily: 'var(--font-family)',
                 lineHeight: 'normal',
@@ -295,6 +300,7 @@ export function TopBar({
             <Plus className="size-[18px] shrink-0" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2.5} />
             <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: '15px', letterSpacing: '0.32px', color: 'var(--secondary-foreground)', whiteSpace: 'nowrap' }}>Add…</span>
           </button>
+          {!hideShare && (
           <button
             className="flex items-center gap-[8px] h-[40px] rounded-[12px] transition-colors"
             style={{ border: '1px solid var(--border-interactive)', paddingLeft: '11px', paddingRight: '13px', paddingTop: '1px', paddingBottom: '1px', backgroundColor: 'transparent', cursor: 'pointer' }}
@@ -305,6 +311,8 @@ export function TopBar({
             <Share2 className="size-[18px] shrink-0" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2} />
             <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: '15px', letterSpacing: '0.32px', color: 'var(--secondary-foreground)', whiteSpace: 'nowrap' }}>Share</span>
           </button>
+          )}
+          {!hideInfo && (
           <button
             className="flex items-center justify-center size-[40px] rounded-[12px] transition-colors"
             style={{ border: '1px solid var(--border-interactive)', paddingLeft: '13px', paddingRight: '13px', paddingTop: '1px', paddingBottom: '1px', backgroundColor: 'transparent', cursor: 'pointer' }}
@@ -315,6 +323,7 @@ export function TopBar({
           >
             <Info className="size-[18px] shrink-0" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2} />
           </button>
+          )}
         </div>
       </div>
     </div>

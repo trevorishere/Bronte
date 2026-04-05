@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 // ─── Public types ─────────────────────────────────────────────────────────────
 
-export type InfoTrayEntityType = 'account' | 'project' | 'team' | 'workspace' | 'shared-project';
+export type InfoTrayEntityType = 'account' | 'project' | 'team' | 'workspace' | 'shared-project' | 'page';
 
 export interface InfoTrayContent {
   type: InfoTrayEntityType;
@@ -59,7 +59,7 @@ interface InfoTrayProps {
 }
 
 export function InfoTray({ isOpen, onClose, content }: InfoTrayProps) {
-  const title = content ? String(content.data.name ?? 'Details') : 'Details';
+  const title = content ? String(content.data.name ?? content.data.title ?? 'Details') : 'Details';
 
   return (
     <AnimatePresence>
@@ -115,6 +115,8 @@ export function InfoTray({ isOpen, onClose, content }: InfoTrayProps) {
                 key={String(content.data.id ?? content.data.name)}
                 data={content.data}
               />
+            ) : content?.type === 'page' ? (
+              <PageInfoPanel data={content.data} />
             ) : content ? (
               <ReadOnlyPanel content={content} />
             ) : (
@@ -309,6 +311,31 @@ function AccountPanel({ data }: { data: Record<string, unknown> }) {
         </button>
       </div>
     </>
+  );
+}
+
+// ─── Page info panel ──────────────────────────────────────────────────────────
+
+function PageInfoPanel({ data }: { data: Record<string, unknown> }) {
+  const rows: Array<{ label: string; value: string }> = [];
+
+  if (data.section != null)
+    rows.push({ label: String(data.section), value: String(data.count ?? '—') });
+  if (data.description != null)
+    rows.push({ label: String(data.description), value: String(data.count ?? '—') });
+
+  // Fallback: just show a count row if nothing else defined
+  if (rows.length === 0 && data.count != null)
+    rows.push({ label: 'Items', value: String(data.count) });
+
+  return (
+    <div className="flex-1 overflow-y-auto">
+      <div className="flex flex-col pt-[8px] pb-[24px] mx-[24px]">
+        {rows.map(({ label, value }) => (
+          <InfoRow key={label} label={label} value={value} />
+        ))}
+      </div>
+    </div>
   );
 }
 

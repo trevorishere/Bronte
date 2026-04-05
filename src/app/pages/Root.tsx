@@ -3,10 +3,23 @@ import { Outlet, useNavigate, useLocation } from 'react-router';
 import { Toaster } from 'sonner';
 import { Sidebar } from '../components/Sidebar';
 import { BottomNav } from '../components/BottomNav';
+import { InfoTray } from '../components/InfoTray';
 import { myWorkspaces, teamWorkspaces } from '../data/workspaces';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
 import { NavigationProvider } from '../contexts/NavigationContext';
+import { InfoTrayProvider, useInfoTray } from '../contexts/InfoTrayContext';
 import { useMobileNav } from '../hooks/useMobileNav';
+
+function InfoTrayPanel() {
+  const { isTrayOpen, setIsTrayOpen, trayContent } = useInfoTray();
+  return (
+    <InfoTray
+      isOpen={isTrayOpen}
+      onClose={() => setIsTrayOpen(false)}
+      content={trayContent}
+    />
+  );
+}
 
 export function Root() {
   const navigate = useNavigate();
@@ -68,6 +81,7 @@ export function Root() {
   return (
     <NavigationProvider>
     <FavoritesProvider>
+    <InfoTrayProvider>
       <div className="size-full flex bg-background overflow-hidden">
         {/* Sidebar */}
         <Sidebar
@@ -81,20 +95,24 @@ export function Root() {
           onDesktopToggle={() => setIsDesktopSidebarOpen(prev => !prev)}
         />
 
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          <Outlet context={{ isDarkMode, onThemeToggle: handleThemeToggle }} />
+        {/* Main Content Area + Info Tray */}
+        <div className="flex-1 flex min-w-0 min-h-0 overflow-hidden">
+          <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
+            <Outlet context={{ isDarkMode, onThemeToggle: handleThemeToggle }} />
+          </div>
+          <InfoTrayPanel />
         </div>
-        
+
         {/* Toast Container */}
         <Toaster position="bottom-right" />
-        
+
         {/* Bottom Navigation */}
         <BottomNav
           activeItem={getActiveItem()}
           onItemClick={handleItemClick}
         />
       </div>
+    </InfoTrayProvider>
     </FavoritesProvider>
     </NavigationProvider>
   );
