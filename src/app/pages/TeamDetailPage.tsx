@@ -46,9 +46,10 @@ export function TeamDetailPage() {
     }
   }, [teamId]);
 
-  // Set default tray content when team loads
+  // Reset tray on navigation then set page default
   useEffect(() => {
     if (!team) return;
+    setIsTrayOpen(false);
     setTrayContent({ type: 'team', data: { id: team.id, name: team.name, owner: team.owner, created: team.created, membersCount: team.membersCount } });
   }, [teamId]);
 

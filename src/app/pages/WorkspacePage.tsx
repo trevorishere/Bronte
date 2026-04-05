@@ -53,11 +53,12 @@ export function WorkspacePage() {
     }
   }, [workspaceId, isAdminRoute]);
 
-  // Set default tray content when workspace loads
+  // Reset tray on navigation then set page default
   useEffect(() => {
     if (!workspace) return;
     const projectCount = projects.filter(p => p.workspace === workspaceId).length;
     const memberCount = accounts.filter(a => a.workspaceIds.includes(workspaceId || '')).length;
+    setIsTrayOpen(false);
     setTrayContent({ type: 'workspace', data: { id: workspace.id, name: workspace.name, owner: workspace.owner, type: workspace.type, created: workspace.created, projectsCount: projectCount, membersCount: memberCount } });
   }, [workspaceId]);
 

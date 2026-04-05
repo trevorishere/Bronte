@@ -84,6 +84,11 @@ export function SharedPage() {
     setTrayContent(row ? { type: 'shared-project', data: row } : null);
   };
 
+  const defaultTrayContent: InfoTrayContent = {
+    type: 'page',
+    data: { name: 'Shared with me', section: 'Projects', count: filteredData.length },
+  };
+
   const handleRowClick = (_row: RowData) => {};
 
   const handleRowDoubleClick = (_row: RowData) => {};
@@ -169,7 +174,7 @@ export function SharedPage() {
       <InfoTray
         isOpen={isTrayOpen}
         onClose={() => setIsTrayOpen(false)}
-        content={trayContent}
+        content={trayContent ?? defaultTrayContent}
       />
     </div>
   );

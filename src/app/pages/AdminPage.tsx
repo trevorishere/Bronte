@@ -208,10 +208,7 @@ export function AdminPage() {
   };
 
   const handleSelectionChange = (row: RowData | null) => {
-    if (!row) {
-      setTrayContent(null);
-      return;
-    }
+    if (!row) { setTrayContent(null); return; }
     const typeMap: Record<string, InfoTrayContent['type']> = {
       projects: 'project',
       accounts: 'account',
@@ -220,6 +217,13 @@ export function AdminPage() {
     };
     const type = typeMap[activeTab];
     if (type) setTrayContent({ type, data: row });
+  };
+
+  // Default page-level tray content (shown when no row is selected)
+  const tabLabel = tabs.find(t => t.id === activeTab)?.label ?? activeTab;
+  const defaultTrayContent: InfoTrayContent = {
+    type: 'page',
+    data: { name: 'Admin', section: tabLabel, count: data.length },
   };
 
   const handleRowClick = (_row: RowData) => {};
@@ -315,7 +319,7 @@ export function AdminPage() {
       <InfoTray
         isOpen={isTrayOpen}
         onClose={() => setIsTrayOpen(false)}
-        content={trayContent}
+        content={trayContent ?? defaultTrayContent}
       />
     </div>
   );

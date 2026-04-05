@@ -93,6 +93,11 @@ export function RecentPage() {
     setTrayContent(row ? { type: 'project', data: row } : null);
   };
 
+  const defaultTrayContent: InfoTrayContent = {
+    type: 'page',
+    data: { name: 'Recent', section: 'Projects', count: filteredData.length },
+  };
+
   const handleRowClick = (_row: RowData) => {};
 
   const handleRowDoubleClick = (_row: RowData) => {};
@@ -163,7 +168,7 @@ export function RecentPage() {
       <InfoTray
         isOpen={isTrayOpen}
         onClose={() => setIsTrayOpen(false)}
-        content={trayContent}
+        content={trayContent ?? defaultTrayContent}
       />
     </div>
   );

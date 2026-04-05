@@ -45,7 +45,8 @@ export function AccountDetailPage() {
     } else if (ancestors.length === 0) {
       setAncestors([{ label: 'Admin', path: '/admin' }]);
     }
-    // Set default tray content to current account
+    // Reset tray on navigation (same-route param change) then set page default
+    setIsTrayOpen(false);
     setTrayContent({ type: 'account', data: { ...account } });
   }, [accountId]);
 
