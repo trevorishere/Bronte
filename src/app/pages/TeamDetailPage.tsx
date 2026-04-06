@@ -16,7 +16,7 @@ import { toast } from 'sonner';
 import { useNavigationContext, BreadcrumbEntry } from '../contexts/NavigationContext';
 import { useInfoTray } from '../contexts/InfoTrayContext';
 import { useSharedMembers } from '../contexts/SharedMembersContext';
-import { ShareModal } from '../components/ShareModal';
+import { ShareModal, CurrentMember } from '../components/ShareModal';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -337,6 +337,9 @@ export function TeamDetailPage() {
         onClose={() => setIsShareOpen(false)}
         entityName={team.name}
         entityId={team.id}
+        currentMembers={accounts
+          .filter(a => a.teamIds?.includes(team.id))
+          .map((a): CurrentMember => ({ id: a.id, name: a.name, role: a.role }))}
         onShare={(ids) => {
           addSharedMembers(team.id, ids);
           toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`);

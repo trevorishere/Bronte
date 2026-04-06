@@ -14,7 +14,7 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import { useNavigationContext, BreadcrumbEntry } from '../contexts/NavigationContext';
 import { useInfoTray } from '../contexts/InfoTrayContext';
 import { useSharedMembers } from '../contexts/SharedMembersContext';
-import { ShareModal } from '../components/ShareModal';
+import { ShareModal, CurrentMember } from '../components/ShareModal';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -217,6 +217,9 @@ export function WorkspacePage() {
         onClose={() => setIsShareOpen(false)}
         entityName={workspace?.name ?? 'Workspace'}
         entityId={workspaceId ?? ''}
+        currentMembers={accounts
+          .filter(a => a.workspaceIds.includes(workspaceId ?? ''))
+          .map((a): CurrentMember => ({ id: a.id, name: a.name, role: a.role }))}
         onShare={(ids) => {
           addSharedMembers(workspaceId ?? '', ids);
           toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`);
