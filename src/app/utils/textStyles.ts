@@ -55,4 +55,21 @@ export const textStyles = {
     letterSpacing: 'var(--letter-spacing-lg)',
     textTransform: 'uppercase' as const,
   } as React.CSSProperties,
+
+  // Card metadata lines — fontSize intentionally omitted, apply via Tailwind className
+  cardMeta: {
+    fontFamily: 'var(--font-family)',
+    fontWeight: 'var(--font-weight-regular)',
+    lineHeight: '20px',
+    letterSpacing: 'var(--letter-spacing-md)',
+    color: 'var(--muted-foreground)',
+  } as React.CSSProperties,
+
+  cardMetaSemibold: {
+    fontFamily: 'var(--font-family)',
+    fontWeight: 'var(--font-weight-semibold)',
+    lineHeight: '20px',
+    letterSpacing: 'var(--letter-spacing-md)',
+    color: 'var(--muted-foreground)',
+  } as React.CSSProperties,
 } as const;

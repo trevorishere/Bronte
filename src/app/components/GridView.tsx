@@ -1,11 +1,12 @@
-import { Star, MoreHorizontal, List, ShieldCheck, Code2, PenLine } from 'lucide-react';
+import { Star, MoreHorizontal, List } from 'lucide-react';
 import { IconButton } from './IconButton';
 import { useState, useRef, useEffect } from 'react';
 import { WorkspaceIcon } from './WorkspaceIcon';
 import { TeamIcon } from './TeamIcon';
-import { Avatar, roleColors, Role } from './Avatar';
+import { Avatar, Role } from './Avatar';
 import { ProjectIcon } from './ProjectIcon';
 import { DropdownMenu, createDefaultMenuItems } from './DropdownMenu';
+import { CardMetadata } from './CardMetadata';
 import { accounts } from '../data/accounts';
 import { toast } from 'sonner';
 
@@ -88,84 +89,6 @@ export function GridView({
     );
   };
 
-  const roleIconMap: Record<Role, React.ReactNode> = {
-    Admin:     <ShieldCheck className="size-[10px] shrink-0" strokeWidth={2} />,
-    Developer: <Code2       className="size-[10px] shrink-0" strokeWidth={2} />,
-    Creator:   <PenLine     className="size-[10px] shrink-0" strokeWidth={2} />,
-  };
-
-  // fontSize deliberately excluded — applied via Tailwind className for responsive sizing
-  const metaLineStyle = (semibold?: boolean): React.CSSProperties => ({
-    fontFamily: 'var(--font-family)',
-    fontWeight: semibold ? 'var(--font-weight-semibold)' : 'var(--font-weight-regular)',
-    lineHeight: '20px',
-    letterSpacing: 'var(--letter-spacing-md)',
-    color: 'var(--muted-foreground)',
-  });
-  // Responsive metadata class: 12px mobile, 14px desktop
-  const metaClass = 'text-[12px] md:text-[14px]';
-
-  const renderCardMetadata = (item: GridItemData) => {
-    if (item.iconType === 'account' && item.role) {
-      const role = item.role as Role;
-      const colors = roleColors[role];
-      return (
-        <div className="flex flex-col gap-[3px]">
-          <div
-            className="inline-flex items-center gap-[4px] self-start py-[3px] pl-[8px] pr-[10px] rounded-[8px]"
-            style={{
-              backgroundColor: colors?.rgba,
-              border: `1px solid ${colors?.border}`,
-            }}
-          >
-            <span style={{ color: 'var(--role-pill-text)', display: 'flex', alignItems: 'center' }}>
-              {roleIconMap[role]}
-            </span>
-            {/* Pill text: 11px mobile, 12px desktop */}
-            <span className="text-[11px] md:text-[12px]" style={{
-              fontFamily: 'var(--font-family)',
-              fontWeight: 'var(--font-weight-medium)',
-              letterSpacing: '0.2px',
-              color: 'var(--role-pill-text)',
-              whiteSpace: 'nowrap',
-              lineHeight: 'normal',
-            }}>
-              {role}
-            </span>
-          </div>
-          {item.accessLevel && (
-            <span className={metaClass} style={metaLineStyle()}>{item.accessLevel}</span>
-          )}
-        </div>
-      );
-    }
-
-    if (item.iconType === 'team') {
-      return (
-        <div className="flex flex-col">
-          {item.owner && <p className={metaClass} style={metaLineStyle(true)}>{item.owner}</p>}
-          {item.membersCount != null && <p className={metaClass} style={metaLineStyle()}>{item.membersCount} {item.membersCount === 1 ? 'Member' : 'Members'}</p>}
-        </div>
-      );
-    }
-
-    if (item.iconType === 'workspace') {
-      return (
-        <div className="flex flex-col">
-          {item.workspaceProjectCount != null && <p className={metaClass} style={metaLineStyle(true)}>{item.workspaceProjectCount} {item.workspaceProjectCount === 1 ? 'Project' : 'Projects'}</p>}
-          {item.workspaceMemberCount != null && <p className={metaClass} style={metaLineStyle()}>{item.workspaceMemberCount} {item.workspaceMemberCount === 1 ? 'Member' : 'Members'}</p>}
-        </div>
-      );
-    }
-
-    // project (default)
-    return (
-      <div className="flex flex-col">
-        {item.owner && <p className={metaClass} style={metaLineStyle(true)}>{item.owner}</p>}
-        {item.accountCount != null && <p className={metaClass} style={metaLineStyle()}>{item.accountCount} {item.accountCount === 1 ? 'Member' : 'Members'}</p>}
-      </div>
-    );
-  };
 
   return (
     <div className="w-full h-full flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--background)' }}>
@@ -245,7 +168,7 @@ export function GridView({
                   </h3>
 
                   {/* Type-specific metadata */}
-                  {renderCardMetadata(item)}
+                  <CardMetadata item={item} metaClassName="text-[12px] md:text-[14px]" />
                 </div>
 
                 {/* Buttons row — hidden on desktop until card is hovered; always visible on mobile */}

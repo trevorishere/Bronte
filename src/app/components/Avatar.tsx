@@ -22,6 +22,12 @@ const roleIcons: Record<Role, React.ReactNode> = {
   Creator:   <PenLine    className="size-[14px] shrink-0" strokeWidth={2} />,
 };
 
+const roleIconsCompact: Record<Role, React.ReactNode> = {
+  Admin:     <ShieldCheck className="size-[10px] shrink-0" strokeWidth={2} />,
+  Developer: <Code2      className="size-[10px] shrink-0" strokeWidth={2} />,
+  Creator:   <PenLine    className="size-[10px] shrink-0" strokeWidth={2} />,
+};
+
 export function Avatar({ name, role = 'Creator', size = 'medium' }: AvatarProps) {
   const getInitials = (fullName: string): string => {
     const parts = fullName.trim().split(' ');
@@ -47,11 +53,39 @@ export function Avatar({ name, role = 'Creator', size = 'medium' }: AvatarProps)
 interface RoleBadgeProps {
   role: Role;
   iconOnly?: boolean;
+  /** Compact variant for card grids: smaller icon, tighter padding, 11px text */
+  compact?: boolean;
 }
 
-export function RoleBadge({ role, iconOnly = false }: RoleBadgeProps) {
+export function RoleBadge({ role, iconOnly = false, compact = false }: RoleBadgeProps) {
   const colors = roleColors[role];
-  const icon = roleIcons[role];
+  const icon = compact ? roleIconsCompact[role] : roleIcons[role];
+
+  if (compact) {
+    return (
+      <div
+        className="inline-flex items-center gap-[4px] self-start py-[3px] pl-[8px] pr-[10px] rounded-[8px]"
+        style={{ backgroundColor: colors.rgba, border: `1px solid ${colors.border}` }}
+      >
+        <span style={{ color: 'var(--role-pill-text)', display: 'flex', alignItems: 'center' }}>
+          {icon}
+        </span>
+        {!iconOnly && (
+          <span style={{
+            fontFamily: 'var(--font-family)',
+            fontWeight: 'var(--font-weight-medium)',
+            fontSize: '11px',
+            letterSpacing: '0.2px',
+            color: 'var(--role-pill-text)',
+            whiteSpace: 'nowrap',
+            lineHeight: 'normal',
+          }}>
+            {role}
+          </span>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div

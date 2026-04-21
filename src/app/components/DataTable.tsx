@@ -13,6 +13,24 @@ import { MobileSortHeader } from './MobileSortHeader';
 import { accounts } from '../data/accounts';
 
 // ========================================
+// COLUMN WIDTH HELPER
+// ========================================
+// Shared between header and row rendering to ensure column widths stay in sync.
+function getColumnFlexStyle(
+  index: number,
+  totalColumns: number,
+  lastColIsNumeric: boolean
+): React.CSSProperties {
+  const isLastColumn = index === totalColumns - 1;
+  if (isLastColumn) {
+    const lastW = lastColIsNumeric ? 112 : 140;
+    return { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
+  }
+  if (index === 0) return { flex: '3 1 0px', minWidth: '200px' };
+  return { flex: '1 1 0px', minWidth: '140px' };
+}
+
+// ========================================
 // TYPE DEFINITIONS
 // ========================================
 
@@ -294,6 +312,7 @@ export function DataTable({
       {/* Mobile Card View - Only visible on mobile */}
       <div className="md:hidden flex-1 flex flex-col overflow-hidden">
         {/* Mobile Sort Header */}
+        <div className="mt-[8px]">
         <MobileSortHeader
           sortColumn={sortConfig?.key || 'lastModified'}
           sortDirection={sortConfig?.direction || 'desc'}
@@ -302,6 +321,7 @@ export function DataTable({
           viewMode={viewMode}
           onViewModeChange={onViewModeChange}
         />
+        </div>
 
         {/* Scrollable Card List */}
         <div className="flex-1 overflow-auto pb-[72px]">
@@ -328,30 +348,8 @@ export function DataTable({
           {/* Header Columns */}
           <div className="flex flex-1 min-w-0">
             {visibleColumns.map((column, index) => {
-              const totalColumns = visibleColumns.length;
-              let flexStyle: React.CSSProperties = {};
-
-              // ========================================
-              // COLUMN WIDTH CALCULATION LOGIC
-              // ========================================
-              // Name column (index 0): Always gets the largest flex share (priority)
-              // Middle columns: Equal smaller shares
-              // Last column: Compact fixed width — extra tight for right-aligned numeric columns
-              const isLastColumn = index === visibleColumns.length - 1;
               const lastColIsNumeric = visibleColumns[visibleColumns.length - 1]?.align === 'right';
-
-              if (isLastColumn) {
-                // Numeric right-aligned (e.g. Members, Projects): tight fixed width
-                // Text last column (e.g. Created On): standard fixed width
-                const lastW = lastColIsNumeric ? 112 : 140;
-                flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
-              } else if (index === 0) {
-                // Name column always gets 3x share so it survives narrowing
-                flexStyle = { flex: '3 1 0px', minWidth: '200px' };
-              } else {
-                // Middle columns share equally
-                flexStyle = { flex: '1 1 0px', minWidth: '140px' };
-              }
+              const flexStyle = getColumnFlexStyle(index, visibleColumns.length, lastColIsNumeric);
 
               return (
                 <div
@@ -476,20 +474,8 @@ export function DataTable({
                   {/* Data columns container */}
                   <div className="flex flex-1 min-w-0">
                     {visibleColumns.map((column, index) => {
-                      let flexStyle: React.CSSProperties = {};
-
-                      // Mirror the header column width logic
-                      const isLastColumn = index === visibleColumns.length - 1;
                       const lastColIsNumeric = visibleColumns[visibleColumns.length - 1]?.align === 'right';
-
-                      if (isLastColumn) {
-                        const lastW = lastColIsNumeric ? 112 : 140;
-                        flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
-                      } else if (index === 0) {
-                        flexStyle = { flex: '3 1 0px', minWidth: '200px' };
-                      } else {
-                        flexStyle = { flex: '1 1 0px', minWidth: '140px' };
-                      }
+                      const flexStyle = getColumnFlexStyle(index, visibleColumns.length, lastColIsNumeric);
 
                       return (
                         <div

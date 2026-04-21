@@ -1,12 +1,13 @@
-import { Star, MoreHorizontal, ShieldCheck, Code2, PenLine } from 'lucide-react';
+import { Star, MoreHorizontal } from 'lucide-react';
 import { getMetadataString } from '../utils/getMetadataString';
 import { useState, useRef } from 'react';
-import { Avatar, roleColors, Role } from './Avatar';
+import { Avatar } from './Avatar';
 import { TeamIcon } from './TeamIcon';
 import { WorkspaceIcon } from './WorkspaceIcon';
 import { ProjectIcon } from './ProjectIcon';
 import { RowData } from './DataTable';
 import { DropdownMenu, createDefaultMenuItems, MenuItem } from './DropdownMenu';
+import { CardMetadata } from './CardMetadata';
 import { toast } from 'sonner';
 import { accounts } from '../data/accounts';
 
@@ -102,112 +103,7 @@ export function MobileCardView({
                     </p>
 
                     {/* Type-specific metadata */}
-                    {row.iconType === 'account' ? (
-                      <div className="flex flex-col gap-[4px]">
-                        {/* Compact role badge */}
-                        {row.role && (() => {
-                          const role = row.role as Role;
-                          const colors = roleColors[role];
-                          const roleIconMap: Record<Role, React.ReactNode> = {
-                            Admin:     <ShieldCheck className="size-[10px] shrink-0" strokeWidth={2} />,
-                            Developer: <Code2       className="size-[10px] shrink-0" strokeWidth={2} />,
-                            Creator:   <PenLine     className="size-[10px] shrink-0" strokeWidth={2} />,
-                          };
-                          return (
-                            <div
-                              className="inline-flex items-center gap-[4px] self-start py-[3px] pl-[8px] pr-[10px] rounded-[8px]"
-                              style={{
-                                backgroundColor: colors?.rgba,
-                                border: `1px solid ${colors?.border}`,
-                              }}
-                            >
-                              <span style={{ color: 'var(--role-pill-text)', display: 'flex', alignItems: 'center' }}>
-                                {roleIconMap[role]}
-                              </span>
-                              <span style={{
-                                fontFamily: 'var(--font-family)',
-                                fontWeight: 'var(--font-weight-medium)',
-                                fontSize: '11px',
-                                letterSpacing: '0.2px',
-                                color: 'var(--role-pill-text)',
-                                whiteSpace: 'nowrap',
-                                lineHeight: 'normal',
-                              }}>
-                                {role}
-                              </span>
-                            </div>
-                          );
-                        })()}
-                        {/* Access level */}
-                        {row.accessLevel && (
-                          <p style={{
-                            fontFamily: 'var(--font-family)',
-                            fontWeight: 'var(--font-weight-regular)',
-                            fontSize: '12px',
-                            lineHeight: '18px',
-                            letterSpacing: 'var(--letter-spacing-md)',
-                            color: 'var(--muted-foreground)',
-                          }}>
-                            {row.accessLevel}
-                          </p>
-                        )}
-                      </div>
-                    ) : row.iconType === 'workspace' ? (
-                      <div className="flex flex-col gap-[2px]">
-                        {row.workspaceProjectCount != null && (
-                          <p style={{
-                            fontFamily: 'var(--font-family)',
-                            fontWeight: 'var(--font-weight-regular)',
-                            fontSize: '12px',
-                            lineHeight: '18px',
-                            letterSpacing: 'var(--letter-spacing-md)',
-                            color: 'var(--muted-foreground)',
-                          }}>
-                            {row.workspaceProjectCount} {row.workspaceProjectCount === 1 ? 'Project' : 'Projects'}
-                          </p>
-                        )}
-                        {row.workspaceMemberCount != null && (
-                          <p style={{
-                            fontFamily: 'var(--font-family)',
-                            fontWeight: 'var(--font-weight-regular)',
-                            fontSize: '12px',
-                            lineHeight: '18px',
-                            letterSpacing: 'var(--letter-spacing-md)',
-                            color: 'var(--muted-foreground)',
-                          }}>
-                            {row.workspaceMemberCount} {row.workspaceMemberCount === 1 ? 'Member' : 'Members'}
-                          </p>
-                        )}
-                      </div>
-                    ) : (
-                      // project (default)
-                      <div className="flex flex-col gap-[2px]">
-                        {row.owner && (
-                          <p style={{
-                            fontFamily: 'var(--font-family)',
-                            fontWeight: 'var(--font-weight-semibold)',
-                            fontSize: '12px',
-                            lineHeight: '20px',
-                            letterSpacing: 'var(--letter-spacing-md)',
-                            color: 'var(--muted-foreground)',
-                          }}>
-                            {row.owner}
-                          </p>
-                        )}
-                        {row.accountCount != null && (
-                          <p style={{
-                            fontFamily: 'var(--font-family)',
-                            fontWeight: 'var(--font-weight-regular)',
-                            fontSize: '12px',
-                            lineHeight: '20px',
-                            letterSpacing: 'var(--letter-spacing-md)',
-                            color: 'var(--muted-foreground)',
-                          }}>
-                            {row.accountCount} {row.accountCount === 1 ? 'Member' : 'Members'}
-                          </p>
-                        )}
-                      </div>
-                    )}
+                    <CardMetadata item={row} />
                   </div>
 
                   {/* Bottom actions: star + ellipsis, right-aligned */}
