@@ -8,6 +8,7 @@ import { myWorkspaces, teamWorkspaces } from '../data/workspaces';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
 import { NavigationProvider } from '../contexts/NavigationContext';
 import { InfoTrayProvider, useInfoTray } from '../contexts/InfoTrayContext';
+import { SharedMembersProvider } from '../contexts/SharedMembersContext';
 import { useMobileNav } from '../hooks/useMobileNav';
 
 function InfoTrayPanel() {
@@ -81,6 +82,7 @@ export function Root() {
   return (
     <NavigationProvider>
     <FavoritesProvider>
+    <SharedMembersProvider>
     <InfoTrayProvider>
       <div className="size-full flex bg-background overflow-hidden">
         {/* Sidebar */}
@@ -113,6 +115,7 @@ export function Root() {
         />
       </div>
     </InfoTrayProvider>
+    </SharedMembersProvider>
     </FavoritesProvider>
     </NavigationProvider>
   );

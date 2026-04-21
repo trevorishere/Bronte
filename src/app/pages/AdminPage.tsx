@@ -14,6 +14,7 @@ import { accounts } from '../data/accounts';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useNavigationContext } from '../contexts/NavigationContext';
 import { useInfoTray } from '../contexts/InfoTrayContext';
+import { ShareModal } from '../components/ShareModal';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -63,6 +64,7 @@ export function AdminPage() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const { setIsTrayOpen, setTrayContent } = useInfoTray();
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const { favorites, addFavorite, removeFavorite } = useFavorites();
   const navigate = useNavigate();
   const { resetToRoot, setAncestors } = useNavigationContext();
@@ -264,6 +266,7 @@ export function AdminPage() {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         onInfoClick={() => setIsTrayOpen(v => !v)}
+        onShareClick={() => setIsShareOpen(true)}
       />
       <TabNav
         tabs={tabs}
@@ -305,6 +308,14 @@ export function AdminPage() {
           onViewModeChange={setViewMode}
         />
       )}
+
+      <ShareModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        entityName={tabs.find(t => t.id === activeTab)?.label ?? 'Admin'}
+        entityId={activeTab}
+        onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
+      />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { DataTable, Column, RowData } from '../components/DataTable';
 import { GridView, GridItemData } from '../components/GridView';
 import { EmptyState } from '../components/EmptyState';
 import { useInfoTray } from '../contexts/InfoTrayContext';
+import { ShareModal } from '../components/ShareModal';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { projects } from '../data/workspaces';
 
@@ -27,6 +28,7 @@ export function FavoritesPage() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const { setIsTrayOpen, setTrayContent } = useInfoTray();
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   // Filter projects to only show favorited ones
@@ -112,6 +114,7 @@ export function FavoritesPage() {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         onInfoClick={() => setIsTrayOpen(v => !v)}
+        onShareClick={() => setIsShareOpen(true)}
       />
       
       {/* Toolbar - Always visible */}
@@ -156,6 +159,14 @@ export function FavoritesPage() {
       ) : (
         <EmptyState message="You currently have no favorite projects yet." />
       )}
+
+      <ShareModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        entityName="Favorites"
+        entityId="favorites"
+        onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
+      />
     </div>
   );
 }

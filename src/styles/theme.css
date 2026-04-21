@@ -154,10 +154,10 @@
   --popover: #201c18;
   --popover-foreground: #BFB8B1;
   --primary: #ede8e2; /* Warm off-white */
-  --primary-foreground: #1e1a16;
+  --primary-foreground: #1C1A19;
   --secondary: rgba(255, 255, 255, 0.05);
   --secondary-foreground: #a09890;
-  --muted: #26211B; /* Warm dark muted */
+  --muted: #262422; /* Warm dark muted */
   --muted-foreground: #9a9088;
   --accent: #342e28; /* Warm medium dark */
   --accent-foreground: #ede8e2;
@@ -168,10 +168,10 @@
   --input-background: #2c2822;
   --switch-background: #4a4440;
   --ring: #6a6460;
-  --sidebar: #1a1612; /* Warm dark sidebar, slightly deeper */
+  --sidebar: #1c1a19; /* Warm dark sidebar, slightly deeper */
   --sidebar-foreground: #b8b0a6;
   --sidebar-primary: #ede8e2;
-  --sidebar-primary-foreground: #1a1612;
+  --sidebar-primary-foreground: #1c1a19;
   --sidebar-accent: #342e28;
   --sidebar-accent-foreground: #ede8e2;
   --sidebar-border: #3c3630;
@@ -179,7 +179,7 @@
 
   /* Dark mode specific custom properties */
   --bg-nav-hover: rgba(44, 40, 34, 0.5);
-  --bg-row-selected: #2c2822;
+  --bg-row-selected: #2E2B29;
   --border-interactive: #4a4440;
   --border-interactive-hover: #6a6460;
   --bg-icon-container: #d58c6f;

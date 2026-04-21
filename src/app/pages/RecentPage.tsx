@@ -9,6 +9,7 @@ import { DataTableSkeleton, GridSkeleton, useLoadingDelay } from '../components/
 import { projects } from '../data/workspaces';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useInfoTray } from '../contexts/InfoTrayContext';
+import { ShareModal } from '../components/ShareModal';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -47,6 +48,7 @@ export function RecentPage() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const { setIsTrayOpen, setTrayContent } = useInfoTray();
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   // Get unique owners for filter options
@@ -118,6 +120,7 @@ export function RecentPage() {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         onInfoClick={() => setIsTrayOpen(v => !v)}
+        onShareClick={() => setIsShareOpen(true)}
       />
       <Toolbar
         viewMode={viewMode}
@@ -156,6 +159,14 @@ export function RecentPage() {
           onViewModeChange={setViewMode}
         />
       )}
+
+      <ShareModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        entityName="Recent projects"
+        entityId="recent"
+        onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
+      />
     </div>
   );
 }

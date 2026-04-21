@@ -12,8 +12,11 @@ import { InfoTrayContent } from '../components/InfoTray';
 import { TabNav, Tab } from '../components/TabNav';
 import { TopBar } from '../components/TopBar';
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { useNavigationContext, BreadcrumbEntry } from '../contexts/NavigationContext';
 import { useInfoTray } from '../contexts/InfoTrayContext';
+import { useSharedMembers } from '../contexts/SharedMembersContext';
+import { ShareModal, CurrentMember } from '../components/ShareModal';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -29,6 +32,8 @@ export function TeamDetailPage() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const { setIsTrayOpen, setTrayContent } = useInfoTray();
+  const { addSharedMembers, getExtraCount } = useSharedMembers();
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   const location = useLocation();
   const { ancestors, setAncestors } = useNavigationContext();
@@ -46,11 +51,12 @@ export function TeamDetailPage() {
     }
   }, [teamId]);
 
-  // Set tray content to this team on navigation
+  // Set tray content to this team on navigation or when shared members change
   useEffect(() => {
     if (!team) return;
-    setTrayContent({ type: 'team', data: { id: team.id, name: team.name, owner: team.owner, created: team.created, membersCount: team.membersCount } });
-  }, [teamId]);
+    const totalMembers = team.membersCount + getExtraCount(team.id);
+    setTrayContent({ type: 'team', data: { id: team.id, name: team.name, owner: team.owner, created: team.created, membersCount: totalMembers } });
+  }, [teamId, getExtraCount(teamId ?? '')]);
 
   if (!team) {
     return (
@@ -71,7 +77,6 @@ export function TeamDetailPage() {
   const tabs: Tab[] = [
     { id: 'Projects', label: 'Projects' },
     { id: 'Members', label: 'Members' },
-    { id: 'Settings', label: 'Settings' }
   ];
 
   const getTabData = () => {
@@ -248,17 +253,23 @@ export function TeamDetailPage() {
         onViewModeChange={setViewMode}
         breadcrumbs={[...ancestors, { label: team.name, path: `/admin/team/${teamId}` }]}
         onInfoClick={() => setIsTrayOpen(v => !v)}
+        onShareClick={() => setIsShareOpen(true)}
       />
 
       {/* Team header */}
-      <DetailPageHeader
-        title={team.name}
-        icon={(size) => <TeamIcon size={size} />}
-        metadata={[
-          { icon: 'users', label: `${team.membersCount} member${team.membersCount !== 1 ? 's' : ''}` },
-          { icon: 'calendar', label: `Created ${team.created}` }
-        ]}
-      />
+      {(() => {
+        const totalMembers = team.membersCount + getExtraCount(team.id);
+        return (
+          <DetailPageHeader
+            title={team.name}
+            icon={(size) => <TeamIcon size={size} />}
+            metadata={[
+              { icon: 'users', label: `${totalMembers} member${totalMembers !== 1 ? 's' : ''}` },
+              { icon: 'calendar', label: `Created ${team.created}` }
+            ]}
+          />
+        );
+      })()}
 
       {/* Tabs */}
       <TabNav
@@ -268,9 +279,8 @@ export function TeamDetailPage() {
         variant="detail"
       />
 
-      {/* Toolbar - Always visible for tabs that display tables */}
-      {activeTab !== 'Settings' && (
-        <Toolbar
+      {/* Toolbar */}
+      <Toolbar
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           filters={getFilters()}
@@ -279,15 +289,9 @@ export function TeamDetailPage() {
           dateFilters={dateFilters}
           onDateFilterChange={handleDateFilterChange}
         />
-      )}
 
       {/* Content area */}
-      {activeTab === 'Settings' ? (
-        <EmptyState 
-          title="No settings available" 
-          description="Team settings configuration is not available yet."
-        />
-      ) : data.length === 0 ? (
+      {data.length === 0 ? (
         <EmptyState 
           title={`No ${activeTab.toLowerCase()} found`}
           description={`This team doesn't have any ${activeTab.toLowerCase()} yet.`}
@@ -327,6 +331,20 @@ export function TeamDetailPage() {
           />
         )
       )}
+
+      <ShareModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        entityName={team.name}
+        entityId={team.id}
+        currentMembers={accounts
+          .filter(a => a.teamIds?.includes(team.id))
+          .map((a): CurrentMember => ({ id: a.id, name: a.name, role: a.role }))}
+        onShare={(ids) => {
+          addSharedMembers(team.id, ids);
+          toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`);
+        }}
+      />
     </div>
   );
 }
