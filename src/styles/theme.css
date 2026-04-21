@@ -52,13 +52,6 @@
   --switch-background: #c8c0b8;
   --ring: #9a8f86;
 
-  /* Charts */
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-
   /* Radius */
   --radius: 0.5rem;
 
@@ -85,17 +78,14 @@
   /* Font family - single variable for the typeface */
   --font-family: 'Figtree', sans-serif;
 
-  /* Font weights - semantic weight values */
-  --font-weight-light: 300;
+  /* Font weights */
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
-  --font-weight-extrabold: 800;
 
   /* Font sizes */
   --font-size-8: 8px;
-  --font-size-10: 10px;
   --font-size-11: 11px;
   --font-size-13: 13px;
   --font-size-14: 14px;
@@ -105,11 +95,9 @@
 
   /* Line heights */
   --line-height-normal: normal;
-  --line-height-15: 15px;
   --line-height-20: 20px;
 
   /* Letter spacing */
-  --letter-spacing-sm: 0.16px;
   --letter-spacing-md: 0.4px;
   --letter-spacing-lg: 0.7px;
 
@@ -132,7 +120,6 @@
   --icon-toggle-inactive: #d0c8c0;
   --icon-toggle-hover: #7a7068;
   --bg-account-avatar: #934790;
-  --bg-beta-badge: #36609e;
   --text-white: white;
   --icon-team-bg: #7FA073;
   --icon-workspace-bg: #6BA0D2;
@@ -161,8 +148,6 @@
   --muted-foreground: #9a9088;
   --accent: #342e28; /* Warm medium dark */
   --accent-foreground: #ede8e2;
-  --destructive: #d4183d;
-  --destructive-foreground: #ffffff;
   --border: #3c3630; /* Warm border */
   --input: transparent;
   --input-background: #2c2822;
@@ -182,16 +167,12 @@
   --bg-row-selected: #2E2B29;
   --border-interactive: #4a4440;
   --border-interactive-hover: #6a6460;
-  --bg-icon-container: #d58c6f;
   --bg-icon-hover: rgba(255, 255, 255, 0.06);
   --icon-nav-hover: #b0a898;
   --icon: #a09890;
   --icon-toggle-active: #ede8e2;
   --icon-toggle-inactive: #4a4440;
   --icon-toggle-hover: #9a9088;
-  --bg-account-avatar: #934790;
-  --bg-beta-badge: #36609e;
-  --text-white: white;
   --bg-grid-card: #261e1a; /* Warm dark grid card */
   --icon-team-bg: #406831;
   --icon-workspace-bg: #2166A6;
@@ -236,14 +217,8 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
-  --color-input-background: var(--input-background);
   --color-switch-background: var(--switch-background);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

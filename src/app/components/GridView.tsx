@@ -192,7 +192,7 @@ export function GridView({
                     <Star
                       className="size-[16px]"
                       fill={isStarred ? 'currentColor' : 'none'}
-                      style={{ color: 'var(--text-foreground)' }}
+                      style={{ color: 'var(--foreground)' }}
                       strokeWidth={1.5}
                     />
                   </button>
@@ -208,7 +208,7 @@ export function GridView({
                     onMouseLeave={() => setHoveredFavorite(null)}
                     title="More options"
                   >
-                    <MoreHorizontal className="size-[16px]" style={{ color: 'var(--text-foreground)' }} />
+                    <MoreHorizontal className="size-[16px]" style={{ color: 'var(--foreground)' }} />
                   </button>
                 </div>
               </div>

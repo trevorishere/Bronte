@@ -657,7 +657,7 @@ export function DataTable({
                       >
                         <Star
                           className="size-[16px]"
-                          style={{ color: 'var(--text-foreground)' }}
+                          style={{ color: 'var(--foreground)' }}
                           strokeWidth={1.5}
                           fill={starredItems?.has(row.id) ? 'currentColor' : 'none'}
                         />
@@ -682,7 +682,7 @@ export function DataTable({
                       >
                         <MoreHorizontal
                           className="size-[16px]"
-                          style={{ color: 'var(--text-foreground)' }}
+                          style={{ color: 'var(--foreground)' }}
                           />
                       </button>
                     </div>
@@ -707,7 +707,7 @@ export function DataTable({
           fontSize: '12px',
           fontWeight: 'var(--font-weight-regular)',
           letterSpacing: 'var(--letter-spacing-md)',
-          color: 'var(--text-secondary)',
+          color: 'var(--muted-foreground)',
         }}>
           {sortedData.length} {sortedData.length === 1 ? 'item' : 'items'}
         </span>
