@@ -1,13 +1,13 @@
-import { Star, MoreHorizontal, List } from 'lucide-react';
+import { Star, MoreHorizontal, List, ShieldCheck, Code2, PenLine } from 'lucide-react';
 import { IconButton } from './IconButton';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { WorkspaceIcon } from './WorkspaceIcon';
 import { TeamIcon } from './TeamIcon';
-import { Avatar } from './Avatar';
+import { Avatar, roleColors, Role } from './Avatar';
 import { ProjectIcon } from './ProjectIcon';
-import { DropdownMenu } from './DropdownMenu';
+import { DropdownMenu, createDefaultMenuItems } from './DropdownMenu';
 import { accounts } from '../data/accounts';
-import { getMetadataString } from '../utils/getMetadataString';
+import { toast } from 'sonner';
 
 export interface GridItemData {
   id: string;
@@ -50,34 +50,24 @@ export function GridView({
   onViewModeChange,
 }: GridViewProps) {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const [hoveredFavorite, setHoveredFavorite] = useState<string | null>(null);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const moreButtonRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
 
-  const getRandomMembers = (id: string) => {
-    // Generate consistent random number based on ID
-    const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return 5 + (hash % 96); // 5-100
-  };
-
-  const getPictogramColor = (iconType: string | undefined) => {
-    // Each icon type has one consistent color
-    if (iconType === 'project') {
-      return '#D58C6F'; // Orange for projects
-    }
-    if (iconType === 'workspace') {
-      return '#6BA0D2'; // Blue for workspaces
-    }
-    if (iconType === 'team') {
-      return '#8B7AB8'; // Purple for teams
-    }
-    if (iconType === 'account') {
-      return '#7CB8A2'; // Green for accounts
-    }
-    return '#6BA0D2';
-  };
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && selectedCard) {
+        setSelectedCard(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedCard]);
 
   const renderPictogram = (item: GridItemData) => {
     return (
-      <div className="w-full h-[128px] flex items-center justify-center">
+      <div className="w-full h-[104px] flex items-center justify-center">
         {item.iconType === 'workspace' && item.name && (
           <WorkspaceIcon name={item.name} size="x-large" />
         )}
@@ -98,12 +88,83 @@ export function GridView({
     );
   };
 
-  const metaTextStyle = {
+  const roleIconMap: Record<Role, React.ReactNode> = {
+    Admin:     <ShieldCheck className="size-[10px] shrink-0" strokeWidth={2} />,
+    Developer: <Code2       className="size-[10px] shrink-0" strokeWidth={2} />,
+    Creator:   <PenLine     className="size-[10px] shrink-0" strokeWidth={2} />,
+  };
+
+  // fontSize deliberately excluded — applied via Tailwind className for responsive sizing
+  const metaLineStyle = (semibold?: boolean): React.CSSProperties => ({
     fontFamily: 'var(--font-family)',
-    fontSize: '13px',
-    fontWeight: 'var(--font-weight-medium)',
-    color: 'var(--muted-foreground)',
+    fontWeight: semibold ? 'var(--font-weight-semibold)' : 'var(--font-weight-regular)',
+    lineHeight: '20px',
     letterSpacing: 'var(--letter-spacing-md)',
+    color: 'var(--muted-foreground)',
+  });
+  // Responsive metadata class: 12px mobile, 14px desktop
+  const metaClass = 'text-[12px] md:text-[14px]';
+
+  const renderCardMetadata = (item: GridItemData) => {
+    if (item.iconType === 'account' && item.role) {
+      const role = item.role as Role;
+      const colors = roleColors[role];
+      return (
+        <div className="flex flex-col gap-[3px]">
+          <div
+            className="inline-flex items-center gap-[4px] self-start py-[3px] pl-[8px] pr-[10px] rounded-[8px]"
+            style={{
+              backgroundColor: colors?.rgba,
+              border: `1px solid ${colors?.border}`,
+            }}
+          >
+            <span style={{ color: 'var(--role-pill-text)', display: 'flex', alignItems: 'center' }}>
+              {roleIconMap[role]}
+            </span>
+            {/* Pill text: 11px mobile, 12px desktop */}
+            <span className="text-[11px] md:text-[12px]" style={{
+              fontFamily: 'var(--font-family)',
+              fontWeight: 'var(--font-weight-medium)',
+              letterSpacing: '0.2px',
+              color: 'var(--role-pill-text)',
+              whiteSpace: 'nowrap',
+              lineHeight: 'normal',
+            }}>
+              {role}
+            </span>
+          </div>
+          {item.accessLevel && (
+            <span className={metaClass} style={metaLineStyle()}>{item.accessLevel}</span>
+          )}
+        </div>
+      );
+    }
+
+    if (item.iconType === 'team') {
+      return (
+        <div className="flex flex-col">
+          {item.owner && <p className={metaClass} style={metaLineStyle(true)}>{item.owner}</p>}
+          {item.membersCount != null && <p className={metaClass} style={metaLineStyle()}>{item.membersCount} {item.membersCount === 1 ? 'Member' : 'Members'}</p>}
+        </div>
+      );
+    }
+
+    if (item.iconType === 'workspace') {
+      return (
+        <div className="flex flex-col">
+          {item.workspaceProjectCount != null && <p className={metaClass} style={metaLineStyle(true)}>{item.workspaceProjectCount} {item.workspaceProjectCount === 1 ? 'Project' : 'Projects'}</p>}
+          {item.workspaceMemberCount != null && <p className={metaClass} style={metaLineStyle()}>{item.workspaceMemberCount} {item.workspaceMemberCount === 1 ? 'Member' : 'Members'}</p>}
+        </div>
+      );
+    }
+
+    // project (default)
+    return (
+      <div className="flex flex-col">
+        {item.owner && <p className={metaClass} style={metaLineStyle(true)}>{item.owner}</p>}
+        {item.accountCount != null && <p className={metaClass} style={metaLineStyle()}>{item.accountCount} {item.accountCount === 1 ? 'Member' : 'Members'}</p>}
+      </div>
+    );
   };
 
   return (
@@ -111,11 +172,11 @@ export function GridView({
 
       {/* Mobile header row — matches MobileSortHeader height/position, toggle on right */}
       {onViewModeChange && (
-        <div className="md:hidden shrink-0 px-4 h-[40px] flex items-center justify-end">
+        <div className="md:hidden shrink-0 px-4 h-[40px] mt-[8px] flex items-center justify-end">
           <IconButton
-            icon={<List className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />}
+            icon={<List className="size-[16px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />}
             onClick={() => onViewModeChange('list')}
-            size={40}
+            size={36}
             title="Switch to list view"
           />
         </div>
@@ -126,70 +187,77 @@ export function GridView({
         {data.map((item) => {
           const isStarred = favorites.has(item.id);
           const isHovered = hoveredCard === item.id;
+          const isSelected = selectedCard === item.id;
+
+          // Title lines: account=1, team/workspace=2, project=3
+          const titleLines = item.iconType === 'account' ? 1
+            : item.iconType === 'team' || item.iconType === 'workspace' ? 2
+            : 3;
+          const titleHeight = titleLines * 22; // 22px, 44px, or 66px
 
           return (
             <div
               key={item.id}
               className="flex flex-col gap-[8px] rounded-[16px] cursor-pointer transition-shadow"
               style={{
-                backgroundColor: 'color-mix(in srgb, var(--background) 96%, white)',
+                backgroundColor: isSelected
+                  ? 'transparent'
+                  : isHovered
+                  ? 'var(--muted)'
+                  : 'color-mix(in srgb, var(--background) 96%, white)',
                 border: '1px solid var(--sidebar-border)',
                 padding: '16px',
-                paddingBottom: '20px',
                 boxShadow: isHovered
                   ? '0px 0px 6px 0px rgba(0,0,0,0.025), 0px 1px 5px 0px rgba(0,0,0,0.04), 0px 6px 15px 0px rgba(50,50,93,0.075)'
                   : '0px 0px 6px 0px rgba(0,0,0,0.025), 0px 1px 5px 0px rgba(0,0,0,0.04), 0px 4px 9px 0px rgba(50,50,93,0.055)',
+                transition: `background-color var(--transition-duration) var(--transition-timing)`,
               }}
-              onClick={() => onItemClick?.(item)}
+              onClick={() => {
+                setSelectedCard(selectedCard === item.id ? null : item.id);
+                onItemClick?.(item);
+              }}
               onDoubleClick={() => onItemDoubleClick?.(item)}
               onMouseEnter={() => setHoveredCard(item.id)}
               onMouseLeave={() => setHoveredCard(null)}
             >
               {/* Pictogram */}
-              <div style={{ marginBottom: '16px' }}>
-                {renderPictogram(item)}
-              </div>
+              {renderPictogram(item)}
 
-              {/* Title - Two lines with fixed height */}
-              <h3
-                className="text-[16px] font-semibold leading-[24px]"
-                style={{ 
-                  color: 'var(--foreground)',
-                  height: '48px', // Reserve space for 2 lines (24px * 2)
-                  overflow: 'hidden',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  letterSpacing: 'var(--letter-spacing-md)',
-                  wordWrap: 'break-word'
-                }}
-                title={item.name}
-              >
-                {item.name}
-              </h3>
-
-              {/* Owner */}
-              <p
-                className="text-[14px] font-normal leading-[21px]"
-                style={{ color: 'var(--muted-foreground)', letterSpacing: 'var(--letter-spacing-md)' }}
-              >
-                {item.owner}
-              </p>
-
-              {/* Metadata and Actions */}
-              <div className="flex items-center justify-between">
-                {getMetadataString(item, metaTextStyle)}
-
-                {/* Icon Buttons */}
-                <div className="flex gap-[8px] items-center">
-                  {/* Favorite Button */}
-                  <button
-                    className="size-[32px] flex items-center justify-center rounded-full transition-colors"
+              {/* Content section — fills remaining height, pushes buttons to bottom */}
+              <div className="flex-1 flex flex-col justify-between">
+                {/* Text group — 12px gap for accounts, 8px for all others */}
+                <div className={`flex flex-col ${item.iconType === 'account' ? 'gap-[12px]' : 'gap-[8px]'}`}>
+                  {/* Title */}
+                  <h3
+                    className={`text-[16px] font-medium leading-[22px] ${titleLines === 1 ? 'line-clamp-1' : titleLines === 2 ? 'line-clamp-2' : 'line-clamp-3'}`}
                     style={{
-                      backgroundColor:
-                        hoveredFavorite === `${item.id}-favorite`
-                          ? 'var(--bg-nav-hover)'
-                          : 'transparent',
+                      color: (isHovered || isSelected) ? 'var(--primary)' : 'var(--foreground)',
+                      height: `${titleHeight}px`,
+                      overflow: 'hidden',
+                      display: '-webkit-box',
+                      WebkitBoxOrient: 'vertical',
+                      letterSpacing: 'var(--letter-spacing-md)',
+                      wordWrap: 'break-word',
+                    }}
+                    title={item.name}
+                  >
+                    {item.name}
+                  </h3>
+
+                  {/* Type-specific metadata */}
+                  {renderCardMetadata(item)}
+                </div>
+
+                {/* Buttons row — hidden on desktop until card is hovered; always visible on mobile */}
+                <div
+                  className={`flex items-center justify-end pt-[4px] ${(isHovered || isSelected || openMenuId === item.id) ? 'opacity-100' : 'opacity-100 md:opacity-0'}`}
+                  style={{ transition: `opacity var(--transition-duration) var(--transition-timing)` }}
+                >
+                  <button
+                    className="size-[32px] flex items-center justify-center rounded-full shrink-0"
+                    style={{
+                      backgroundColor: hoveredFavorite === `${item.id}-favorite` ? 'var(--bg-icon-hover)' : 'transparent',
+                      transition: `background-color var(--transition-duration) var(--transition-timing)`,
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -199,41 +267,26 @@ export function GridView({
                     onMouseLeave={() => setHoveredFavorite(null)}
                   >
                     <Star
-                      size={16}
+                      className="size-[16px]"
                       fill={isStarred ? 'currentColor' : 'none'}
-                      style={{ color: 'var(--icon)' }}
-                      strokeWidth={2}
+                      style={{ color: 'var(--text-foreground)' }}
+                      strokeWidth={1.5}
                     />
                   </button>
-
-                  {/* More Menu */}
-                  <div style={{ position: 'relative', zIndex: 10 }}>
-                    <DropdownMenu
-                      trigger={
-                        <button
-                          className="size-[32px] flex items-center justify-center rounded-full transition-colors"
-                          style={{
-                            backgroundColor:
-                              hoveredFavorite === `${item.id}-more`
-                                ? 'var(--bg-nav-hover)'
-                                : 'transparent',
-                          }}
-                          onClick={(e) => e.stopPropagation()}
-                          onMouseEnter={() => setHoveredFavorite(`${item.id}-more`)}
-                          onMouseLeave={() => setHoveredFavorite(null)}
-                        >
-                          <MoreHorizontal size={16} style={{ color: 'var(--icon)' }} />
-                        </button>
-                      }
-                      items={[
-                        { label: 'Open', action: () => {} },
-                        { label: 'Rename', action: () => {} },
-                        { label: 'Duplicate', action: () => {} },
-                        { type: 'separator' },
-                        { label: 'Delete', action: () => {} },
-                      ]}
-                    />
-                  </div>
+                  <button
+                    ref={(el) => el && moreButtonRefs.current.set(item.id, el)}
+                    className="size-[32px] flex items-center justify-center rounded-full shrink-0"
+                    style={{
+                      backgroundColor: hoveredFavorite === `${item.id}-more` || openMenuId === item.id ? 'var(--bg-icon-hover)' : 'transparent',
+                      transition: `background-color var(--transition-duration) var(--transition-timing)`,
+                    }}
+                    onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === item.id ? null : item.id); }}
+                    onMouseEnter={() => setHoveredFavorite(`${item.id}-more`)}
+                    onMouseLeave={() => setHoveredFavorite(null)}
+                    title="More options"
+                  >
+                    <MoreHorizontal className="size-[16px]" style={{ color: 'var(--text-foreground)' }} />
+                  </button>
                 </div>
               </div>
             </div>
@@ -241,6 +294,28 @@ export function GridView({
         })}
       </div>
       </div>
+
+      {/* Dropdown menus — rendered outside the grid to avoid overflow clipping */}
+      {data.map((item) => {
+        const anchorRef = { current: moreButtonRefs.current.get(item.id) || null };
+        const menuItems = createDefaultMenuItems(
+          item.name,
+          () => { toast.success(`Rename: ${item.name}`); setOpenMenuId(null); },
+          () => { toast.success(`Share: ${item.name}`); setOpenMenuId(null); },
+          () => { toast.success(`Duplicate: ${item.name}`); setOpenMenuId(null); },
+          () => { toast.success(`Move: ${item.name}`); setOpenMenuId(null); },
+          () => { toast.success(`Delete: ${item.name}`); setOpenMenuId(null); }
+        );
+        return (
+          <DropdownMenu
+            key={`menu-${item.id}`}
+            items={menuItems}
+            isOpen={openMenuId === item.id}
+            onClose={() => setOpenMenuId(null)}
+            anchorRef={anchorRef as React.RefObject<HTMLElement>}
+          />
+        );
+      })}
     </div>
   );
 }
