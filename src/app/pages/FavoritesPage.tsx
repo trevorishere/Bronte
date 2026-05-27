@@ -39,7 +39,6 @@ export function FavoritesPage() {
   const { getExtraCount } = useSharedMembers();
   const { favorites, addFavorite, removeFavorite } = useFavorites();
   const [extraRows, setExtraRows] = useState<RowData[]>([]);
-  const displayData = [...filteredData, ...extraRows];
 
   // Filter projects to only show favorited ones
   const tableData: RowData[] = projects
@@ -78,6 +77,8 @@ export function FavoritesPage() {
     
     return true;
   });
+
+  const displayData = [...filteredData, ...extraRows];
 
   const handleFilterChange = (filterLabel: string, values: string[]) => {
     setSelectedFilters(prev => ({
