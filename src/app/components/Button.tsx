@@ -39,14 +39,14 @@ export function Button({
     primary: {
       padding: '8px 16px',
       borderRadius: 'var(--radius-8)',
-      backgroundColor: isHovered && !props.disabled ? 'var(--accent-hover)' : 'var(--accent)',
-      color: 'var(--primary)',
+      backgroundColor: isHovered && !props.disabled ? 'var(--btn-primary-hover)' : 'var(--btn-primary-bg)',
+      color: 'var(--btn-primary-text)',
     },
     secondary: {
       padding: '8px 16px',
       borderRadius: 'var(--radius-8)',
       border: '1px solid var(--border-interactive)',
-      backgroundColor: isHovered && !props.disabled ? 'var(--border-interactive-hover)' : 'var(--background)',
+      backgroundColor: isHovered && !props.disabled ? 'var(--muted)' : 'var(--background)',
       color: 'var(--foreground)',
     },
     danger: {

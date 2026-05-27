@@ -172,6 +172,7 @@ export function AdminPage() {
   };
 
   const { columns, data, filters } = getTableData();
+  const [extraRows, setExtraRows] = useState<RowData[]>([]);
 
   // Apply filters to table data
   const filteredData = data.filter(row => {
@@ -200,6 +201,8 @@ export function AdminPage() {
     
     return true;
   });
+
+  const displayData = [...filteredData, ...extraRows];
 
   const handleFilterChange = (filterLabel: string, values: string[]) => {
     setSelectedFilters(prev => ({
@@ -278,6 +281,7 @@ export function AdminPage() {
     setActiveTab(tabId);
     setSelectedFilters({});
     setDateFilters({});
+    setExtraRows([]);
   };
 
   return (
@@ -310,7 +314,7 @@ export function AdminPage() {
         viewMode === 'grid' ? <GridSkeleton itemCount={8} /> : <DataTableSkeleton rowCount={8} />
       ) : viewMode === 'grid' ? (
         <GridView
-          data={filteredData as GridItemData[]}
+          data={displayData as GridItemData[]}
           onItemClick={handleRowClick}
           onItemDoubleClick={handleRowDoubleClick}
           onStarClick={handleStarClick}
@@ -321,13 +325,15 @@ export function AdminPage() {
         <DataTable
           key={activeTab}
           columns={columns}
-          data={filteredData}
+          data={displayData}
           onRowClick={handleRowClick}
           onRowDoubleClick={handleRowDoubleClick}
           onSelectionChange={handleSelectionChange}
           onStarClick={handleStarClick}
           onMoreClick={handleMoreClick}
           onShare={handleShareRow}
+          onDuplicate={(copy) => setExtraRows(prev => [...prev, copy])}
+          onDelete={(deleted) => setExtraRows(prev => prev.filter(r => r.id !== deleted.id))}
           onMemberCountClick={handleMemberCountClick}
           starredItems={favorites}
           viewMode={viewMode}

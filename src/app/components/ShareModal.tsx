@@ -247,7 +247,7 @@ function SectionLabel({ text }: { text: string }) {
       textTransform: 'uppercase' as const,
       letterSpacing: '0.8px',
       color: 'var(--muted-foreground)',
-      padding: '4px 12px 16px',
+      padding: '4px 12px 8px',
     }}>
       {text}
     </p>
@@ -338,7 +338,7 @@ export function ShareModal({
       <div
         className="relative flex flex-col rounded-2xl shadow-lg overflow-hidden"
         style={{
-          width: '480px',
+          width: '560px',
           maxHeight: '80vh',
           backgroundColor: 'var(--background)',
           border: '1px solid var(--border)',
@@ -346,20 +346,30 @@ export function ShareModal({
       >
         {/* ── Header ──────────────────────────────────────────────────── */}
         <div
-          className="shrink-0 flex items-center justify-between px-[24px] py-[20px]"
+          className="shrink-0 flex items-center justify-between px-[32px] py-[28px]"
         >
-          <h2 style={{
-            fontFamily: 'var(--font-family)',
-            fontWeight: 'var(--font-weight-semibold)',
-            fontSize: 'var(--font-size-18)',
-            lineHeight: 'var(--line-height-normal)',
-            color: 'var(--primary)',
-          }}>
-            Share "{entityName}"
-          </h2>
+          <div className="flex flex-col gap-[4px] min-w-0 pr-[8px]">
+            <h2 style={{
+              fontFamily: 'var(--font-family)',
+              fontWeight: 'var(--font-weight-semibold)',
+              fontSize: 'var(--font-size-24)',
+              lineHeight: 'var(--line-height-normal)',
+              color: 'var(--primary)',
+            }}>
+              Share
+            </h2>
+            <p className="truncate" style={{
+              fontFamily: 'var(--font-family)',
+              fontSize: 'var(--font-size-15)',
+              color: 'var(--muted-foreground)',
+              lineHeight: '1.3',
+            }}>
+              {entityName}
+            </p>
+          </div>
           <button
             onClick={onClose}
-            className="flex items-center justify-center size-[32px] rounded-full transition-colors shrink-0"
+            className="flex items-center justify-center size-[32px] rounded-full transition-colors ml-[16px] shrink-0"
             style={{ backgroundColor: 'transparent' }}
             onMouseOver={e => (e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)')}
             onMouseOut={e => (e.currentTarget.style.backgroundColor = 'transparent')}
@@ -369,7 +379,7 @@ export function ShareModal({
         </div>
 
         {/* ── Search input + chips ─────────────────────────────────────── */}
-        <div className="shrink-0 px-[24px] pt-[0px] pb-[8px]">
+        <div className="shrink-0 px-[32px] pt-[0px] pb-[24px]">
           <div
             className={`flex gap-[8px] min-h-[40px] px-[10px] py-[6px] rounded-[12px] cursor-text ${selected.length > 0 ? 'items-start' : 'items-center'}`}
             style={{
@@ -408,7 +418,7 @@ export function ShareModal({
         </div>
 
         {/* ── Scrollable body ───────────────────────────────────────────── */}
-        <div className="flex flex-col px-[12px] pb-[8px]" style={{ minHeight: 0, overflowY: 'auto' }}>
+        <div className="flex flex-col px-[24px] pb-[24px]" style={{ minHeight: 0, overflowY: 'auto' }}>
 
           {/* ── All accounts ─────────────────────────────────────────────── */}
           <SectionLabel text={`All Accounts (${filteredList.length})`} />
@@ -446,7 +456,7 @@ export function ShareModal({
           {/* ── Accounts with access ─────────────────────────────────────── */}
           {(accessList.length > 0 || pendingList.length > 0) && (
             <>
-              <div style={{ height: 32 }} />
+              <div style={{ height: 48 }} />
               {(() => {
                 const total = accessList.length + pendingList.length;
                 return <SectionLabel text={`Accounts with Access (${total})`} />;
@@ -468,7 +478,7 @@ export function ShareModal({
 
         {/* ── Footer ───────────────────────────────────────────────────── */}
         <div
-          className="shrink-0 flex items-center justify-end gap-[12px] px-[24px] py-[20px]"
+          className="shrink-0 flex items-center justify-end gap-[12px] px-[32px] py-[28px]"
         >
           <Button variant="secondary" onClick={onClose} type="button">
             Cancel

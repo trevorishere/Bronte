@@ -227,10 +227,14 @@ export function TeamDetailPage() {
     return true;
   });
 
+  const [extraRows, setExtraRows] = useState<RowData[]>([]);
+  const displayData = [...filteredData, ...extraRows];
+
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     setSelectedFilters({});
     setDateFilters({});
+    setExtraRows([]);
   };
 
   const handleSelectionChange = (row: RowData | null) => {
@@ -300,7 +304,7 @@ export function TeamDetailPage() {
       ) : (
         viewMode === 'grid' ? (
           <GridView
-            data={filteredData as GridItemData[]}
+            data={displayData as GridItemData[]}
             onItemClick={() => {}}
             onItemDoubleClick={(item) => {
               if (activeTab === 'Members') {
@@ -316,7 +320,7 @@ export function TeamDetailPage() {
         ) : (
           <DataTable
             columns={columns}
-            data={filteredData}
+            data={displayData}
             onRowClick={() => {}}
             onRowDoubleClick={(row) => {
               if (activeTab === 'Members') {
@@ -327,6 +331,8 @@ export function TeamDetailPage() {
               }
             }}
             onSelectionChange={handleSelectionChange}
+            onDuplicate={(copy) => setExtraRows(prev => [...prev, copy])}
+            onDelete={(deleted) => setExtraRows(prev => prev.filter(r => r.id !== deleted.id))}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
           />

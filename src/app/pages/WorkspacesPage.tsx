@@ -68,6 +68,8 @@ export function WorkspacesPage() {
   };
 
   const filteredData = getFilteredData();
+  const [extraRows, setExtraRows] = useState<RowData[]>([]);
+  const displayData = [...filteredData, ...extraRows];
 
   const handleRowClick = (row: RowData) => {
     navigate(`/workspace/${row.id}`);
@@ -118,7 +120,7 @@ export function WorkspacesPage() {
       />
       {viewMode === 'grid' ? (
         <GridView
-          data={filteredData as GridItemData[]}
+          data={displayData as GridItemData[]}
           onItemClick={handleRowClick}
           onItemDoubleClick={handleRowClick}
           onStarClick={handleStarClick}
@@ -126,12 +128,14 @@ export function WorkspacesPage() {
           onViewModeChange={setViewMode}
         />
       ) : (
-        <DataTable 
+        <DataTable
           columns={columns}
-          data={filteredData}
+          data={displayData}
           onRowClick={handleRowClick}
           onStarClick={handleStarClick}
           onRename={handleRename}
+          onDuplicate={(copy) => setExtraRows(prev => [...prev, copy])}
+          onDelete={(deleted) => setExtraRows(prev => prev.filter(r => r.id !== deleted.id))}
           starredItems={starredItems}
           viewMode={viewMode}
           onViewModeChange={setViewMode}

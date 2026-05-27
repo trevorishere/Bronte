@@ -59,6 +59,8 @@ export function RecentPage() {
   const [membersModalRow, setMembersModalRow] = useState<RowData | null>(null);
   const { getExtraCount } = useSharedMembers();
   const { favorites, addFavorite, removeFavorite } = useFavorites();
+  const [extraRows, setExtraRows] = useState<RowData[]>([]);
+  const displayData = [...filteredData, ...extraRows];
 
   // Get unique owners for filter options
   const uniqueOwners = Array.from(new Set(tableData.map(p => p.owner))).sort();
@@ -154,7 +156,7 @@ export function RecentPage() {
         viewMode === 'grid' ? <GridSkeleton itemCount={8} /> : <DataTableSkeleton rowCount={8} />
       ) : viewMode === 'grid' ? (
         <GridView
-          data={filteredData as GridItemData[]}
+          data={displayData as GridItemData[]}
           onItemClick={handleRowClick}
           onItemDoubleClick={handleRowDoubleClick}
           onStarClick={handleStarClick}
@@ -164,13 +166,15 @@ export function RecentPage() {
       ) : (
         <DataTable
           columns={tableColumns}
-          data={filteredData}
+          data={displayData}
           onRowClick={handleRowClick}
           onRowDoubleClick={handleRowDoubleClick}
           onSelectionChange={handleSelectionChange}
           onStarClick={handleStarClick}
           onMoreClick={handleMoreClick}
           onShare={handleShareRow}
+          onDuplicate={(copy) => setExtraRows(prev => [...prev, copy])}
+          onDelete={(deleted) => setExtraRows(prev => prev.filter(r => r.id !== deleted.id))}
           onMemberCountClick={handleMemberCountClick}
           starredItems={favorites}
           viewMode={viewMode}

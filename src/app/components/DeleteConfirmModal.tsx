@@ -38,26 +38,36 @@ export function DeleteConfirmModal({ isOpen, itemName, onClose, onConfirm }: Del
     >
       <div
         className="relative flex flex-col rounded-2xl shadow-lg"
-        style={{ width: '480px', backgroundColor: 'var(--background)', border: '1px solid var(--border)' }}
+        style={{ width: '560px', backgroundColor: 'var(--background)', border: '1px solid var(--border)' }}
       >
         {/* Header */}
         <div
-          className="flex items-center justify-between px-[24px] py-[20px]"
+          className="flex items-center justify-between px-[32px] py-[28px]"
         >
-          <h2
-            style={{
+          <div className="flex flex-col gap-[4px] min-w-0 pr-[8px]">
+            <h2
+              style={{
+                fontFamily: 'var(--font-family)',
+                fontWeight: 'var(--font-weight-semibold)',
+                fontSize: 'var(--font-size-24)',
+                lineHeight: 'var(--line-height-normal)',
+                color: 'var(--primary)',
+              }}
+            >
+              Delete
+            </h2>
+            <p className="truncate" style={{
               fontFamily: 'var(--font-family)',
-              fontWeight: 'var(--font-weight-semibold)',
-              fontSize: 'var(--font-size-18)',
-              lineHeight: 'var(--line-height-normal)',
-              color: 'var(--primary)',
-            }}
-          >
-            Delete item?
-          </h2>
+              fontSize: 'var(--font-size-15)',
+              color: 'var(--muted-foreground)',
+              lineHeight: '1.3',
+            }}>
+              {itemName}
+            </p>
+          </div>
           <button
             onClick={onClose}
-            className="flex items-center justify-center size-[32px] rounded-full transition-colors"
+            className="flex items-center justify-center size-[32px] rounded-full transition-colors ml-[16px] shrink-0"
             style={{ backgroundColor: 'transparent' }}
             onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)')}
             onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
@@ -67,7 +77,7 @@ export function DeleteConfirmModal({ isOpen, itemName, onClose, onConfirm }: Del
         </div>
 
         {/* Body */}
-        <div className="px-[24px] py-[24px]">
+        <div className="px-[32px] py-[24px]">
           <p
             style={{
               fontFamily: 'var(--font-family)',
@@ -77,13 +87,13 @@ export function DeleteConfirmModal({ isOpen, itemName, onClose, onConfirm }: Del
               color: 'var(--foreground)',
             }}
           >
-            Are you sure you want to delete <strong style={{ fontWeight: 'var(--font-weight-semibold)', color: 'var(--primary)' }}>{itemName}</strong>? This action cannot be undone.
+            Are you sure? This action cannot be undone.
           </p>
         </div>
 
         {/* Footer */}
         <div
-          className="flex items-center justify-end gap-[12px] px-[24px] py-[20px]"
+          className="flex items-center justify-end gap-[12px] px-[32px] py-[28px]"
         >
           <Button variant="secondary" onClick={onClose} type="button">
             Cancel
