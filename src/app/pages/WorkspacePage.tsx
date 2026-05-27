@@ -15,6 +15,7 @@ import { useNavigationContext, BreadcrumbEntry } from '../contexts/NavigationCon
 import { useInfoTray } from '../contexts/InfoTrayContext';
 import { useSharedMembers } from '../contexts/SharedMembersContext';
 import { ShareModal, CurrentMember } from '../components/ShareModal';
+import { MembersModal } from '../components/MembersModal';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -39,6 +40,10 @@ export function WorkspacePage() {
   const { setIsTrayOpen, setTrayContent } = useInfoTray();
   const { addSharedMembers, getExtraCount } = useSharedMembers();
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isProjectShareOpen, setIsProjectShareOpen] = useState(false);
+  const [projectShareRow, setProjectShareRow] = useState<RowData | null>(null);
+  const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
+  const [membersModalRow, setMembersModalRow] = useState<RowData | null>(null);
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   const { ancestors, setAncestors } = useNavigationContext();
@@ -145,6 +150,11 @@ export function WorkspacePage() {
 
   const handleMoreClick = (_row: RowData) => {};
 
+  const getMembersForProject = (row: RowData): CurrentMember[] =>
+    accounts.filter(a => a.projectIds.includes(String(row.id))).map(a => ({ id: a.id, name: a.name, role: a.role }));
+
+  const handleMemberCountClick = (row: RowData) => { setMembersModalRow(row); setIsMembersModalOpen(true); };
+
   return (
     <div className="flex-1 flex flex-col min-h-0 overflow-hidden" style={{ backgroundColor: 'var(--background)' }}>
       {/* Top bar */}
@@ -161,6 +171,7 @@ export function WorkspacePage() {
         onViewModeChange={setViewMode}
         onInfoClick={() => setIsTrayOpen(v => !v)}
         onShareClick={() => setIsShareOpen(true)}
+        shareCount={memberCount}
       />
 
       {/* Workspace header */}
@@ -206,12 +217,14 @@ export function WorkspacePage() {
           onSelectionChange={handleSelectionChange}
           onStarClick={handleStarClick}
           onMoreClick={handleMoreClick}
+          onMemberCountClick={handleMemberCountClick}
           starredItems={favorites}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
         />
       )}
 
+      {/* Workspace-level ShareModal */}
       <ShareModal
         isOpen={isShareOpen}
         onClose={() => setIsShareOpen(false)}
@@ -224,6 +237,24 @@ export function WorkspacePage() {
           addSharedMembers(workspaceId ?? '', ids);
           toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`);
         }}
+      />
+
+      {/* Project-level ShareModal (triggered from MembersModal) */}
+      <ShareModal
+        isOpen={isProjectShareOpen}
+        onClose={() => { setIsProjectShareOpen(false); setProjectShareRow(null); }}
+        entityName={projectShareRow?.name ?? ''}
+        entityId={projectShareRow?.id ?? ''}
+        currentMembers={projectShareRow ? getMembersForProject(projectShareRow) : []}
+        onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
+      />
+
+      <MembersModal
+        isOpen={isMembersModalOpen}
+        onClose={() => { setIsMembersModalOpen(false); setMembersModalRow(null); }}
+        entityName={membersModalRow?.name ?? ''}
+        members={membersModalRow ? getMembersForProject(membersModalRow) : []}
+        onAddMembers={() => { if (membersModalRow) { setProjectShareRow(membersModalRow); setIsProjectShareOpen(true); } }}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Edit3, Share2, Copy, FolderInput, Trash2 } from 'lucide-react';
+import { Edit3, UserRoundPlus, Copy, FolderInput, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export interface MenuItem {
@@ -131,7 +131,7 @@ export const createDefaultMenuItems = (
   {
     id: 'share',
     label: 'Share',
-    icon: <Share2 className="size-4" />,
+    icon: <UserRoundPlus className="size-4" />,
     onClick: onShare,
   },
   {

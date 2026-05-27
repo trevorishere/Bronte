@@ -10,7 +10,7 @@ function ChevronIcon({ isOpen, isActive }: { isOpen: boolean; isActive: boolean 
         fill="none"
         preserveAspectRatio="none"
         viewBox="0 0 14 14"
-        style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+        style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)' }}
       >
         <path
           d="M3 5L7 9L11 5"
@@ -29,17 +29,20 @@ interface FilterDropdownProps {
   options: string[];
   selectedValues: string[];
   onSelectionChange: (values: string[]) => void;
+  isMulti?: boolean;
 }
 
 export function FilterDropdown({
   label,
   options,
   selectedValues,
-  onSelectionChange
+  onSelectionChange,
+  isMulti = false
 }: FilterDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredOption, setHoveredOption] = useState<string | null>(null);
+  const [hoveredOptionX, setHoveredOptionX] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -68,15 +71,26 @@ export function FilterDropdown({
     }
   }, [isOpen]);
 
-  const selectOption = (option: string) => {
-    onSelectionChange([option]);
-    setIsOpen(false);
-    setSearchQuery('');
+  const toggleOption = (option: string) => {
+    const isSelected = selectedValues.includes(option);
+    if (isMulti) {
+      onSelectionChange(
+        isSelected ? selectedValues.filter(v => v !== option) : [...selectedValues, option]
+      );
+    } else {
+      if (isSelected) {
+        onSelectionChange([]);
+      } else {
+        onSelectionChange([option]);
+        setIsOpen(false);
+        setSearchQuery('');
+      }
+    }
   };
 
-  const clearSelection = (e: React.MouseEvent) => {
+  const removeOption = (e: React.MouseEvent, option: string) => {
     e.stopPropagation();
-    onSelectionChange([]);
+    onSelectionChange(selectedValues.filter(v => v !== option));
   };
 
   // Filter options based on search query
@@ -132,7 +146,7 @@ export function FilterDropdown({
                 {selectedValue}
               </span>
               <div
-                onClick={clearSelection}
+                onClick={(e) => removeOption(e, selectedValue!)}
                 className="flex items-center justify-center size-[12px] rounded-full hover:opacity-70 transition-opacity cursor-pointer shrink-0"
               >
                 <X className="size-[10px]" style={{ color: 'var(--foreground)' }} strokeWidth={2.5} />
@@ -225,8 +239,8 @@ export function FilterDropdown({
             </div>
 
             {/* Options List */}
-            <div 
-              className="mt-[8px]"
+            <div
+              className="mt-[8px] flex flex-col gap-[1px]"
               style={{
                 maxHeight: '240px',
                 overflowY: 'auto'
@@ -234,20 +248,21 @@ export function FilterDropdown({
             >
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((option) => {
-                  const isSelected = selectedValue === option;
+                  const isSelected = selectedValues.includes(option);
+                  const isHovering = hoveredOption === option;
                   return (
                     <button
                       key={option}
-                      onClick={() => selectOption(option)}
+                      onClick={() => toggleOption(option)}
                       onMouseEnter={() => setHoveredOption(option)}
                       onMouseLeave={() => setHoveredOption(null)}
-                      className="w-full flex items-center justify-between px-[12px] py-[10px] transition-colors rounded-xl"
+                      className="group w-full flex items-center justify-between px-[12px] py-[8px] transition-colors rounded-xl"
                       style={{
-                        backgroundColor: hoveredOption === option ? 'var(--muted)' : 'transparent'
+                        backgroundColor: isSelected ? 'var(--accent)' : isHovering ? 'var(--muted)' : 'transparent'
                       }}
                     >
                       <span
-                        className={`${hoveredOption === option ? 'text-primary' : 'text-foreground'} truncate`}
+                        className={`${isHovering ? 'text-primary' : 'text-foreground'} truncate`}
                         style={{
                           fontFamily: 'var(--font-family)',
                           fontWeight: 'var(--font-weight-regular)',
@@ -259,7 +274,23 @@ export function FilterDropdown({
                         {option}
                       </span>
                       {isSelected && (
-                        <Check className="size-[16px] shrink-0 ml-[8px]" style={{ color: 'var(--primary)' }} strokeWidth={2} />
+                        <div className="relative size-[20px] ml-[8px] shrink-0">
+                          {/* Check: visible by default, hidden on desktop hover */}
+                          <div className="absolute inset-0 flex items-center justify-center transition-opacity pointer-events-none md:group-hover:opacity-0">
+                            <Check className="size-[14px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
+                          </div>
+                          {/* X: hidden on mobile + desktop default, visible on desktop hover */}
+                          <div
+                            role="button"
+                            onClick={(e) => removeOption(e, option)}
+                            onMouseEnter={() => setHoveredOptionX(option)}
+                            onMouseLeave={() => setHoveredOptionX(null)}
+                            className="absolute inset-0 flex items-center justify-center rounded-full cursor-pointer transition-opacity opacity-0 pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto"
+                            style={{ backgroundColor: 'var(--bg-icon-hover)' }}
+                          >
+                            <X className="size-[11px]" style={{ color: hoveredOptionX === option ? 'var(--primary)' : 'var(--foreground)' }} strokeWidth={2} />
+                          </div>
+                        </div>
                       )}
                     </button>
                   );

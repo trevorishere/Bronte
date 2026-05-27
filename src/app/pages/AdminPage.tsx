@@ -14,7 +14,9 @@ import { accounts } from '../data/accounts';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useNavigationContext } from '../contexts/NavigationContext';
 import { useInfoTray } from '../contexts/InfoTrayContext';
-import { ShareModal } from '../components/ShareModal';
+import { ShareModal, CurrentMember } from '../components/ShareModal';
+import { MembersModal } from '../components/MembersModal';
+import { useSharedMembers } from '../contexts/SharedMembersContext';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -65,6 +67,10 @@ export function AdminPage() {
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const { setIsTrayOpen, setTrayContent } = useInfoTray();
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [shareRow, setShareRow] = useState<RowData | null>(null);
+  const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
+  const [membersModalRow, setMembersModalRow] = useState<RowData | null>(null);
+  const { getExtraCount } = useSharedMembers();
   const { favorites, addFavorite, removeFavorite } = useFavorites();
   const navigate = useNavigate();
   const { resetToRoot, setAncestors } = useNavigationContext();
@@ -122,8 +128,8 @@ export function AdminPage() {
             id: team.id,
             name: team.name,
             owner: team.owner,
-            membersCount: team.membersCount,
-            members: team.membersCount,
+            membersCount: accounts.filter(a => a.teamIds.includes(team.id)).length,
+            members: accounts.filter(a => a.teamIds.includes(team.id)).length,
             teamProjectCount: projects.filter(p => accounts.filter(a => a.teamIds.includes(team.id)).some(a => a.projectIds.includes(p.id))).length,
             created: team.created,
             lastModified: team.created,
@@ -249,6 +255,24 @@ export function AdminPage() {
 
   const handleMoreClick = (_row: RowData) => {};
 
+  const handleShareRow = (row: RowData) => {
+    setShareRow(row);
+    setIsShareOpen(true);
+  };
+
+  const getMembersForRow = (row: RowData): CurrentMember[] => {
+    const id = String(row.id);
+    if (row.iconType === 'project') return accounts.filter(a => a.projectIds.includes(id)).map(a => ({ id: a.id, name: a.name, role: a.role }));
+    if (row.iconType === 'team') return accounts.filter(a => a.teamIds.includes(id)).map(a => ({ id: a.id, name: a.name, role: a.role }));
+    if (row.iconType === 'folder' || row.iconType === 'workspace') return accounts.filter(a => a.workspaceIds.includes(id)).map(a => ({ id: a.id, name: a.name, role: a.role }));
+    return [];
+  };
+
+  const handleMemberCountClick = (row: RowData) => {
+    setMembersModalRow(row);
+    setIsMembersModalOpen(true);
+  };
+
   // Reset filters when tab changes (tray content stays sticky)
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
@@ -266,7 +290,7 @@ export function AdminPage() {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         onInfoClick={() => setIsTrayOpen(v => !v)}
-        onShareClick={() => setIsShareOpen(true)}
+        hideShare
       />
       <TabNav
         tabs={tabs}
@@ -303,6 +327,8 @@ export function AdminPage() {
           onSelectionChange={handleSelectionChange}
           onStarClick={handleStarClick}
           onMoreClick={handleMoreClick}
+          onShare={handleShareRow}
+          onMemberCountClick={handleMemberCountClick}
           starredItems={favorites}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
@@ -311,10 +337,19 @@ export function AdminPage() {
 
       <ShareModal
         isOpen={isShareOpen}
-        onClose={() => setIsShareOpen(false)}
-        entityName={tabs.find(t => t.id === activeTab)?.label ?? 'Admin'}
-        entityId={activeTab}
+        onClose={() => { setIsShareOpen(false); setShareRow(null); }}
+        entityName={shareRow?.name ?? tabs.find(t => t.id === activeTab)?.label ?? 'Admin'}
+        entityId={shareRow?.id ?? activeTab}
+        currentMembers={shareRow ? getMembersForRow(shareRow) : []}
         onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
+      />
+
+      <MembersModal
+        isOpen={isMembersModalOpen}
+        onClose={() => { setIsMembersModalOpen(false); setMembersModalRow(null); }}
+        entityName={membersModalRow?.name ?? ''}
+        members={membersModalRow ? getMembersForRow(membersModalRow) : []}
+        onAddMembers={() => { if (membersModalRow) handleShareRow(membersModalRow); }}
       />
     </div>
   );

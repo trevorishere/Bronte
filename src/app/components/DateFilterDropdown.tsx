@@ -9,7 +9,7 @@ function ChevronIcon({ isOpen, isActive }: { isOpen: boolean; isActive: boolean 
         fill="none"
         preserveAspectRatio="none"
         viewBox="0 0 14 14"
-        style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+        style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)' }}
       >
         <path
           d="M3 5L7 9L11 5"

@@ -1,11 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Search, ChevronDown, Check } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from './ui/dialog';
+import { X, Search, Check, CircleCheck } from 'lucide-react';
+import { Button } from './Button';
 import { accounts } from '../data/accounts';
 import { roleColors } from './Avatar';
 import type { Role } from './Avatar';
@@ -37,14 +32,22 @@ interface SelectedAccount {
 
 // ─── Mini avatar ──────────────────────────────────────────────────────────────
 
-function MiniAvatar({ name, role, size = 22 }: { name: string; role: Role; size?: number }) {
+type MiniAvatarSize = 'small' | 'medium' | 'large';
+const miniAvatarSizes: Record<MiniAvatarSize, { px: number; fontSize: string }> = {
+  small:  { px: 16, fontSize: '7px' },
+  medium: { px: 20, fontSize: '12px' },
+  large:  { px: 24, fontSize: '10px' },
+};
+
+function MiniAvatar({ name, role, size = 'medium' }: { name: string; role: Role; size?: MiniAvatarSize }) {
+  const { px, fontSize } = miniAvatarSizes[size];
   const initials = name.trim().split(' ').filter(Boolean)
     .map(p => p[0]).slice(0, 2).join('').toUpperCase();
   const bg = roleColors[role]?.bg ?? '#665e56';
   return (
     <div
       className="shrink-0 flex items-center justify-center rounded-full"
-      style={{ width: size, height: size, backgroundColor: bg, fontSize: size * 0.45, fontWeight: 600, color: '#fff', letterSpacing: '0.3px' }}
+      style={{ width: px, height: px, backgroundColor: bg, fontSize, lineHeight: fontSize, fontWeight: 600, color: '#fff' }}
     >
       {initials}
     </div>
@@ -56,34 +59,31 @@ function MiniAvatar({ name, role, size = 22 }: { name: string; role: Role; size?
 function Chip({ account, onRemove }: { account: SelectedAccount; onRemove: () => void }) {
   return (
     <div
-      className="flex items-center gap-[6px] pl-[4px] pr-[6px] shrink-0"
+      className="flex items-center gap-[8px] pl-[6px] pr-[8px] shrink-0"
       style={{
         backgroundColor: 'var(--muted)',
         border: '1px solid var(--border-interactive)',
         borderRadius: '8px',
         height: '28px',
+        maxWidth: '220px',
       }}
     >
-      <MiniAvatar name={account.name} role={account.role} />
-      <span style={{
+      <MiniAvatar name={account.name} role={account.role} size="small" />
+      <span className="truncate" style={{
         fontFamily: 'var(--font-family)',
         fontWeight: 'var(--font-weight-medium)',
-        fontSize: '13px',
+        fontSize: 'var(--font-size-15)',
         color: 'var(--foreground)',
         whiteSpace: 'nowrap',
-        maxWidth: '120px',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
       }}>
         {account.name}
       </span>
-      <button
+      <div
         onClick={onRemove}
-        className="shrink-0 flex items-center justify-center size-[14px] rounded-full transition-opacity hover:opacity-70"
-        style={{ backgroundColor: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}
+        className="shrink-0 flex items-center justify-center size-[12px] rounded-full transition-opacity hover:opacity-70 cursor-pointer"
       >
-        <X className="size-[10px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2.5} />
-      </button>
+        <X className="size-[10px]" style={{ color: 'var(--foreground)' }} strokeWidth={2.5} />
+      </div>
     </div>
   );
 }
@@ -91,7 +91,7 @@ function Chip({ account, onRemove }: { account: SelectedAccount; onRemove: () =>
 // ─── Account row in the list ──────────────────────────────────────────────────
 
 function AccountListRow({
-  name, email, role, isMember, isSelected, onSelect,
+  name, email, role, isMember, isSelected, onSelect, onDeselect,
 }: {
   name: string;
   email: string;
@@ -99,29 +99,34 @@ function AccountListRow({
   isMember: boolean;
   isSelected: boolean;
   onSelect: () => void;
+  onDeselect: () => void;
 }) {
   const [hovered, setHovered] = useState(false);
-  const disabled = isMember || isSelected;
+  const [hoveredX, setHoveredX] = useState(false);
+  const disabled = isMember;
+
+  const handleClick = disabled ? undefined : isSelected ? onDeselect : onSelect;
 
   return (
     <button
-      onClick={disabled ? undefined : onSelect}
+      onClick={handleClick}
       onMouseEnter={() => !disabled && setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="w-full flex items-center gap-[12px] px-[12px] py-[8px] rounded-xl transition-colors text-left"
+      className="group w-full flex items-center gap-[12px] px-[12px] h-[48px] rounded-xl transition-colors text-left"
       style={{
-        backgroundColor: hovered ? 'var(--muted)' : 'transparent',
+        backgroundColor: isSelected ? 'var(--accent)' : hovered ? 'var(--muted)' : 'transparent',
         border: 'none',
         cursor: disabled ? 'default' : 'pointer',
         opacity: isMember ? 0.45 : 1,
       }}
     >
-      <MiniAvatar name={name} role={role} />
-      <div className="flex-1 min-w-0">
+      <MiniAvatar name={name} role={role} size="large" />
+      <div className="flex flex-col gap-[2px] flex-1 min-w-0">
         <p style={{
           fontFamily: 'var(--font-family)',
           fontWeight: 'var(--font-weight-medium)',
-          fontSize: '14px',
+          fontSize: 'var(--font-size-15)',
+          lineHeight: '16px',
           color: hovered ? 'var(--primary)' : 'var(--foreground)',
           letterSpacing: '0.3px',
           whiteSpace: 'nowrap',
@@ -134,6 +139,7 @@ function AccountListRow({
           fontFamily: 'var(--font-family)',
           fontWeight: 'var(--font-weight-regular)',
           fontSize: '12px',
+          lineHeight: '12px',
           color: 'var(--muted-foreground)',
           letterSpacing: '0.3px',
           whiteSpace: 'nowrap',
@@ -145,12 +151,88 @@ function AccountListRow({
       </div>
       {/* Right indicator */}
       {isMember && (
-        <Check className="size-[14px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2.5} />
+        <CircleCheck className="size-[14px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2.5} />
       )}
       {isSelected && !isMember && (
-        <Check className="size-[14px] shrink-0" style={{ color: 'var(--foreground)' }} strokeWidth={2.5} />
+        <div className="relative size-[22px] shrink-0">
+          {/* Check: visible by default, hidden on desktop hover */}
+          <div className="absolute inset-0 flex items-center justify-center transition-opacity pointer-events-none md:group-hover:opacity-0">
+            <Check className="size-[14px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2.5} />
+          </div>
+          {/* X: hidden on mobile + desktop default, visible on desktop hover */}
+          <div
+            role="button"
+            onClick={(e) => { e.stopPropagation(); onDeselect(); }}
+            onMouseEnter={() => setHoveredX(true)}
+            onMouseLeave={() => setHoveredX(false)}
+            className="absolute inset-0 flex items-center justify-center size-[22px] rounded-full cursor-pointer transition-opacity opacity-0 pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto"
+            style={{ backgroundColor: 'var(--bg-icon-hover)' }}
+          >
+            <X className="size-[10px]" style={{ color: hoveredX ? 'var(--primary)' : 'var(--foreground)' }} strokeWidth={2.5} />
+          </div>
+        </div>
       )}
     </button>
+  );
+}
+
+// ─── Access row (accounts with access list) ───────────────────────────────────
+
+function AccessRow({ member, onRemove, isPending = false }: { member: CurrentMember; onRemove: () => void; isPending?: boolean }) {
+  const [hovered, setHovered] = useState(false);
+  const [hoveredX, setHoveredX] = useState(false);
+  return (
+    <div
+      className="group w-full flex items-center gap-[12px] px-[12px] h-[40px] rounded-xl transition-colors cursor-pointer"
+      style={{ backgroundColor: hovered ? 'var(--muted)' : 'transparent' }}
+      onClick={onRemove}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <MiniAvatar name={member.name} role={member.role} size="large" />
+      <span className="flex-1 truncate" style={{
+        fontFamily: 'var(--font-family)',
+        fontWeight: 'var(--font-weight-regular)',
+        fontSize: 'var(--font-size-15)',
+        lineHeight: 'var(--line-height-20)',
+        color: hovered ? 'var(--primary)' : 'var(--foreground)',
+        letterSpacing: '0.3px',
+        fontStyle: isPending ? 'italic' : 'normal',
+      }}>
+        {member.name}
+      </span>
+      {isPending ? (
+        <button
+          onClick={onRemove}
+          className="shrink-0 transition-colors"
+          style={{
+            fontFamily: 'var(--font-family)',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: '12px',
+            letterSpacing: '0.3px',
+            color: hovered ? 'var(--primary)' : 'var(--muted-foreground)',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          Revoke Invitation
+        </button>
+      ) : (
+        <div
+          role="button"
+          onClick={onRemove}
+          onMouseEnter={() => setHoveredX(true)}
+          onMouseLeave={() => setHoveredX(false)}
+          className="flex items-center justify-center size-[20px] rounded-full cursor-pointer shrink-0 transition-opacity md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto"
+          style={{ backgroundColor: 'var(--bg-icon-hover)' }}
+        >
+          <X className="size-[11px]" style={{ color: hoveredX ? 'var(--primary)' : 'var(--foreground)' }} strokeWidth={2} />
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -165,7 +247,7 @@ function SectionLabel({ text }: { text: string }) {
       textTransform: 'uppercase' as const,
       letterSpacing: '0.8px',
       color: 'var(--muted-foreground)',
-      padding: '4px 12px 6px',
+      padding: '4px 12px 16px',
     }}>
       {text}
     </p>
@@ -177,26 +259,16 @@ function SectionLabel({ text }: { text: string }) {
 export function ShareModal({
   isOpen, onClose, entityName, entityId, onShare, currentMembers = [],
 }: ShareModalProps) {
-  const { sharedWith } = useSharedMembers();
+  const { pendingInvitations, revokeInvitation } = useSharedMembers();
 
-  // All accounts that already have access: original members + previously shared
-  const previouslySharedIds = new Set(sharedWith[entityId] ?? []);
   const currentMemberIds = new Set(currentMembers.map(m => m.id));
-  const allExistingIds = new Set([...currentMemberIds, ...previouslySharedIds]);
-
-  // Build combined current member list (original + previously shared via modal)
-  const previouslySharedAccounts = [...previouslySharedIds]
-    .map(id => accounts.find(a => a.id === id))
-    .filter((a): a is NonNullable<typeof a> => a != null && !currentMemberIds.has(a.id));
-  const allCurrentMembers: CurrentMember[] = [
-    ...currentMembers,
-    ...previouslySharedAccounts.map(a => ({ id: a.id, name: a.name, role: a.role })),
-  ];
-  const totalCurrentCount = allCurrentMembers.length;
+  const pendingIds = new Set(pendingInvitations[entityId] ?? []);
+  // Exclude confirmed members and pending invitations from the all-accounts list
+  const allExistingIds = new Set([...currentMemberIds, ...pendingIds]);
 
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<SelectedAccount[]>([]);
-  const [membersExpanded, setMembersExpanded] = useState(false);
+  const [removedMemberIds, setRemovedMemberIds] = useState<Set<string>>(new Set());
   const [inputFocused, setInputFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -205,22 +277,40 @@ export function ShareModal({
     if (!isOpen) {
       setQuery('');
       setSelected([]);
-      setMembersExpanded(false);
+      setRemovedMemberIds(new Set());
     } else {
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [isOpen]);
 
+  // Escape to close
+  useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [isOpen, onClose]);
+
   const selectedIds = new Set(selected.map(a => a.id));
 
-  // Full alphabetized list, filtered live by query
+  // Full alphabetized list — existing members excluded, current session selections stay
   const filteredList = accounts
+    .filter(a => !allExistingIds.has(a.id))
     .filter(a => {
       if (!query) return true;
       const q = query.toLowerCase();
       return a.name.toLowerCase().includes(q) || a.email.toLowerCase().includes(q);
     })
     .sort((a, b) => a.name.localeCompare(b.name));
+
+  // Confirmed members minus any removed this session
+  const accessList = currentMembers.filter(m => !removedMemberIds.has(m.id));
+
+  // Pending invitations: accounts shared in a previous session awaiting acceptance
+  const pendingList: CurrentMember[] = [...pendingIds]
+    .map(id => accounts.find(a => a.id === id))
+    .filter((a): a is NonNullable<typeof a> => a != null)
+    .map(a => ({ id: a.id, name: a.name, role: a.role }));
 
   const selectAccount = (acc: typeof accounts[0]) => {
     if (allExistingIds.has(acc.id) || selectedIds.has(acc.id)) return;
@@ -230,42 +320,58 @@ export function ShareModal({
 
   const removeChip = (id: string) => setSelected(prev => prev.filter(a => a.id !== id));
 
+  const removeAccess = (id: string) => setRemovedMemberIds(prev => new Set([...prev, id]));
+
   const handleShare = () => {
     onShare(selected.map(a => a.id));
     onClose();
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={open => { if (!open) onClose(); }}>
-      <DialogContent
-        className="p-0 flex flex-col overflow-hidden"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div
+        className="relative flex flex-col rounded-2xl shadow-lg overflow-hidden"
         style={{
-          backgroundColor: 'var(--background)',
-          border: '1px solid var(--border-interactive)',
-          borderRadius: '16px',
           width: '480px',
-          maxWidth: '480px',
           maxHeight: '80vh',
-          boxShadow: '0 24px 48px rgba(0,0,0,0.4)',
+          backgroundColor: 'var(--background)',
+          border: '1px solid var(--border)',
         }}
       >
         {/* ── Header ──────────────────────────────────────────────────── */}
-        <DialogHeader className="shrink-0 px-[24px] pt-[20px] pb-[4px]">
-          <DialogTitle style={{
+        <div
+          className="shrink-0 flex items-center justify-between px-[24px] py-[20px]"
+        >
+          <h2 style={{
             fontFamily: 'var(--font-family)',
             fontWeight: 'var(--font-weight-semibold)',
-            fontSize: '18px',
-            color: 'var(--foreground)',
-            letterSpacing: '0.3px',
+            fontSize: 'var(--font-size-18)',
+            lineHeight: 'var(--line-height-normal)',
+            color: 'var(--primary)',
           }}>
             Share "{entityName}"
-          </DialogTitle>
-        </DialogHeader>
+          </h2>
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center size-[32px] rounded-full transition-colors shrink-0"
+            style={{ backgroundColor: 'transparent' }}
+            onMouseOver={e => (e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)')}
+            onMouseOut={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+          >
+            <X className="size-[20px]" style={{ color: 'var(--icon)' }} />
+          </button>
+        </div>
 
         {/* ── Search input + chips ─────────────────────────────────────── */}
-        <div className="shrink-0 px-[24px] pt-[12px] pb-[8px]">
+        <div className="shrink-0 px-[24px] pt-[0px] pb-[8px]">
           <div
-            className="flex flex-wrap items-center gap-[6px] min-h-[44px] px-[10px] py-[8px] rounded-[12px] cursor-text"
+            className={`flex gap-[8px] min-h-[40px] px-[10px] py-[6px] rounded-[12px] cursor-text ${selected.length > 0 ? 'items-start' : 'items-center'}`}
             style={{
               border: `1px solid ${inputFocused ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}`,
               backgroundColor: 'var(--background)',
@@ -273,164 +379,128 @@ export function ShareModal({
             }}
             onClick={() => inputRef.current?.focus()}
           >
-            {selected.map(acc => (
-              <Chip key={acc.id} account={acc} onRemove={() => removeChip(acc.id)} />
-            ))}
-            <div className="flex items-center gap-[8px] flex-1 min-w-[120px]">
-              <Search className="size-[15px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
-              <input
-                ref={inputRef}
-                type="text"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                onFocus={() => setInputFocused(true)}
-                onBlur={() => setInputFocused(false)}
-                placeholder={selected.length === 0 ? 'Search by name or email…' : ''}
-                className="flex-1 outline-none bg-transparent"
-                style={{
-                  fontFamily: 'var(--font-family)',
-                  fontWeight: 'var(--font-weight-regular)',
-                  fontSize: '14px',
-                  color: 'var(--foreground)',
-                  letterSpacing: '0.3px',
-                  minWidth: 0,
-                }}
-              />
+            <Search className={`size-[16px] shrink-0 pointer-events-none ${selected.length > 0 ? 'mt-[6px]' : ''}`} style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
+            <div className="flex flex-wrap items-center gap-[6px] flex-1 min-w-0">
+              {selected.map(acc => (
+                <Chip key={acc.id} account={acc} onRemove={() => removeChip(acc.id)} />
+              ))}
+              <div className={selected.length > 0 ? 'basis-full min-w-0' : 'flex-1 min-w-0'}>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setInputFocused(false)}
+                  placeholder={selected.length === 0 ? 'Search by name or email…' : ''}
+                  className="w-full outline-none bg-transparent"
+                  style={{
+                    fontFamily: 'var(--font-family)',
+                    fontWeight: 'var(--font-weight-regular)',
+                    fontSize: 'var(--font-size-15)',
+                    lineHeight: 'var(--line-height-20)',
+                    color: 'var(--foreground)',
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {/* ── Scrollable body ───────────────────────────────────────────── */}
-        <div className="flex-1 overflow-y-auto px-[12px]">
+        <div className="flex flex-col px-[12px] pb-[8px]" style={{ minHeight: 0, overflowY: 'auto' }}>
 
-          {/* ── Current members row ──────────────────────────────────────── */}
-          {totalCurrentCount > 0 && (
-            <div className="mb-[4px]">
-              <button
-                onClick={() => setMembersExpanded(v => !v)}
-                className="w-full flex items-center justify-between px-[12px] py-[10px] rounded-xl transition-colors"
-                style={{ backgroundColor: 'transparent', border: 'none', cursor: 'pointer' }}
-                onMouseOver={e => (e.currentTarget.style.backgroundColor = 'var(--muted)')}
-                onMouseOut={e  => (e.currentTarget.style.backgroundColor = 'transparent')}
-              >
-                <span style={{
+          {/* ── All accounts ─────────────────────────────────────────────── */}
+          <SectionLabel text={`All Accounts (${filteredList.length})`} />
+
+          <div style={{ maxHeight: '302px', overflowY: 'auto' }}>
+            {filteredList.length > 0 ? (
+              <div className="flex flex-col gap-[1px]">
+                {filteredList.map(acc => (
+                  <AccountListRow
+                    key={acc.id}
+                    name={acc.name}
+                    email={acc.email}
+                    role={acc.role}
+                    isMember={false}
+                    isSelected={selectedIds.has(acc.id)}
+                    onSelect={() => selectAccount(acc)}
+                    onDeselect={() => removeChip(acc.id)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center py-[24px]">
+                <p style={{
                   fontFamily: 'var(--font-family)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  fontSize: '14px',
-                  color: 'var(--foreground)',
+                  fontSize: 'var(--font-size-14)',
+                  color: 'var(--muted-foreground)',
                   letterSpacing: '0.3px',
                 }}>
-                  {totalCurrentCount} {totalCurrentCount === 1 ? 'person has' : 'people have'} access
-                </span>
-                <ChevronDown
-                  className="size-[16px] shrink-0 transition-transform"
-                  style={{ color: 'var(--muted-foreground)', transform: membersExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
-                  strokeWidth={2}
-                />
-              </button>
+                  No accounts match "{query}"
+                </p>
+              </div>
+            )}
+          </div>
 
-              {membersExpanded && (
-                <div className="pb-[4px]">
-                  {allCurrentMembers.map(m => (
-                    <div key={m.id} className="flex items-center gap-[12px] px-[12px] py-[6px]">
-                      <MiniAvatar name={m.name} role={m.role} size={20} />
-                      <span style={{
-                        fontFamily: 'var(--font-family)',
-                        fontWeight: 'var(--font-weight-regular)',
-                        fontSize: '13px',
-                        color: 'var(--foreground)',
-                        letterSpacing: '0.3px',
-                      }}>
-                        {m.name}
-                      </span>
-                    </div>
+          {/* ── Accounts with access ─────────────────────────────────────── */}
+          {(accessList.length > 0 || pendingList.length > 0) && (
+            <>
+              <div style={{ height: 32 }} />
+              {(() => {
+                const total = accessList.length + pendingList.length;
+                return <SectionLabel text={`Accounts with Access (${total})`} />;
+              })()}
+              <div style={{ maxHeight: '198px', overflowY: 'auto' }}>
+                <div className="flex flex-col gap-[1px]">
+                  {accessList.map(m => (
+                    <AccessRow key={m.id} member={m} onRemove={() => removeAccess(m.id)} />
+                  ))}
+                  {pendingList.map(m => (
+                    <AccessRow key={m.id} member={m} onRemove={() => revokeInvitation(entityId, m.id)} isPending />
                   ))}
                 </div>
-              )}
-
-              {/* Divider */}
-              <div style={{ height: 1, backgroundColor: 'var(--border)', margin: '4px 12px 8px' }} />
-            </div>
+              </div>
+            </>
           )}
 
-          {/* ── Alphabetized account list ─────────────────────────────────── */}
-          <SectionLabel text={query ? `${filteredList.length} result${filteredList.length !== 1 ? 's' : ''}` : 'All accounts'} />
-
-          {filteredList.length > 0 ? (
-            filteredList.map(acc => (
-              <AccountListRow
-                key={acc.id}
-                name={acc.name}
-                email={acc.email}
-                role={acc.role}
-                isMember={allExistingIds.has(acc.id)}
-                isSelected={selectedIds.has(acc.id)}
-                onSelect={() => selectAccount(acc)}
-              />
-            ))
-          ) : (
-            <div className="flex items-center justify-center py-[24px]">
-              <p style={{
-                fontFamily: 'var(--font-family)',
-                fontSize: '14px',
-                color: 'var(--muted-foreground)',
-                letterSpacing: '0.3px',
-              }}>
-                No accounts match "{query}"
-              </p>
-            </div>
-          )}
-
-          {/* Bottom breathing room */}
-          <div style={{ height: 8 }} />
         </div>
 
         {/* ── Footer ───────────────────────────────────────────────────── */}
         <div
-          className="shrink-0 flex items-center justify-end gap-[8px] px-[24px] py-[16px]"
-          style={{ borderTop: '1px solid var(--border-interactive)' }}
+          className="shrink-0 flex items-center justify-end gap-[12px] px-[24px] py-[20px]"
         >
-          <button
-            onClick={onClose}
-            className="flex items-center justify-center h-[40px] px-[16px] rounded-[10px] transition-colors"
-            style={{
-              fontFamily: 'var(--font-family)',
-              fontWeight: 'var(--font-weight-medium)',
-              fontSize: '14px',
-              color: 'var(--foreground)',
-              letterSpacing: '0.3px',
-              border: '1px solid var(--border-interactive)',
-              backgroundColor: 'transparent',
-              cursor: 'pointer',
-            }}
-            onMouseOver={e => (e.currentTarget.style.backgroundColor = 'var(--muted)')}
-            onMouseOut={e  => (e.currentTarget.style.backgroundColor = 'transparent')}
-          >
+          <Button variant="secondary" onClick={onClose} type="button">
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="primary"
             onClick={handleShare}
             disabled={selected.length === 0}
-            className="flex items-center justify-center h-[40px] px-[16px] rounded-[10px]"
-            style={{
-              fontFamily: 'var(--font-family)',
-              fontWeight: 'var(--font-weight-semibold)',
-              fontSize: '14px',
-              letterSpacing: '0.3px',
-              border: 'none',
-              cursor: selected.length === 0 ? 'not-allowed' : 'pointer',
-              backgroundColor: selected.length === 0 ? 'var(--muted)' : 'var(--foreground)',
-              color: selected.length === 0 ? 'var(--muted-foreground)' : 'var(--background)',
-              opacity: selected.length === 0 ? 0.5 : 1,
-              transition: 'background-color 150ms ease, opacity 150ms ease',
-            }}
-            onMouseOver={e => { if (selected.length > 0) e.currentTarget.style.backgroundColor = 'var(--primary)'; }}
-            onMouseOut={e  => { if (selected.length > 0) e.currentTarget.style.backgroundColor = 'var(--foreground)'; }}
+            type="button"
           >
-            {selected.length > 0 ? `Share (${selected.length})` : 'Share'}
-          </button>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              Share
+              {selected.length > 0 && (
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 22,
+                  height: 22,
+                  borderRadius: 6,
+                  backgroundColor: 'rgba(0,0,0,0.12)',
+                  fontFamily: 'var(--font-family)',
+                  fontWeight: 'var(--font-weight-semibold)',
+                  fontSize: 'var(--font-size-13)',
+                }}>
+                  {selected.length}
+                </span>
+              )}
+            </span>
+          </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }
