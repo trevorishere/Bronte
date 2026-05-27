@@ -82,12 +82,10 @@ function TreeNodeRow({ node, depth, isExpanded, isSelected, isCurrentLocation, o
     <div
       className="flex items-center gap-[8px] cursor-pointer rounded-[8px] transition-colors"
       style={{
+        height: '40px',
         paddingLeft: `${16 + depth * 20}px`,
         paddingRight: '12px',
-        paddingTop: '7px',
-        paddingBottom: '7px',
-        backgroundColor: isSelected ? 'var(--muted)' : 'transparent',
-        border: isSelected ? '1px solid var(--border-interactive)' : '1px solid transparent',
+        backgroundColor: isSelected ? 'var(--accent)' : 'transparent',
       }}
       onClick={() => onSelect(node.id)}
       onMouseOver={e => { if (!isSelected) e.currentTarget.style.backgroundColor = 'var(--muted)'; }}
@@ -251,7 +249,7 @@ export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
       <div
         className="relative flex flex-col rounded-2xl shadow-lg"
         style={{
-          width: '480px',
+          width: '560px',
           maxHeight: '80vh',
           backgroundColor: 'var(--background)',
           border: '1px solid var(--border)',
@@ -259,25 +257,25 @@ export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
       >
         {/* Header */}
         <div
-          className="flex items-center justify-between px-[24px] py-[20px] shrink-0"
+          className="flex items-center justify-between px-[32px] py-[28px] shrink-0"
         >
-          <div className="flex flex-col gap-[2px] min-w-0 pr-[8px]">
+          <div className="flex flex-col gap-[4px] min-w-0 pr-[8px]">
             <h2
               style={{
                 fontFamily: 'var(--font-family)',
                 fontWeight: 'var(--font-weight-semibold)',
-                fontSize: 'var(--font-size-18)',
+                fontSize: 'var(--font-size-24)',
                 lineHeight: 'var(--line-height-normal)',
                 color: 'var(--primary)',
               }}
             >
-              Move item
+              Move
             </h2>
             <p
               className="truncate"
               style={{
                 fontFamily: 'var(--font-family)',
-                fontSize: 'var(--font-size-13)',
+                fontSize: 'var(--font-size-15)',
                 color: 'var(--muted-foreground)',
                 lineHeight: '1.3',
               }}
@@ -287,7 +285,7 @@ export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
           </div>
           <button
             onClick={onClose}
-            className="flex items-center justify-center size-[32px] rounded-full transition-colors shrink-0"
+            className="flex items-center justify-center size-[32px] rounded-full transition-colors ml-[16px] shrink-0"
             style={{ backgroundColor: 'transparent' }}
             onMouseOver={e => (e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)')}
             onMouseOut={e => (e.currentTarget.style.backgroundColor = 'transparent')}
@@ -297,7 +295,7 @@ export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
         </div>
 
         {/* Search */}
-        <div className="px-[24px] pt-[16px] pb-[8px] shrink-0">
+        <div className="px-[32px] pt-[16px] pb-[24px] shrink-0">
           <div
             className="flex items-center gap-[8px] rounded-[10px] px-[10px]"
             style={{
@@ -334,7 +332,7 @@ export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
         </div>
 
         {/* Tree */}
-        <div className="flex-1 overflow-y-auto px-[12px] pb-[8px] min-h-0">
+        <div className="flex-1 overflow-y-auto px-[24px] pb-[24px] min-h-0" style={{ maxHeight: '280px' }}>
           {visibleTree.length === 0 ? (
             <div
               className="flex items-center justify-center py-[32px]"
@@ -347,13 +345,15 @@ export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
               No locations match "{searchQuery}"
             </div>
           ) : (
-            renderNodes(visibleTree)
+            <div className="flex flex-col gap-[1px]">
+              {renderNodes(visibleTree)}
+            </div>
           )}
         </div>
 
         {/* Footer */}
         <div
-          className="flex items-center justify-between px-[24px] py-[20px] shrink-0"
+          className="flex items-center justify-between px-[32px] py-[28px] shrink-0"
         >
           <span
             style={{

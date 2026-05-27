@@ -36,19 +36,19 @@ export function MembersModal({ isOpen, onClose, entityName, members, onAddMember
       <div
         className="relative flex flex-col rounded-2xl shadow-lg overflow-hidden"
         style={{
-          width: '480px',
+          width: '560px',
           maxHeight: '80vh',
           backgroundColor: 'var(--background)',
           border: '1px solid var(--border)',
         }}
       >
         {/* Header */}
-        <div className="shrink-0 flex items-center justify-between px-[24px] py-[20px]">
-          <div className="flex flex-col gap-[2px] min-w-0 pr-[8px]">
+        <div className="shrink-0 flex items-center justify-between px-[32px] py-[28px]">
+          <div className="flex flex-col gap-[4px] min-w-0 pr-[8px]">
             <h2 style={{
               fontFamily: 'var(--font-family)',
               fontWeight: 'var(--font-weight-semibold)',
-              fontSize: 'var(--font-size-18)',
+              fontSize: 'var(--font-size-24)',
               lineHeight: 'var(--line-height-normal)',
               color: 'var(--primary)',
             }}>
@@ -56,7 +56,7 @@ export function MembersModal({ isOpen, onClose, entityName, members, onAddMember
             </h2>
             <p className="truncate" style={{
               fontFamily: 'var(--font-family)',
-              fontSize: 'var(--font-size-13)',
+              fontSize: 'var(--font-size-15)',
               color: 'var(--muted-foreground)',
               lineHeight: '1.3',
             }}>
@@ -65,7 +65,7 @@ export function MembersModal({ isOpen, onClose, entityName, members, onAddMember
           </div>
           <button
             onClick={onClose}
-            className="flex items-center justify-center size-[32px] rounded-full transition-colors shrink-0"
+            className="flex items-center justify-center size-[32px] rounded-full transition-colors ml-[16px] shrink-0"
             style={{ backgroundColor: 'transparent' }}
             onMouseOver={e => (e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)')}
             onMouseOut={e => (e.currentTarget.style.backgroundColor = 'transparent')}
@@ -75,7 +75,7 @@ export function MembersModal({ isOpen, onClose, entityName, members, onAddMember
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-[12px] pb-[8px] min-h-0">
+        <div className="flex-1 overflow-y-auto px-[24px] pb-[24px] min-h-0">
           {members.length === 0 ? (
             <div
               className="flex items-center justify-center py-[32px]"
@@ -115,7 +115,7 @@ export function MembersModal({ isOpen, onClose, entityName, members, onAddMember
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 flex items-center justify-end gap-[12px] px-[24px] py-[20px]">
+        <div className="shrink-0 flex items-center justify-end gap-[12px] px-[32px] py-[28px]">
           <Button variant="secondary" onClick={onClose} type="button">
             Done
           </Button>

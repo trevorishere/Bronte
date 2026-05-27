@@ -103,29 +103,39 @@ export function RenameModal({
       <div 
         className="relative flex flex-col rounded-2xl shadow-lg"
         style={{
-          width: '480px',
+          width: '560px',
           backgroundColor: 'var(--background)',
           border: '1px solid var(--border)'
         }}
       >
         {/* Header */}
-        <div 
-          className="flex items-center justify-between px-[24px] py-[20px]"
+        <div
+          className="flex items-center justify-between px-[32px] py-[28px]"
         >
-          <h2 
-            style={{
+          <div className="flex flex-col gap-[4px] min-w-0 pr-[8px]">
+            <h2
+              style={{
+                fontFamily: 'var(--font-family)',
+                fontWeight: 'var(--font-weight-semibold)',
+                fontSize: 'var(--font-size-24)',
+                lineHeight: 'var(--line-height-normal)',
+                color: 'var(--primary)'
+              }}
+            >
+              Rename
+            </h2>
+            <p className="truncate" style={{
               fontFamily: 'var(--font-family)',
-              fontWeight: 'var(--font-weight-semibold)',
-              fontSize: 'var(--font-size-18)',
-              lineHeight: 'var(--line-height-normal)',
-              color: 'var(--primary)'
-            }}
-          >
-            {title}
-          </h2>
+              fontSize: 'var(--font-size-15)',
+              color: 'var(--muted-foreground)',
+              lineHeight: '1.3',
+            }}>
+              {currentName}
+            </p>
+          </div>
           <button
             onClick={handleCancel}
-            className="flex items-center justify-center size-[32px] rounded-full transition-colors"
+            className="flex items-center justify-center size-[32px] rounded-full transition-colors ml-[16px] shrink-0"
             style={{ backgroundColor: 'transparent' }}
             onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
             onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
@@ -136,50 +146,67 @@ export function RenameModal({
 
         {/* Content */}
         <form onSubmit={handleSubmit}>
-          <div className="px-[24px] py-[24px]">
+          <div className="px-[32px] py-[24px]">
             <div className="flex flex-col gap-[8px]">
               <label
                 htmlFor="rename-input"
                 style={{
                   fontFamily: 'var(--font-family)',
                   fontWeight: 'var(--font-weight-medium)',
-                  fontSize: 'var(--font-size-14)',
+                  fontSize: 'var(--font-size-11)',
                   lineHeight: 'var(--line-height-normal)',
-                  color: 'var(--foreground)'
+                  color: 'var(--foreground)',
+                  opacity: 0.5,
                 }}
               >
-                New name
+                New Name
               </label>
-              <input
-                ref={inputRef}
-                id="rename-input"
-                type="text"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="w-full px-[12px] py-[8px] rounded-lg transition-all"
-                style={{
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--font-size-14)',
-                  lineHeight: 'var(--line-height-normal)',
-                  color: 'var(--primary)',
-                  border: '1px solid var(--border-interactive)',
-                  outline: 'none',
-                  backgroundColor: 'var(--background)'
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--border-interactive-hover)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--border-interactive)';
-                }}
-              />
+              <div className="relative flex items-center">
+                <input
+                  ref={inputRef}
+                  id="rename-input"
+                  type="text"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="w-full pl-[12px] pr-[36px] rounded-lg transition-all"
+                  style={{
+                    height: '40px',
+                    fontFamily: 'var(--font-family)',
+                    fontSize: 'var(--font-size-16)',
+                    lineHeight: 'var(--line-height-normal)',
+                    color: 'var(--primary)',
+                    border: '1px solid var(--border-interactive)',
+                    outline: 'none',
+                    backgroundColor: 'var(--background)'
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--border-interactive-hover)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--border-interactive)';
+                  }}
+                />
+                {newName && (
+                  <button
+                    type="button"
+                    onClick={() => { setNewName(''); inputRef.current?.focus(); }}
+                    className="absolute right-[8px] flex items-center justify-center size-[20px] rounded-full transition-colors"
+                    style={{ backgroundColor: 'transparent' }}
+                    onMouseOver={e => (e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)')}
+                    onMouseOut={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                    tabIndex={-1}
+                  >
+                    <X className="size-[12px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2.5} />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Footer */}
           <div 
-            className="flex items-center justify-end gap-[12px] px-[24px] py-[20px]"
+            className="flex items-center justify-end gap-[12px] px-[32px] py-[28px]"
           >
             <Button
               variant="secondary"

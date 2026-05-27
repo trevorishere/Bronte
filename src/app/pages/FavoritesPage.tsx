@@ -38,6 +38,8 @@ export function FavoritesPage() {
   const [membersModalRow, setMembersModalRow] = useState<RowData | null>(null);
   const { getExtraCount } = useSharedMembers();
   const { favorites, addFavorite, removeFavorite } = useFavorites();
+  const [extraRows, setExtraRows] = useState<RowData[]>([]);
+  const displayData = [...filteredData, ...extraRows];
 
   // Filter projects to only show favorited ones
   const tableData: RowData[] = projects
@@ -151,23 +153,25 @@ export function FavoritesPage() {
       {hasData ? (
         viewMode === 'grid' ? (
           <GridView
-            data={filteredData as GridItemData[]}
+            data={displayData as GridItemData[]}
             onItemClick={handleRowClick}
             onItemDoubleClick={handleRowDoubleClick}
             onStarClick={handleStarClick}
             favorites={favorites}
-          onViewModeChange={setViewMode}
+            onViewModeChange={setViewMode}
           />
         ) : (
           <DataTable
             columns={tableColumns}
-            data={filteredData}
+            data={displayData}
             onRowClick={handleRowClick}
             onRowDoubleClick={handleRowDoubleClick}
             onSelectionChange={handleSelectionChange}
             onStarClick={handleStarClick}
             onMoreClick={handleMoreClick}
             onShare={handleShareRow}
+            onDuplicate={(copy) => setExtraRows(prev => [...prev, copy])}
+            onDelete={(deleted) => setExtraRows(prev => prev.filter(r => r.id !== deleted.id))}
             onMemberCountClick={handleMemberCountClick}
             starredItems={favorites}
             viewMode={viewMode}

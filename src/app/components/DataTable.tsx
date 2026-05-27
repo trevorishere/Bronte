@@ -43,6 +43,7 @@ interface DataTableProps {
   onShare?: (row: RowData) => void;
   onRename?: (row: RowData, newName: string) => void;
   onDelete?: (row: RowData) => void;
+  onDuplicate?: (copy: RowData) => void;
   onMemberCountClick?: (row: RowData) => void;
   onSelectionChange?: (row: RowData | null) => void;
   starredItems?: Set<string>;
@@ -67,6 +68,7 @@ export function DataTable({
   onShare,
   onRename,
   onDelete,
+  onDuplicate,
   onMemberCountClick,
   onSelectionChange,
   starredItems,
@@ -132,9 +134,6 @@ export function DataTable({
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
   const [rowToMove, setRowToMove] = useState<RowData | null>(null);
 
-  // Duplicate State
-  const [insertedRows, setInsertedRows] = useState<{ afterId: string; item: RowData }[]>([]);
-
   // Refs
   const moreButtonRefs = useRef<Map<string, HTMLButtonElement>>(new Map()); // For dropdown menu positioning
 
@@ -199,16 +198,11 @@ export function DataTable({
     return sortConfig.direction === 'asc' ? comparison : -comparison;
   });
 
-  const buildDisplayData = (rows: RowData[]): RowData[] =>
-    rows.flatMap(row => {
-      const children = insertedRows.filter(e => e.afterId === row.id).map(e => e.item);
-      return [row, ...buildDisplayData(children)];
-    });
-  const displayData = buildDisplayData(sortedData);
+  const displayData = sortedData;
 
   const handleDuplicate = (row: RowData) => {
     const copy: RowData = { ...row, id: `${row.id}-copy-${Date.now()}`, name: `Copy of ${row.name}` };
-    setInsertedRows(prev => [...prev, { afterId: row.id, item: copy }]);
+    onDuplicate?.(copy);
     toast.success(`"${row.name}" duplicated`);
     setOpenMenuRowId(null);
   };
@@ -488,8 +482,9 @@ export function DataTable({
               return (
                 <div
                   key={row.id}
-                  className="cursor-pointer transition-colors flex w-full"
+                  className="cursor-pointer transition-colors flex items-center w-full"
                   style={{
+                    height: '64px',
                     borderBottom: rowIndex === displayData.length - 1 ? 'none' : '1px solid var(--border-interactive)',
                     backgroundColor: getRowBackgroundColor(row.id),
                     minWidth: '100%'
@@ -529,7 +524,7 @@ export function DataTable({
                       return (
                         <div
                           key={column.key}
-                          className="py-[16px] flex items-center"
+                          className="flex items-center"
                           style={{
                             ...flexStyle,
                             fontFamily: 'var(--font-family)',
@@ -722,7 +717,7 @@ export function DataTable({
                   </div>
 
                   {/* Separate icons column */}
-                  <div className="py-[16px]" style={{ flex: '0 0 116px', minWidth: '116px', maxWidth: '116px', paddingLeft: '24px', paddingRight: '20px' }}>
+                  <div className="flex items-center" style={{ flex: '0 0 116px', minWidth: '116px', maxWidth: '116px', paddingLeft: '24px', paddingRight: '20px' }}>
                     <div className={`flex items-center justify-end gap-[0px] ${(hoveredRow === row.id || openMenuRowId === row.id) ? 'opacity-100' : 'opacity-0'}`} style={{ transition: `opacity var(--transition-duration) var(--transition-timing)` }}>
                       {/* ========================================
                           STAR BUTTON - Uses theme variables
@@ -863,13 +858,7 @@ export function DataTable({
           }}
           onConfirm={() => {
             const deleted = rowToDelete;
-            // If it's a duplicate, remove from insertedRows; otherwise notify parent
-            const isDuplicate = insertedRows.some(e => e.item.id === deleted.id);
-            if (isDuplicate) {
-              setInsertedRows(prev => prev.filter(e => e.item.id !== deleted.id));
-            } else {
-              onDelete?.(deleted);
-            }
+            onDelete?.(deleted);
             setRowToDelete(null);
             toast.success(`"${deleted.name}" deleted`);
           }}

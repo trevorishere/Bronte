@@ -45,6 +45,7 @@ export function WorkspacePage() {
   const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
   const [membersModalRow, setMembersModalRow] = useState<RowData | null>(null);
   const { favorites, addFavorite, removeFavorite } = useFavorites();
+  const [extraRows, setExtraRows] = useState<RowData[]>([]);
 
   const { ancestors, setAncestors } = useNavigationContext();
 
@@ -114,6 +115,8 @@ export function WorkspacePage() {
     
     return true;
   });
+
+  const displayData = [...filteredData, ...extraRows];
 
   const handleFilterChange = (filterLabel: string, values: string[]) => {
     setSelectedFilters(prev => ({
@@ -201,7 +204,7 @@ export function WorkspacePage() {
       />
       {viewMode === 'grid' ? (
         <GridView
-          data={filteredData as GridItemData[]}
+          data={displayData as GridItemData[]}
           onItemClick={handleRowClick}
           onItemDoubleClick={handleRowDoubleClick}
           onStarClick={handleStarClick}
@@ -211,12 +214,14 @@ export function WorkspacePage() {
       ) : (
         <DataTable
           columns={tableColumns}
-          data={filteredData}
+          data={displayData}
           onRowClick={handleRowClick}
           onRowDoubleClick={handleRowDoubleClick}
           onSelectionChange={handleSelectionChange}
           onStarClick={handleStarClick}
           onMoreClick={handleMoreClick}
+          onDuplicate={(copy) => setExtraRows(prev => [...prev, copy])}
+          onDelete={(deleted) => setExtraRows(prev => prev.filter(r => r.id !== deleted.id))}
           onMemberCountClick={handleMemberCountClick}
           starredItems={favorites}
           viewMode={viewMode}

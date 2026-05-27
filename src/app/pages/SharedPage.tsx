@@ -46,6 +46,8 @@ export function SharedPage() {
   const [shareRow, setShareRow] = useState<RowData | null>(null);
   const { getExtraCount } = useSharedMembers();
   const { favorites, addFavorite, removeFavorite } = useFavorites();
+  const [extraRows, setExtraRows] = useState<RowData[]>([]);
+  const displayData = [...filteredData, ...extraRows];
 
   // Get unique shared by users for filter options
   const uniqueSharedBy = Array.from(new Set(tableData.map(p => p.sharedBy))).sort();
@@ -142,7 +144,7 @@ export function SharedPage() {
       />
 
       {/* Content area */}
-      {filteredData.length === 0 && Object.keys(selectedFilters).length === 0 && Object.keys(dateFilters).length === 0 ? (
+      {displayData.length === 0 && Object.keys(selectedFilters).length === 0 && Object.keys(dateFilters).length === 0 ? (
         <EmptyState 
           title="No shared projects"
           description="Projects that others share with you will appear here."
@@ -150,23 +152,25 @@ export function SharedPage() {
       ) : (
         viewMode === 'grid' ? (
           <GridView
-            data={filteredData as GridItemData[]}
+            data={displayData as GridItemData[]}
             onItemClick={handleRowClick}
             onItemDoubleClick={handleRowDoubleClick}
             onStarClick={handleStarClick}
             favorites={favorites}
-          onViewModeChange={setViewMode}
+            onViewModeChange={setViewMode}
           />
         ) : (
           <DataTable
             columns={tableColumns}
-            data={filteredData}
+            data={displayData}
             onRowClick={handleRowClick}
             onRowDoubleClick={handleRowDoubleClick}
             onSelectionChange={handleSelectionChange}
             onStarClick={handleStarClick}
             onMoreClick={handleMoreClick}
             onShare={handleShareRow}
+            onDuplicate={(copy) => setExtraRows(prev => [...prev, copy])}
+            onDelete={(deleted) => setExtraRows(prev => prev.filter(r => r.id !== deleted.id))}
             starredItems={favorites}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
