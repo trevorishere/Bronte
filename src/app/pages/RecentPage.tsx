@@ -60,7 +60,6 @@ export function RecentPage() {
   const { getExtraCount } = useSharedMembers();
   const { favorites, addFavorite, removeFavorite } = useFavorites();
   const [extraRows, setExtraRows] = useState<RowData[]>([]);
-  const displayData = [...filteredData, ...extraRows];
 
   // Get unique owners for filter options
   const uniqueOwners = Array.from(new Set(tableData.map(p => p.owner))).sort();
@@ -86,6 +85,8 @@ export function RecentPage() {
     
     return true;
   });
+
+  const displayData = [...filteredData, ...extraRows];
 
   const handleFilterChange = (filterLabel: string, values: string[]) => {
     setSelectedFilters(prev => ({

@@ -47,7 +47,6 @@ export function SharedPage() {
   const { getExtraCount } = useSharedMembers();
   const { favorites, addFavorite, removeFavorite } = useFavorites();
   const [extraRows, setExtraRows] = useState<RowData[]>([]);
-  const displayData = [...filteredData, ...extraRows];
 
   // Get unique shared by users for filter options
   const uniqueSharedBy = Array.from(new Set(tableData.map(p => p.sharedBy))).sort();
@@ -73,6 +72,8 @@ export function SharedPage() {
     
     return true;
   });
+
+  const displayData = [...filteredData, ...extraRows];
 
   const handleFilterChange = (filterLabel: string, values: string[]) => {
     setSelectedFilters(prev => ({
