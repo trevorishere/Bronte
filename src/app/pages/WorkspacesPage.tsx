@@ -105,6 +105,7 @@ export function WorkspacesPage() {
     <div className="flex flex-col h-screen" style={{ backgroundColor: 'var(--background-content)' }}>
       <TopBar
         title="Workspaces"
+        hideShare
       />
       <Toolbar 
         viewMode={viewMode}

@@ -111,7 +111,6 @@ export function RenameModal({
         {/* Header */}
         <div 
           className="flex items-center justify-between px-[24px] py-[20px]"
-          style={{ borderBottom: '1px solid var(--border-interactive)' }}
         >
           <h2 
             style={{
@@ -181,7 +180,6 @@ export function RenameModal({
           {/* Footer */}
           <div 
             className="flex items-center justify-end gap-[12px] px-[24px] py-[20px]"
-            style={{ borderTop: '1px solid var(--border-interactive)' }}
           >
             <Button
               variant="secondary"

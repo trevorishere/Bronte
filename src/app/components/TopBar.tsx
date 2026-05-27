@@ -1,4 +1,4 @@
-import { ChevronLeft, Plus, Share2, Info } from 'lucide-react';
+import { ChevronLeft, Plus, UserRoundPlus, Info } from 'lucide-react';
 import { ReactNode, useRef, useState, useEffect, cloneElement, isValidElement } from 'react';
 import { useNavigate } from 'react-router';
 import { ActionButtons } from './ActionButtons';
@@ -147,6 +147,8 @@ interface TopBarProps {
   onShareClick?: () => void;
   /** Hide the Share action button */
   hideShare?: boolean;
+  /** Number of members with access — shown as a badge on the Share button */
+  shareCount?: number;
   /** Hide the Info (ⓘ) action button */
   hideInfo?: boolean;
 }
@@ -167,6 +169,7 @@ export function TopBar({
   onShareClick,
   hideShare = false,
   hideInfo = false,
+  shareCount = 0,
 }: TopBarProps) {
   const backBtn = (extraClass = '') => (
     <button
@@ -301,19 +304,38 @@ export function TopBar({
             title="Add"
           >
             <Plus className="size-[18px] shrink-0" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2.5} />
-            <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: '15px', letterSpacing: '0.32px', color: 'var(--secondary-foreground)', whiteSpace: 'nowrap' }}>Add…</span>
+            <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: '15px', letterSpacing: '0.32px', color: 'var(--secondary-foreground)', whiteSpace: 'nowrap' }}>New…</span>
           </button>
           {!hideShare && (
           <button
             className="flex items-center gap-[8px] h-[40px] rounded-[12px] transition-colors"
-            style={{ border: '1px solid var(--border-interactive)', paddingLeft: '11px', paddingRight: '13px', paddingTop: '1px', paddingBottom: '1px', backgroundColor: 'transparent', cursor: 'pointer' }}
+            style={{ border: '1px solid var(--border-interactive)', paddingLeft: '12px', paddingRight: '12px', paddingTop: '1px', paddingBottom: '1px', backgroundColor: 'transparent', cursor: 'pointer' }}
             onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
             onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             title="Share"
             onClick={onShareClick}
           >
-            <Share2 className="size-[18px] shrink-0" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2} />
+            <UserRoundPlus className="size-[18px] shrink-0" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2} />
             <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: '15px', letterSpacing: '0.32px', color: 'var(--secondary-foreground)', whiteSpace: 'nowrap' }}>Share</span>
+            {shareCount > 0 && (
+              <div style={{
+                width: 24,
+                height: 24,
+                borderRadius: 8,
+                backgroundColor: 'rgba(74,68,64,0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontFamily: 'var(--font-family)',
+                fontWeight: 600,
+                fontSize: '13px',
+                lineHeight: '20px',
+                color: 'var(--secondary-foreground)',
+                flexShrink: 0,
+              }}>
+                {shareCount}
+              </div>
+            )}
           </button>
           )}
           {!hideInfo && (

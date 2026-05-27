@@ -8,6 +8,8 @@ import { TeamIcon } from './TeamIcon';
 import { WorkspaceIcon } from './WorkspaceIcon';
 import { ProjectIcon } from './ProjectIcon';
 import { RenameModal } from './RenameModal';
+import { DeleteConfirmModal } from './DeleteConfirmModal';
+import { MoveModal } from './MoveModal';
 import { MobileCardView } from './MobileCardView';
 import { MobileSortHeader } from './MobileSortHeader';
 import { accounts } from '../data/accounts';
@@ -38,7 +40,10 @@ interface DataTableProps {
   onRowDoubleClick?: (row: RowData) => void;
   onStarClick?: (row: RowData, isStarred: boolean) => void;
   onMoreClick?: (row: RowData) => void;
+  onShare?: (row: RowData) => void;
   onRename?: (row: RowData, newName: string) => void;
+  onDelete?: (row: RowData) => void;
+  onMemberCountClick?: (row: RowData) => void;
   onSelectionChange?: (row: RowData | null) => void;
   starredItems?: Set<string>;
   viewMode?: 'grid' | 'list';
@@ -50,6 +55,8 @@ type SortConfig = {
   direction: 'asc' | 'desc';
 } | null;
 
+const MEMBER_COUNT_KEYS = new Set(['accountCount', 'membersCount', 'memberCount']);
+
 export function DataTable({
   columns,
   data,
@@ -57,7 +64,10 @@ export function DataTable({
   onRowDoubleClick,
   onStarClick,
   onMoreClick,
+  onShare,
   onRename,
+  onDelete,
+  onMemberCountClick,
   onSelectionChange,
   starredItems,
   viewMode,
@@ -113,6 +123,17 @@ export function DataTable({
   // Rename Modal State
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
   const [rowToRename, setRowToRename] = useState<RowData | null>(null);
+
+  // Delete Modal State
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [rowToDelete, setRowToDelete] = useState<RowData | null>(null);
+
+  // Move Modal State
+  const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
+  const [rowToMove, setRowToMove] = useState<RowData | null>(null);
+
+  // Duplicate State
+  const [insertedRows, setInsertedRows] = useState<{ afterId: string; item: RowData }[]>([]);
 
   // Refs
   const moreButtonRefs = useRef<Map<string, HTMLButtonElement>>(new Map()); // For dropdown menu positioning
@@ -177,6 +198,20 @@ export function DataTable({
 
     return sortConfig.direction === 'asc' ? comparison : -comparison;
   });
+
+  const buildDisplayData = (rows: RowData[]): RowData[] =>
+    rows.flatMap(row => {
+      const children = insertedRows.filter(e => e.afterId === row.id).map(e => e.item);
+      return [row, ...buildDisplayData(children)];
+    });
+  const displayData = buildDisplayData(sortedData);
+
+  const handleDuplicate = (row: RowData) => {
+    const copy: RowData = { ...row, id: `${row.id}-copy-${Date.now()}`, name: `Copy of ${row.name}` };
+    setInsertedRows(prev => [...prev, { afterId: row.id, item: copy }]);
+    toast.success(`"${row.name}" duplicated`);
+    setOpenMenuRowId(null);
+  };
 
   const handleStarClick = (e: React.MouseEvent, row: RowData) => {
     e.stopPropagation();
@@ -306,7 +341,7 @@ export function DataTable({
         {/* Scrollable Card List */}
         <div className="flex-1 overflow-auto pb-[72px]">
           <MobileCardView
-            data={sortedData}
+            data={displayData}
             onRowClick={onRowClick}
             onRowDoubleClick={onRowDoubleClick}
             onStarClick={onStarClick}
@@ -447,7 +482,7 @@ export function DataTable({
       <div className="overflow-hidden flex-1 min-h-0">
         <div className="overflow-y-auto w-full h-full" style={{ paddingBottom: '4px' }} onClick={handleTableAreaClick}>
           <div className="w-full" style={{ minWidth: '100%' }}>
-            {sortedData.map((row, rowIndex) => {
+            {displayData.map((row, rowIndex) => {
               const totalColumns = visibleColumns.length;
 
               return (
@@ -455,7 +490,7 @@ export function DataTable({
                   key={row.id}
                   className="cursor-pointer transition-colors flex w-full"
                   style={{
-                    borderBottom: rowIndex === sortedData.length - 1 ? 'none' : '1px solid var(--border-interactive)',
+                    borderBottom: rowIndex === displayData.length - 1 ? 'none' : '1px solid var(--border-interactive)',
                     backgroundColor: getRowBackgroundColor(row.id),
                     minWidth: '100%'
                   }}
@@ -563,37 +598,40 @@ export function DataTable({
                             column.key === 'owner' ? (
                               (() => {
                                 const ownerAccount = accounts.find(a => a.name === row[column.key]);
-                                return (
-                                  <div className="flex items-center gap-[12px] min-w-0">
-                                    {ownerAccount && (
-                                      <Avatar name={ownerAccount.name} role={ownerAccount.role} size="small" />
-                                    )}
-                                    {ownerAccount ? (
-                                      <span
-                                        className="cursor-pointer hover:underline min-w-0"
-                                        style={{
-                                          fontFamily: 'var(--font-family)',
-                                          fontSize: 'var(--font-size-16)',
-                                          fontWeight: 'var(--font-weight-regular)',
-                                          letterSpacing: 'var(--letter-spacing-md)',
-                                          color: 'var(--foreground)',
-                                          whiteSpace: 'nowrap',
-                                          overflow: 'hidden',
-                                          textOverflow: 'ellipsis',
-                                        }}
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          navigate(`/admin/account/${ownerAccount.id}`);
-                                        }}
-                                      >
-                                        {row[column.key]}
-                                      </span>
-                                    ) : (
-                                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-16)', fontWeight: 'var(--font-weight-regular)', letterSpacing: 'var(--letter-spacing-md)', color: 'var(--primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                        {row[column.key]}
-                                      </span>
-                                    )}
+                                return ownerAccount ? (
+                                  <div
+                                    className="flex items-center gap-[12px] min-w-0 cursor-pointer"
+                                    style={{
+                                      padding: '8px 12px',
+                                      borderRadius: '24px',
+                                      backgroundColor: 'transparent',
+                                      transition: 'background-color var(--transition-duration) var(--transition-timing)',
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                                    onClick={e => { e.stopPropagation(); navigate(`/admin/account/${ownerAccount.id}`); }}
+                                  >
+                                    <Avatar name={ownerAccount.name} role={ownerAccount.role} size="small" />
+                                    <span
+                                      className="min-w-0"
+                                      style={{
+                                        fontFamily: 'var(--font-family)',
+                                        fontSize: 'var(--font-size-16)',
+                                        fontWeight: 'var(--font-weight-regular)',
+                                        letterSpacing: 'var(--letter-spacing-md)',
+                                        color: (hoveredRow === row.id || selectedRow === row.id) ? 'var(--primary)' : 'var(--foreground)',
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                      }}
+                                    >
+                                      {row[column.key]}
+                                    </span>
                                   </div>
+                                ) : (
+                                  <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-16)', fontWeight: 'var(--font-weight-regular)', letterSpacing: 'var(--letter-spacing-md)', color: 'var(--foreground)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    {row[column.key]}
+                                  </span>
                                 );
                               })()
                             ) :
@@ -615,20 +653,50 @@ export function DataTable({
                             column.align === 'right' ? (
                               // Right-aligned columns - use flex justify-end to match header
                               <div className="flex items-center justify-end w-full">
-                                <span
-                                  className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'}`}
-                                  style={{
-                                    fontFamily: 'var(--font-family)',
-                                    fontSize: 'var(--font-size-16)',
-                                    fontWeight: 'var(--font-weight-regular)',
-                                    letterSpacing: 'var(--letter-spacing-md)',
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis'
-                                  }}
-                                >
-                                  {row[column.key]}
-                                </span>
+                                {onMemberCountClick && MEMBER_COUNT_KEYS.has(column.key) ? (
+                                  <button
+                                    onClick={e => { e.stopPropagation(); onMemberCountClick(row); }}
+                                    style={{
+                                      fontFamily: 'var(--font-family)',
+                                      fontSize: 'var(--font-size-16)',
+                                      fontWeight: 'var(--font-weight-regular)',
+                                      letterSpacing: 'var(--letter-spacing-md)',
+                                      color: (hoveredRow === row.id || selectedRow === row.id) ? 'var(--primary)' : 'var(--foreground)',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      background: 'none',
+                                      border: 'none',
+                                      cursor: 'pointer',
+                                      height: '36px',
+                                      minWidth: '36px',
+                                      padding: '0 12px',
+                                      borderRadius: '24px',
+                                      backgroundColor: 'transparent',
+                                      textDecoration: 'none',
+                                      transition: 'background-color var(--transition-duration) var(--transition-timing)',
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                                  >
+                                    {row[column.key]}
+                                  </button>
+                                ) : (
+                                  <span
+                                    className={`${(hoveredRow === row.id || selectedRow === row.id) ? 'text-primary' : 'text-foreground'}`}
+                                    style={{
+                                      fontFamily: 'var(--font-family)',
+                                      fontSize: 'var(--font-size-16)',
+                                      fontWeight: 'var(--font-weight-regular)',
+                                      letterSpacing: 'var(--letter-spacing-md)',
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis'
+                                    }}
+                                  >
+                                    {row[column.key]}
+                                  </span>
+                                )}
                               </div>
                             ) : (
                               // Left-aligned columns
@@ -723,26 +791,28 @@ export function DataTable({
           letterSpacing: 'var(--letter-spacing-md)',
           color: 'var(--text-secondary)',
         }}>
-          {sortedData.length} {sortedData.length === 1 ? 'item' : 'items'}
+          {displayData.length} {displayData.length === 1 ? 'item' : 'items'}
         </span>
       </div>
       </div>
 
       {/* Dropdown Menus */}
-      {sortedData.map((row) => {
+      {displayData.map((row) => {
         const anchorRef = { current: moreButtonRefs.current.get(row.id) || null } as React.RefObject<HTMLElement>;
-        const menuItems = createDefaultMenuItems(
+        const isAccount = row.iconType === 'account';
+        const allItems = createDefaultMenuItems(
           row.name,
           () => {
             setRowToRename(row);
             setIsRenameModalOpen(true);
-            setOpenMenuRowId(null); // Close the dropdown menu
+            setOpenMenuRowId(null);
           },
-          () => toast.success(`Share: ${row.name}`),
-          () => toast.success(`Duplicate: ${row.name}`),
-          () => toast.success(`Move: ${row.name}`),
-          () => toast.success(`Delete: ${row.name}`)
+          () => { onShare?.(row); setOpenMenuRowId(null); },
+          () => handleDuplicate(row),
+          () => { setRowToMove(row); setIsMoveModalOpen(true); setOpenMenuRowId(null); },
+          () => { setRowToDelete(row); setIsDeleteModalOpen(true); setOpenMenuRowId(null); }
         );
+        const menuItems = isAccount ? allItems.filter(item => item.id !== 'share') : allItems;
 
         return (
           <DropdownMenu
@@ -769,6 +839,40 @@ export function DataTable({
             toast.success(`Renamed to "${newName}"`);
           }}
           title={`Rename "${rowToRename.name}"`}
+        />
+      )}
+
+      {/* Move Modal */}
+      <MoveModal
+        isOpen={isMoveModalOpen}
+        row={rowToMove}
+        onClose={() => { setIsMoveModalOpen(false); setRowToMove(null); }}
+        onMove={(row, _destId, destLabel) => {
+          toast.success(`"${row.name}" moved to ${destLabel}`);
+        }}
+      />
+
+      {/* Delete Confirm Modal */}
+      {rowToDelete && (
+        <DeleteConfirmModal
+          isOpen={isDeleteModalOpen}
+          itemName={rowToDelete.name}
+          onClose={() => {
+            setIsDeleteModalOpen(false);
+            setRowToDelete(null);
+          }}
+          onConfirm={() => {
+            const deleted = rowToDelete;
+            // If it's a duplicate, remove from insertedRows; otherwise notify parent
+            const isDuplicate = insertedRows.some(e => e.item.id === deleted.id);
+            if (isDuplicate) {
+              setInsertedRows(prev => prev.filter(e => e.item.id !== deleted.id));
+            } else {
+              onDelete?.(deleted);
+            }
+            setRowToDelete(null);
+            toast.success(`"${deleted.name}" deleted`);
+          }}
         />
       )}
     </div>

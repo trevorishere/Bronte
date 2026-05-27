@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'text' | 'primary' | 'secondary';
+  variant?: 'text' | 'primary' | 'secondary' | 'danger';
   children: React.ReactNode;
 }
 
@@ -48,6 +48,12 @@ export function Button({
       border: '1px solid var(--border-interactive)',
       backgroundColor: isHovered && !props.disabled ? 'var(--border-interactive-hover)' : 'var(--background)',
       color: 'var(--foreground)',
+    },
+    danger: {
+      padding: '8px 16px',
+      borderRadius: 'var(--radius-8)',
+      backgroundColor: isHovered && !props.disabled ? 'var(--destructive-hover)' : 'var(--destructive)',
+      color: 'var(--destructive-foreground)',
     },
   };
 

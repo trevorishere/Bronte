@@ -8,6 +8,7 @@ import { GridView, GridItemData } from '../components/GridView';
 import { EmptyState } from '../components/EmptyState';
 import { useInfoTray } from '../contexts/InfoTrayContext';
 import { ShareModal } from '../components/ShareModal';
+import { useSharedMembers } from '../contexts/SharedMembersContext';
 import { sharedProjects } from '../data/shared';
 import { useFavorites } from '../contexts/FavoritesContext';
 
@@ -20,6 +21,7 @@ const tableColumns: Column[] = [
   { key: 'name', label: 'Project Name', sortable: true, width: 'w-[400px]' },
   { key: 'sharedBy', label: 'Shared By', sortable: true, width: 'w-[200px]' },
   { key: 'lastModified', label: 'Last Modified', sortable: true, width: 'w-[200px]' },
+  { key: 'accountCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
 ];
 
 const tableData: RowData[] = sharedProjects.map(project => ({
@@ -31,6 +33,7 @@ const tableData: RowData[] = sharedProjects.map(project => ({
   lastModified: project.lastModified,
   workspace: project.workspace,
   iconType: 'project' as const,
+  accountCount: project.membersCount,
 }));
 
 export function SharedPage() {
@@ -40,6 +43,8 @@ export function SharedPage() {
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const { setIsTrayOpen, setTrayContent } = useInfoTray();
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [shareRow, setShareRow] = useState<RowData | null>(null);
+  const { getExtraCount } = useSharedMembers();
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   // Get unique shared by users for filter options
@@ -101,6 +106,8 @@ export function SharedPage() {
 
   const handleMoreClick = (_row: RowData) => {};
 
+  const handleShareRow = (row: RowData) => { setShareRow(row); setIsShareOpen(true); };
+
   return (
     <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       <TopBar
@@ -111,7 +118,7 @@ export function SharedPage() {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         onInfoClick={() => setIsTrayOpen(v => !v)}
-        onShareClick={() => setIsShareOpen(true)}
+        hideShare
       />
       
       {/* Toolbar - Always visible */}
@@ -159,6 +166,7 @@ export function SharedPage() {
             onSelectionChange={handleSelectionChange}
             onStarClick={handleStarClick}
             onMoreClick={handleMoreClick}
+            onShare={handleShareRow}
             starredItems={favorites}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
@@ -168,9 +176,9 @@ export function SharedPage() {
 
       <ShareModal
         isOpen={isShareOpen}
-        onClose={() => setIsShareOpen(false)}
-        entityName="Shared with me"
-        entityId="shared"
+        onClose={() => { setIsShareOpen(false); setShareRow(null); }}
+        entityName={shareRow?.name ?? "Shared with me"}
+        entityId={shareRow?.id ?? "shared"}
         onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
       />
     </div>

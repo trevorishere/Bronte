@@ -40,10 +40,12 @@
   /* Accent (navigation selected) */
   --accent: #e4ddd6; /* Nav selected background - warm medium */
   --accent-foreground: #2b2520;
+  --accent-hover: #cfc8c0;
 
   /* Destructive */
   --destructive: #d4183d;
   --destructive-foreground: #ffffff;
+  --destructive-hover: #b8142f;
 
   /* Borders */
   --border: #e0d8d0; /* Table borders - warm */
@@ -101,12 +103,14 @@
   --font-size-14: 14px;
   --font-size-15: 15px;
   --font-size-16: 16px;
+  --font-size-18: 18px;
   --font-size-20: 20px;
 
   /* Line heights */
   --line-height-normal: normal;
   --line-height-15: 15px;
   --line-height-20: 20px;
+  --line-height-22: 22px;
 
   /* Letter spacing */
   --letter-spacing-sm: 0.16px;
@@ -161,8 +165,10 @@
   --muted-foreground: #9a9088;
   --accent: #342e28; /* Warm medium dark */
   --accent-foreground: #ede8e2;
+  --accent-hover: #2e2924;
   --destructive: #d4183d;
   --destructive-foreground: #ffffff;
+  --destructive-hover: #b8142f;
   --border: #3c3630; /* Warm border */
   --input: transparent;
   --input-background: #2c2822;

@@ -7,9 +7,12 @@ import { DataTable, Column, RowData } from '../components/DataTable';
 import { GridView, GridItemData } from '../components/GridView';
 import { DataTableSkeleton, GridSkeleton, useLoadingDelay } from '../components/SkeletonLoader';
 import { projects } from '../data/workspaces';
+import { accounts } from '../data/accounts';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useInfoTray } from '../contexts/InfoTrayContext';
-import { ShareModal } from '../components/ShareModal';
+import { ShareModal, CurrentMember } from '../components/ShareModal';
+import { MembersModal } from '../components/MembersModal';
+import { useSharedMembers } from '../contexts/SharedMembersContext';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -20,6 +23,7 @@ const tableColumns: Column[] = [
   { key: 'name', label: 'Project Name', sortable: true, width: 'w-[400px]' },
   { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
   { key: 'lastModified', label: 'Last Modified', sortable: true, width: 'w-[200px]' },
+  { key: 'accountCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
 ];
 
 // Sort all projects by lastModified date (newest first) and take the top 24
@@ -37,6 +41,7 @@ const allProjects: RowData[] = [...projects]
     lastModified: project.lastModified,
     workspace: project.workspace,
     iconType: 'project' as const,
+    accountCount: accounts.filter(a => a.projectIds.includes(project.id)).length,
   }));
 
 const tableData: RowData[] = allProjects;
@@ -49,6 +54,10 @@ export function RecentPage() {
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const { setIsTrayOpen, setTrayContent } = useInfoTray();
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [shareRow, setShareRow] = useState<RowData | null>(null);
+  const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
+  const [membersModalRow, setMembersModalRow] = useState<RowData | null>(null);
+  const { getExtraCount } = useSharedMembers();
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
   // Get unique owners for filter options
@@ -110,6 +119,13 @@ export function RecentPage() {
 
   const handleMoreClick = (_row: RowData) => {};
 
+  const handleShareRow = (row: RowData) => { setShareRow(row); setIsShareOpen(true); };
+
+  const getMembersForRow = (row: RowData): CurrentMember[] =>
+    accounts.filter(a => a.projectIds.includes(String(row.id))).map(a => ({ id: a.id, name: a.name, role: a.role }));
+
+  const handleMemberCountClick = (row: RowData) => { setMembersModalRow(row); setIsMembersModalOpen(true); };
+
   return (
     <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       <TopBar
@@ -120,7 +136,7 @@ export function RecentPage() {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         onInfoClick={() => setIsTrayOpen(v => !v)}
-        onShareClick={() => setIsShareOpen(true)}
+        hideShare
       />
       <Toolbar
         viewMode={viewMode}
@@ -154,6 +170,8 @@ export function RecentPage() {
           onSelectionChange={handleSelectionChange}
           onStarClick={handleStarClick}
           onMoreClick={handleMoreClick}
+          onShare={handleShareRow}
+          onMemberCountClick={handleMemberCountClick}
           starredItems={favorites}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
@@ -162,10 +180,19 @@ export function RecentPage() {
 
       <ShareModal
         isOpen={isShareOpen}
-        onClose={() => setIsShareOpen(false)}
-        entityName="Recent projects"
-        entityId="recent"
+        onClose={() => { setIsShareOpen(false); setShareRow(null); }}
+        entityName={shareRow?.name ?? "Recent projects"}
+        entityId={shareRow?.id ?? "recent"}
+        currentMembers={shareRow ? getMembersForRow(shareRow) : []}
         onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
+      />
+
+      <MembersModal
+        isOpen={isMembersModalOpen}
+        onClose={() => { setIsMembersModalOpen(false); setMembersModalRow(null); }}
+        entityName={membersModalRow?.name ?? ''}
+        members={membersModalRow ? getMembersForRow(membersModalRow) : []}
+        onAddMembers={() => { if (membersModalRow) handleShareRow(membersModalRow); }}
       />
     </div>
   );

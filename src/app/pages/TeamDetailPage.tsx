@@ -54,7 +54,7 @@ export function TeamDetailPage() {
   // Set tray content to this team on navigation or when shared members change
   useEffect(() => {
     if (!team) return;
-    const totalMembers = team.membersCount + getExtraCount(team.id);
+    const totalMembers = accounts.filter(a => a.teamIds.includes(team.id)).length + getExtraCount(team.id);
     setTrayContent({ type: 'team', data: { id: team.id, name: team.name, owner: team.owner, created: team.created, membersCount: totalMembers } });
   }, [teamId, getExtraCount(teamId ?? '')]);
 
@@ -254,11 +254,12 @@ export function TeamDetailPage() {
         breadcrumbs={[...ancestors, { label: team.name, path: `/admin/team/${teamId}` }]}
         onInfoClick={() => setIsTrayOpen(v => !v)}
         onShareClick={() => setIsShareOpen(true)}
+        shareCount={accounts.filter(a => a.teamIds.includes(team.id)).length + getExtraCount(team.id)}
       />
 
       {/* Team header */}
       {(() => {
-        const totalMembers = team.membersCount + getExtraCount(team.id);
+        const totalMembers = accounts.filter(a => a.teamIds.includes(team.id)).length + getExtraCount(team.id);
         return (
           <DetailPageHeader
             title={team.name}

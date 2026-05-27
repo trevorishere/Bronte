@@ -4,6 +4,7 @@ import type { Role } from './Avatar';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
+import { workspaces } from '../data/workspaces';
 
 // ─── Public types ─────────────────────────────────────────────────────────────
 
@@ -191,7 +192,7 @@ function AccountPanel({ data }: { data: Record<string, unknown> }) {
           <div className="flex items-center gap-[24px] h-[40px]">
             <span className="shrink-0 w-[92px]" style={labelStyle}>Role</span>
             <div className="relative flex-1" ref={roleRef}>
-              <DropdownTrigger onClick={() => { setIsRoleOpen(v => !v); setIsAccessOpen(false); }}>
+              <DropdownTrigger onClick={() => { setIsRoleOpen(v => !v); setIsAccessOpen(false); }} isOpen={isRoleOpen}>
                 <RoleBadge role={role} />
               </DropdownTrigger>
               <AnimatePresence>
@@ -215,7 +216,7 @@ function AccountPanel({ data }: { data: Record<string, unknown> }) {
             <div className="flex items-center gap-[24px] h-[40px]">
               <span className="shrink-0" style={labelStyle}>Access Level</span>
               <div className="relative flex-1" ref={accessRef}>
-                <DropdownTrigger onClick={() => { setIsAccessOpen(v => !v); setIsRoleOpen(false); }}>
+                <DropdownTrigger onClick={() => { setIsAccessOpen(v => !v); setIsRoleOpen(false); }} isOpen={isAccessOpen}>
                   <span style={{
                     fontFamily:    'var(--font-family)',
                     fontSize:      '14px',
@@ -349,7 +350,7 @@ function ReadOnlyPanel({ content }: { content: InfoTrayContent }) {
   if (type === 'project') {
     rows.push(
       { label: 'Owner',         value: data.owner },
-      { label: 'Workspace',     value: data.workspace },
+      { label: 'Workspace',     value: workspaces.find(w => w.id === data.workspace)?.name ?? data.workspace },
       { label: 'Last Modified', value: data.lastModified },
       { label: 'Members',       value: data.accountCount ?? data.members },
     );
@@ -373,7 +374,7 @@ function ReadOnlyPanel({ content }: { content: InfoTrayContent }) {
       { label: 'Shared By',     value: data.sharedBy },
       { label: 'Date Shared',   value: data.dateShared },
       { label: 'Last Modified', value: data.lastModified },
-      { label: 'Workspace',     value: data.workspace },
+      { label: 'Workspace',     value: workspaces.find(w => w.id === data.workspace)?.name ?? data.workspace },
     );
   }
 
@@ -445,7 +446,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 
 // ─── DropdownTrigger ──────────────────────────────────────────────────────────
 
-function DropdownTrigger({ children, onClick }: { children: React.ReactNode; onClick: () => void }) {
+function DropdownTrigger({ children, onClick, isOpen = false }: { children: React.ReactNode; onClick: () => void; isOpen?: boolean }) {
   const [hovered, setHovered] = useState(false);
   return (
     <button
@@ -460,7 +461,7 @@ function DropdownTrigger({ children, onClick }: { children: React.ReactNode; onC
       }}
     >
       {children}
-      <ChevronDown className="size-[16px] shrink-0 ml-[8px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={1.5} />
+      <ChevronDown className="size-[16px] shrink-0 ml-[8px] transition-transform" style={{ color: 'var(--muted-foreground)', transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)' }} strokeWidth={1.5} />
     </button>
   );
 }
@@ -497,7 +498,7 @@ function TrayDropdownItem({ children, selected, onClick }: { children: React.Rea
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="w-full flex items-center justify-between px-[4px] py-[4px] rounded-lg transition-colors"
+      className="w-full flex items-center justify-between px-[4px] h-[40px] rounded-lg transition-colors"
       style={{ backgroundColor: hovered ? 'var(--muted)' : 'transparent', border: 'none', cursor: 'pointer' }}
     >
       {children}
