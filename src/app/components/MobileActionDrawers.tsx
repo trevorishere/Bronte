@@ -113,8 +113,7 @@ function DrawerChrome({ isOpen, onClose, title, subtitle, maxHeight, children, f
 
             {/* Footer */}
             <div
-              className="shrink-0 flex items-center justify-end gap-[12px] px-[24px] pt-[12px] pb-[32px]"
-              style={{ borderTop: '1px solid var(--border)' }}
+              className="shrink-0 flex items-center justify-end gap-[12px] px-[24px] pt-[24px] pb-[32px]"
             >
               {footer}
             </div>
