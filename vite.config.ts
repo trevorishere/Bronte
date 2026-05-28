@@ -7,7 +7,7 @@ export default defineConfig({
   // Base path for deployment (e.g., GitHub Pages)
   // For GitHub Pages: set to '/repo-name/' (replace with your actual repo name)
   // For root domain deployment: set to '/'
-  base: '/Bronte/',
+  base: '/',
   
   plugins: [
     // The React and Tailwind plugins are both required for Make, even if
