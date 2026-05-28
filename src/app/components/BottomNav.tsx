@@ -1,4 +1,4 @@
-import { Clock, Star, UserRoundPlus, Box } from 'lucide-react';
+import { Star, UserRoundPlus, Box, ShieldUser } from 'lucide-react';
 
 interface BottomNavProps {
   activeItem?: string;
@@ -7,14 +7,14 @@ interface BottomNavProps {
 }
 
 const navItems = [
-  { id: 'recent', label: 'Recent', icon: Clock },
+  { id: 'workspaces', label: 'Workspaces', icon: Box },
   { id: 'favorites', label: 'Favorites', icon: Star },
   { id: 'shared', label: 'Shared', icon: UserRoundPlus },
-  { id: 'workspaces', label: 'Workspaces', icon: Box },
+  { id: 'admin', label: 'Admin', icon: ShieldUser },
   { id: 'account', label: 'Account', icon: null }, // uses avatar
 ];
 
-export function BottomNav({ activeItem = 'recent', onItemClick, userInitials = 'LD' }: BottomNavProps) {
+export function BottomNav({ activeItem = 'workspaces', onItemClick, userInitials = 'LD' }: BottomNavProps) {
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
       {/* Bottom Nav Bar */}
