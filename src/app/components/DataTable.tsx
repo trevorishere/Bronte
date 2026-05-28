@@ -322,15 +322,17 @@ export function DataTable({
     <>
       {/* Mobile Card View - Only visible on mobile */}
       <div className="md:hidden flex-1 flex flex-col overflow-hidden">
-        {/* Mobile Sort Header */}
-        <MobileSortHeader
-          sortColumn={sortConfig?.key || 'lastModified'}
-          sortDirection={sortConfig?.direction || 'desc'}
-          sortOptions={columns.filter(col => col.sortable).map(col => ({ key: col.key, label: col.label }))}
-          onSortChange={handleSort}
-          viewMode={viewMode}
-          onViewModeChange={onViewModeChange}
-        />
+        {/* Mobile Sort Header — 16px gap below TabNav */}
+        <div className="shrink-0 mt-[16px] mb-[16px]">
+          <MobileSortHeader
+            sortColumn={sortConfig?.key || 'lastModified'}
+            sortDirection={sortConfig?.direction || 'desc'}
+            sortOptions={columns.filter(col => col.sortable).map(col => ({ key: col.key, label: col.label }))}
+            onSortChange={handleSort}
+            viewMode={viewMode}
+            onViewModeChange={onViewModeChange}
+          />
+        </div>
 
         {/* Scrollable Card List */}
         <div className="flex-1 overflow-auto pb-[72px]">
@@ -341,6 +343,11 @@ export function DataTable({
             onStarClick={onStarClick}
             starredItems={starredItems}
             viewMode={viewMode}
+            onRename={(row, newName) => { onRename?.(row, newName); toast.success(`Renamed to "${newName}"`); }}
+            onShare={(row) => { onShare?.(row); }}
+            onDuplicate={(row) => handleDuplicate(row)}
+            onMove={(_row, _destId, destLabel) => { toast.success(`Moved to ${destLabel}`); }}
+            onDelete={(row) => { onDelete?.(row); toast.success(`"${row.name || row.projectName || row.accountName || row.teamName || ''}" deleted`); }}
           />
         </div>
       </div>
@@ -820,7 +827,9 @@ export function DataTable({
         );
       })}
 
-      {/* Rename Modal */}
+    </div>
+
+      {/* ── Modals (top-level so they render on mobile and desktop) ─────── */}
       {rowToRename && (
         <RenameModal
           isOpen={isRenameModalOpen}
@@ -837,7 +846,6 @@ export function DataTable({
         />
       )}
 
-      {/* Move Modal */}
       <MoveModal
         isOpen={isMoveModalOpen}
         row={rowToMove}
@@ -847,7 +855,6 @@ export function DataTable({
         }}
       />
 
-      {/* Delete Confirm Modal */}
       {rowToDelete && (
         <DeleteConfirmModal
           isOpen={isDeleteModalOpen}
@@ -864,7 +871,6 @@ export function DataTable({
           }}
         />
       )}
-    </div>
     </>
   );
 }

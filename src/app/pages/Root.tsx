@@ -3,7 +3,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router';
 import { Toaster } from 'sonner';
 import { Sidebar } from '../components/Sidebar';
 import { BottomNav } from '../components/BottomNav';
-import { InfoTray } from '../components/InfoTray';
+import { InfoTray, InfoDrawer } from '../components/InfoTray';
 import { myWorkspaces, teamWorkspaces } from '../data/workspaces';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
 import { NavigationProvider } from '../contexts/NavigationContext';
@@ -15,6 +15,17 @@ function InfoTrayPanel() {
   const { isTrayOpen, setIsTrayOpen, trayContent } = useInfoTray();
   return (
     <InfoTray
+      isOpen={isTrayOpen}
+      onClose={() => setIsTrayOpen(false)}
+      content={trayContent}
+    />
+  );
+}
+
+function InfoDrawerPanel() {
+  const { isTrayOpen, setIsTrayOpen, trayContent } = useInfoTray();
+  return (
+    <InfoDrawer
       isOpen={isTrayOpen}
       onClose={() => setIsTrayOpen(false)}
       content={trayContent}
@@ -104,6 +115,9 @@ export function Root() {
           </div>
           <InfoTrayPanel />
         </div>
+
+        {/* Info drawer — mobile bottom-sheet (desktop uses InfoTrayPanel inline above) */}
+        <InfoDrawerPanel />
 
         {/* Toast Container */}
         <Toaster position="bottom-right" />

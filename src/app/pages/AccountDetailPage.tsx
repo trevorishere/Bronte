@@ -1,5 +1,6 @@
 import { useParams, useNavigate, useOutletContext, useLocation } from 'react-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { accounts } from '../data/accounts';
 import { projects } from '../data/workspaces';
 import { teams } from '../data/teams';
@@ -13,9 +14,12 @@ import { DetailPageHeader } from '../components/DetailPageHeader';
 import { InfoTrayContent } from '../components/InfoTray';
 import { TabNav, Tab } from '../components/TabNav';
 import { TopBar } from '../components/TopBar';
-import { useState } from 'react';
+import { ShareModal, CurrentMember } from '../components/ShareModal';
+import { ShareDrawer } from '../components/ShareDrawer';
+import { MembersModal } from '../components/MembersModal';
 import { useNavigationContext, BreadcrumbEntry } from '../contexts/NavigationContext';
 import { useInfoTray } from '../contexts/InfoTrayContext';
+import { useSharedMembers } from '../contexts/SharedMembersContext';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -32,6 +36,18 @@ export function AccountDetailPage() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const { setIsTrayOpen, setTrayContent } = useInfoTray();
+  const { addSharedMembers, getExtraCount } = useSharedMembers();
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
+  const [membersModalRow, setMembersModalRow] = useState<RowData | null>(null);
+  const [isRowShareOpen, setIsRowShareOpen] = useState(false);
+  const [rowToShare, setRowToShare] = useState<RowData | null>(null);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
   const { ancestors, setAncestors } = useNavigationContext();
 
   const account = accounts.find(acc => acc.id === accountId);
@@ -236,6 +252,19 @@ export function AccountDetailPage() {
     return true;
   });
 
+  const getMembersForRow = (row: RowData): CurrentMember[] => {
+    const id = String(row.id);
+    if (row.iconType === 'project')   return accounts.filter(a => a.projectIds.includes(id)).map(a => ({ id: a.id, name: a.name, role: a.role }));
+    if (row.iconType === 'team')      return accounts.filter(a => a.teamIds.includes(id)).map(a => ({ id: a.id, name: a.name, role: a.role }));
+    if (row.iconType === 'workspace') return accounts.filter(a => a.workspaceIds.includes(id)).map(a => ({ id: a.id, name: a.name, role: a.role }));
+    return [];
+  };
+
+  const handleMemberCountClick = (row: RowData) => {
+    setMembersModalRow(row);
+    setIsMembersModalOpen(true);
+  };
+
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     setSelectedFilters({});
@@ -264,7 +293,8 @@ export function AccountDetailPage() {
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           onInfoClick={() => setIsTrayOpen(prev => !prev)}
-          hideShare
+          onShareClick={() => setIsShareOpen(true)}
+          shareCount={getExtraCount(account.id)}
         />
 
       {/* Account header */}
@@ -276,7 +306,8 @@ export function AccountDetailPage() {
           { icon: 'email', label: account.email },
           { icon: 'calendar', label: `Joined ${account.created}` }
         ]}
-        onSettingsClick={() => setIsTrayOpen(prev => !prev)}
+        onShareClick={() => setIsShareOpen(true)}
+        onInfoClick={() => setIsTrayOpen(prev => !prev)}
       />
 
         {/* Tabs */}
@@ -349,11 +380,56 @@ export function AccountDetailPage() {
                 }
               }}
               onSelectionChange={handleSelectionChange}
+              onMemberCountClick={handleMemberCountClick}
               viewMode={viewMode}
               onViewModeChange={setViewMode}
             />
           )
         )}
+
+      <MembersModal
+        isOpen={isMembersModalOpen}
+        onClose={() => { setIsMembersModalOpen(false); setMembersModalRow(null); }}
+        entityName={membersModalRow?.name ?? ''}
+        members={membersModalRow ? getMembersForRow(membersModalRow) : []}
+        onAddMembers={() => { if (membersModalRow) { setRowToShare(membersModalRow); setIsRowShareOpen(true); } }}
+      />
+
+      <ShareModal
+        isOpen={isRowShareOpen}
+        onClose={() => { setIsRowShareOpen(false); setRowToShare(null); }}
+        entityName={rowToShare?.name ?? ''}
+        entityId={rowToShare?.id ?? ''}
+        currentMembers={rowToShare ? getMembersForRow(rowToShare) : []}
+        onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
+      />
+
+      {/* Share — drawer on mobile, modal on desktop */}
+      {isMobile ? (
+        <ShareDrawer
+          isOpen={isShareOpen}
+          onClose={() => setIsShareOpen(false)}
+          entityName={account.name}
+          entityId={account.id}
+          currentMembers={[]}
+          onShare={(ids) => {
+            addSharedMembers(account.id, ids);
+            toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`);
+          }}
+        />
+      ) : (
+        <ShareModal
+          isOpen={isShareOpen}
+          onClose={() => setIsShareOpen(false)}
+          entityName={account.name}
+          entityId={account.id}
+          currentMembers={[]}
+          onShare={(ids) => {
+            addSharedMembers(account.id, ids);
+            toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`);
+          }}
+        />
+      )}
     </div>
   );
 }
