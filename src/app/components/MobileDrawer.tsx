@@ -54,6 +54,7 @@ export function MobileDrawer({ items, isOpen, onClose, entityName, entityIcon }:
               backgroundColor: 'var(--background)',
               paddingTop: '40px',
               paddingBottom: '72px',
+              minHeight: '50vh',
             }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}

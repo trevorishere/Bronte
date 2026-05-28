@@ -75,7 +75,7 @@ function DrawerChrome({ isOpen, onClose, title, subtitle, maxHeight, children, f
           {/* Drawer */}
           <motion.div
             className="fixed bottom-0 left-0 right-0 z-[63] rounded-t-[24px] flex flex-col"
-            style={{ backgroundColor: 'var(--background)', maxHeight: maxHeight ?? 'auto' }}
+            style={{ backgroundColor: 'var(--background)', maxHeight: maxHeight ?? 'auto', minHeight: '50vh' }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
