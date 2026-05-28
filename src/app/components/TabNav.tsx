@@ -22,11 +22,11 @@ export function TabNav({ tabs, activeTab, onTabChange, variant = 'default' }: Ta
   const fontSize = variant === 'detail' ? 'var(--font-size-14)' : 'var(--font-size-14)';
 
   return (
-    <div 
-      className="h-[64px] shrink-0 w-full px-4 md:px-[24px]"
+    <div
+      className="md:h-[64px] shrink-0 w-full px-4 md:px-[24px] pt-[8px] md:pt-0 mb-[8px] md:mb-0"
       style={{ borderBottom: '1px solid var(--border-interactive)' }}
     >
-      <div className="flex h-full items-end overflow-x-auto scrollbar-hide">
+      <div className="flex md:h-full items-end overflow-x-auto scrollbar-hide">
         <div className={`flex items-start ${gap} pt-[16px] min-w-max`}>
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;

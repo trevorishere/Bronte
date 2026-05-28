@@ -402,3 +402,8 @@
     color: inherit;
   }
 }
+
+/* Calendar: force range-middle day text to match start/end day text */
+.rdp-range-middle-color {
+  color: var(--primary) !important;
+}

@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Users, Mail, Calendar, Book, FolderOpen, Settings2, Share2, Plus, MoreHorizontal } from 'lucide-react';
+import { Users, Mail, Calendar, Book, FolderOpen, UserRoundPlus, Plus, Info, MoreHorizontal } from 'lucide-react';
 import type { IconSize } from './BaseIcon';
 
 interface MetadataItemProps {
@@ -45,11 +45,13 @@ interface DetailPageHeaderProps {
     icon?: 'email' | 'calendar' | 'users' | 'book' | 'folder' | ReactNode;
     label: string;
   }>;
-  /** When provided, replaces the share/add/more buttons with a single gear icon that calls this handler. */
-  onSettingsClick?: () => void;
+  /** Called when the share button is tapped */
+  onShareClick?: () => void;
+  /** Called when the info button is tapped */
+  onInfoClick?: () => void;
 }
 
-export function DetailPageHeader({ title, badge, icon, metadata, onSettingsClick }: DetailPageHeaderProps) {
+export function DetailPageHeader({ title, badge, icon, metadata, onShareClick, onInfoClick }: DetailPageHeaderProps) {
   const getIconElement = (iconType: 'email' | 'calendar' | 'users' | 'book' | 'folder' | ReactNode) => {
     if (typeof iconType !== 'string') {
       return iconType;
@@ -91,83 +93,35 @@ export function DetailPageHeader({ title, badge, icon, metadata, onSettingsClick
     <div className="shrink-0">
 
       {/* ================================================================ */}
-      {/* MOBILE LAYOUT — centered profile card                           */}
+      {/* MOBILE LAYOUT — action buttons only, left aligned              */}
       {/* ================================================================ */}
-      <div className="md:hidden flex flex-col items-center gap-[10px] px-4 pt-6 pb-5 text-center">
-
-        {/* Icon — large, centered */}
-        {icon && (
-          <div className="mb-1">
-            {icon('large')}
-          </div>
-        )}
-
-        {/* Title + badge */}
-        <div className="flex flex-col items-center gap-[6px]">
-          <h2
-            className="font-medium leading-tight"
-            style={{
-              fontFamily: 'var(--font-family)',
-              fontSize: '22px',
-              color: 'var(--primary)',
-              letterSpacing: '0.22px',
-            }}
-          >
-            {title}
-          </h2>
-          {badge && <div>{badge}</div>}
-        </div>
-
-        {/* Metadata — centered, wrapping */}
-        {metadata.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-x-[12px] gap-y-[6px]">
-            {metadata.map((item, index) => (
-              <MetadataItem
-                key={index}
-                icon={item.icon ? getIconElement(item.icon) : undefined}
-                label={item.label}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Action buttons */}
-        <div className="flex items-center gap-[8px] mt-1">
-          <button
-            className="flex items-center justify-center size-[34px] rounded-xl transition-colors"
-            style={actionBtnStyle}
-            title="Share"
-            {...mobileActionHover}
-          >
-            <Share2 className="size-[15px]" strokeWidth={2} />
-          </button>
-          <button
-            className="flex items-center justify-center size-[34px] rounded-xl transition-colors"
-            style={{ ...actionBtnStyle, backgroundColor: 'var(--primary)', border: 'none', color: 'white' }}
-            title="New"
-          >
-            <Plus className="size-[15px]" strokeWidth={2.5} style={{ color: 'white' }} />
-          </button>
-          <button
-            className="flex items-center justify-center size-[34px] rounded-xl transition-colors"
-            style={actionBtnStyle}
-            title="More options"
-            {...mobileActionHover}
-          >
-            <MoreHorizontal className="size-[15px]" strokeWidth={2} />
-          </button>
-          {onSettingsClick && (
-            <button
-              className="flex items-center justify-center size-[34px] rounded-xl transition-colors"
-              style={actionBtnStyle}
-              title="Roles & Permissions"
-              onClick={onSettingsClick}
-              {...mobileActionHover}
-            >
-              <Settings2 className="size-[15px]" strokeWidth={2} />
-            </button>
-          )}
-        </div>
+      <div className="md:hidden flex items-center gap-[8px] px-4 pt-3 pb-3">
+        <button
+          className="flex items-center justify-center size-[34px] rounded-xl transition-colors"
+          style={actionBtnStyle}
+          title="Share"
+          onClick={onShareClick}
+          {...mobileActionHover}
+        >
+          <UserRoundPlus className="size-[15px]" strokeWidth={2} />
+        </button>
+        <button
+          className="flex items-center justify-center size-[34px] rounded-xl transition-colors"
+          style={actionBtnStyle}
+          title="New"
+          {...mobileActionHover}
+        >
+          <Plus className="size-[15px]" strokeWidth={2.5} />
+        </button>
+        <button
+          className="flex items-center justify-center size-[34px] rounded-xl transition-colors"
+          style={actionBtnStyle}
+          title="Info"
+          onClick={onInfoClick}
+          {...mobileActionHover}
+        >
+          <Info className="size-[15px]" strokeWidth={2} />
+        </button>
       </div>
 
       {/* ================================================================ */}
@@ -223,8 +177,9 @@ export function DetailPageHeader({ title, badge, icon, metadata, onSettingsClick
               onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
               onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               title="Share"
+              onClick={onShareClick}
             >
-              <Share2 className="size-[14px]" strokeWidth={2} />
+              <UserRoundPlus className="size-[14px]" strokeWidth={2} />
               <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)', fontSize: '14px', letterSpacing: 'var(--letter-spacing-md)', color: 'var(--foreground)' }}>Share</span>
             </button>
             <button
@@ -246,18 +201,6 @@ export function DetailPageHeader({ title, badge, icon, metadata, onSettingsClick
             >
               <MoreHorizontal className="size-[15px]" strokeWidth={2} />
             </button>
-            {onSettingsClick && (
-              <button
-                className="flex items-center justify-center size-[32px] rounded-lg transition-colors"
-                style={actionBtnStyle}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                title="Roles & Permissions"
-                onClick={onSettingsClick}
-              >
-                <Settings2 className="size-[15px]" strokeWidth={2} />
-              </button>
-            )}
           </div>
         </div>
       </div>

@@ -1,13 +1,14 @@
-import { Star, MoreHorizontal, ShieldCheck, Code2, PenLine } from 'lucide-react';
+import { Star, ShieldCheck, Code2, PenLine } from 'lucide-react';
 import { getMetadataString } from '../utils/getMetadataString';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Avatar, roleColors, Role } from './Avatar';
 import { TeamIcon } from './TeamIcon';
 import { WorkspaceIcon } from './WorkspaceIcon';
 import { ProjectIcon } from './ProjectIcon';
 import { RowData } from './DataTable';
-import { DropdownMenu, createDefaultMenuItems, MenuItem } from './DropdownMenu';
-import { toast } from 'sonner';
+import { createDefaultMenuItems, MenuItem } from './DropdownMenu';
+import { MobileDrawer } from './MobileDrawer';
+import { RenameActionDrawer, DeleteActionDrawer, MoveActionDrawer } from './MobileActionDrawers';
 import { accounts } from '../data/accounts';
 
 interface MobileCardViewProps {
@@ -18,6 +19,11 @@ interface MobileCardViewProps {
   starredItems?: Set<string>;
   onSortChange?: (columnKey: string) => void;
   viewMode?: 'grid' | 'list';
+  onRename?: (row: RowData, newName: string) => void;
+  onShare?: (row: RowData) => void;
+  onDuplicate?: (row: RowData) => void;
+  onMove?: (row: RowData, destinationId: string, destinationLabel: string) => void;
+  onDelete?: (row: RowData) => void;
 }
 
 export function MobileCardView({
@@ -27,9 +33,19 @@ export function MobileCardView({
   onStarClick,
   starredItems,
   viewMode = 'list',
+  onRename,
+  onShare,
+  onDuplicate,
+  onMove,
+  onDelete,
 }: MobileCardViewProps) {
   const [openMenuRowId, setOpenMenuRowId] = useState<string | null>(null);
-  const moreButtonRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  // Keep last opened row so drawer content persists during exit animation
+  const [drawerRow, setDrawerRow] = useState<RowData | null>(null);
+  // Secondary action drawer state
+  type ActionType = 'rename' | 'delete' | 'move' | null;
+  const [actionType, setActionType] = useState<ActionType>(null);
+  const [actionRow, setActionRow] = useState<RowData | null>(null);
 
   const renderIcon = (row: RowData, size: 'small' | 'medium' | 'large' = 'medium') => {
     const iconType = row.iconType || 'user';
@@ -45,6 +61,54 @@ export function MobileCardView({
       return <ProjectIcon size={size} />;
     }
     return null;
+  };
+
+  const openMenu = (row: RowData) => {
+    setDrawerRow(row);
+    setOpenMenuRowId(row.id);
+  };
+
+  const closeMenu = () => setOpenMenuRowId(null);
+
+  const openAction = (type: ActionType, row: RowData) => {
+    setActionRow(row);
+    setActionType(type);
+  };
+
+  const closeAction = () => {
+    setActionType(null);
+    setActionRow(null);
+  };
+
+  const buildDrawerItems = (row: RowData, includeStarItem: boolean): MenuItem[] => {
+    const name = row.name || row.projectName || row.accountName || row.teamName || row.workspaceName || '';
+    const isAccount = row.iconType === 'account';
+
+    const base = createDefaultMenuItems(
+      name,
+      () => { openAction('rename', row); },
+      () => { onShare?.(row); },
+      () => { onDuplicate?.(row); },
+      () => { openAction('move', row); },
+      () => { openAction('delete', row); }
+    );
+
+    // Accounts don't get share option — same rule as desktop dropdown
+    const filtered = isAccount ? base.filter(item => item.id !== 'share') : base;
+
+    if (includeStarItem) {
+      const isStarred = starredItems?.has(row.id) || false;
+      return [
+        {
+          id: 'favorite',
+          label: isStarred ? 'Remove from Favorites' : 'Add to Favorites',
+          icon: <Star className="size-4" fill={isStarred ? 'currentColor' : 'none'} />,
+          onClick: () => { onStarClick?.(row, !isStarred); },
+        },
+        ...filtered,
+      ];
+    }
+    return filtered;
   };
 
   // Grid View Rendering
@@ -216,22 +280,23 @@ export function MobileCardView({
                       className="flex items-center justify-center size-[32px] rounded-full transition-colors"
                       style={{ backgroundColor: 'transparent', color: 'var(--icon)' }}
                       onClick={(e) => { e.stopPropagation(); onStarClick?.(row, !isStarred); }}
-                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
-                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--muted)')}
+                      onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                       title={isStarred ? 'Remove from favorites' : 'Add to favorites'}
                     >
                       <Star size={16} fill={isStarred ? 'currentColor' : 'none'} strokeWidth={2} style={{ color: 'var(--icon)' }} />
                     </button>
                     <button
-                      ref={(el) => el && moreButtonRefs.current.set(row.id, el)}
                       className="flex items-center justify-center size-[32px] rounded-full transition-colors"
                       style={{ backgroundColor: 'transparent', color: 'var(--icon)' }}
-                      onClick={(e) => { e.stopPropagation(); setOpenMenuRowId(openMenuRowId === row.id ? null : row.id); }}
-                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
-                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                      onClick={(e) => { e.stopPropagation(); openMenu(row); }}
+                      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--muted)')}
+                      onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                       title="More options"
                     >
-                      <MoreHorizontal size={16} strokeWidth={1.875} />
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.875" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
+                      </svg>
                     </button>
                   </div>
                 </div>
@@ -240,27 +305,34 @@ export function MobileCardView({
           })}
         </div>
 
-        {/* Grid mode dropdown menus */}
-        {data.map((row) => {
-          const anchorRef = { current: moreButtonRefs.current.get(row.id) || null };
-          const menuItems = createDefaultMenuItems(
-            row.name || row.projectName || row.accountName || row.teamName || row.workspaceName || '',
-            () => { toast.success(`Rename: ${row.name}`); setOpenMenuRowId(null); },
-            () => { toast.success(`Share: ${row.name}`); setOpenMenuRowId(null); },
-            () => { toast.success(`Duplicate: ${row.name}`); setOpenMenuRowId(null); },
-            () => { toast.success(`Move: ${row.name}`); setOpenMenuRowId(null); },
-            () => { toast.success(`Delete: ${row.name}`); setOpenMenuRowId(null); }
-          );
-          return (
-            <DropdownMenu
-              key={`grid-menu-${row.id}`}
-              items={menuItems}
-              isOpen={openMenuRowId === row.id}
-              onClose={() => setOpenMenuRowId(null)}
-              anchorRef={anchorRef}
-            />
-          );
-        })}
+        {/* Single drawer for all grid items */}
+        <MobileDrawer
+          items={drawerRow ? buildDrawerItems(drawerRow, false) : []}
+          isOpen={openMenuRowId !== null}
+          onClose={closeMenu}
+          entityName={drawerRow ? (drawerRow.name || drawerRow.projectName || drawerRow.accountName || drawerRow.teamName || drawerRow.workspaceName || '') : ''}
+          entityIcon={drawerRow ? renderIcon(drawerRow, 'medium') : undefined}
+        />
+
+        {/* Action drawers */}
+        <RenameActionDrawer
+          isOpen={actionType === 'rename'}
+          row={actionRow}
+          onClose={closeAction}
+          onConfirm={(newName) => { onRename?.(actionRow!, newName); closeAction(); }}
+        />
+        <DeleteActionDrawer
+          isOpen={actionType === 'delete'}
+          row={actionRow}
+          onClose={closeAction}
+          onConfirm={() => { onDelete?.(actionRow!); closeAction(); }}
+        />
+        <MoveActionDrawer
+          isOpen={actionType === 'move'}
+          row={actionRow}
+          onClose={closeAction}
+          onConfirm={(destId, destLabel) => { onMove?.(actionRow!, destId, destLabel); closeAction(); }}
+        />
       </>
     );
   }
@@ -271,7 +343,6 @@ export function MobileCardView({
       <div className="flex flex-col">
         {data.map((row) => {
           const primaryName = row.name || row.projectName || row.accountName || row.teamName || row.workspaceName;
-
           const metaLine = getMetadataString(row);
 
           return (
@@ -317,59 +388,49 @@ export function MobileCardView({
                 )}
               </div>
 
-              {/* More Button - always visible on mobile */}
+              {/* More button */}
               <button
-                ref={(el) => el && moreButtonRefs.current.set(row.id, el)}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpenMenuRowId(openMenuRowId === row.id ? null : row.id);
-                }}
+                onClick={(e) => { e.stopPropagation(); openMenu(row); }}
                 className="flex items-center justify-center size-[36px] rounded-full shrink-0"
                 style={{ color: 'var(--icon)', backgroundColor: 'transparent' }}
               >
-                <MoreHorizontal size={20} strokeWidth={1.875} />
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.875" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
+                </svg>
               </button>
             </div>
           );
         })}
       </div>
 
-      {/* Dropdown Menus */}
-      {data.map((row) => {
-        const anchorRef = { current: moreButtonRefs.current.get(row.id) || null };
-        const menuItems = createDefaultMenuItems(
-          row.name || row.projectName || row.accountName || row.teamName || row.workspaceName || '',
-          () => { toast.success(`Rename: ${row.name}`); setOpenMenuRowId(null); },
-          () => { toast.success(`Share: ${row.name}`); setOpenMenuRowId(null); },
-          () => { toast.success(`Duplicate: ${row.name}`); setOpenMenuRowId(null); },
-          () => { toast.success(`Move: ${row.name}`); setOpenMenuRowId(null); },
-          () => { toast.success(`Delete: ${row.name}`); setOpenMenuRowId(null); }
-        );
+      {/* Single drawer for all list items (includes star item) */}
+      <MobileDrawer
+        items={drawerRow ? buildDrawerItems(drawerRow, true) : []}
+        isOpen={openMenuRowId !== null}
+        onClose={closeMenu}
+        entityName={drawerRow ? (drawerRow.name || drawerRow.projectName || drawerRow.accountName || drawerRow.teamName || drawerRow.workspaceName || '') : ''}
+        entityIcon={drawerRow ? renderIcon(drawerRow, 'medium') : undefined}
+      />
 
-        const menuItemsWithFavorite: MenuItem[] = [
-          {
-            id: 'favorite',
-            label: starredItems?.has(row.id) ? 'Remove from Favorites' : 'Add to Favorites',
-            icon: <Star className="size-4" fill={starredItems?.has(row.id) ? 'currentColor' : 'none'} />,
-            onClick: () => {
-              const isStarred = starredItems?.has(row.id) || false;
-              onStarClick?.(row, !isStarred);
-              setOpenMenuRowId(null);
-            },
-          },
-          ...menuItems
-        ];
-
-        return (
-          <DropdownMenu
-            key={`menu-${row.id}`}
-            items={menuItemsWithFavorite}
-            isOpen={openMenuRowId === row.id}
-            onClose={() => setOpenMenuRowId(null)}
-            anchorRef={anchorRef}
-          />
-        );
-      })}
+      {/* Action drawers */}
+      <RenameActionDrawer
+        isOpen={actionType === 'rename'}
+        row={actionRow}
+        onClose={closeAction}
+        onConfirm={(newName) => { onRename?.(actionRow!, newName); closeAction(); }}
+      />
+      <DeleteActionDrawer
+        isOpen={actionType === 'delete'}
+        row={actionRow}
+        onClose={closeAction}
+        onConfirm={() => { onDelete?.(actionRow!); closeAction(); }}
+      />
+      <MoveActionDrawer
+        isOpen={actionType === 'move'}
+        row={actionRow}
+        onClose={closeAction}
+        onConfirm={(destId, destLabel) => { onMove?.(actionRow!, destId, destLabel); closeAction(); }}
+      />
     </>
   );
 }

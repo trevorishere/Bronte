@@ -15,6 +15,7 @@ import { useNavigationContext, BreadcrumbEntry } from '../contexts/NavigationCon
 import { useInfoTray } from '../contexts/InfoTrayContext';
 import { useSharedMembers } from '../contexts/SharedMembersContext';
 import { ShareModal, CurrentMember } from '../components/ShareModal';
+import { ShareDrawer } from '../components/ShareDrawer';
 import { MembersModal } from '../components/MembersModal';
 
 interface OutletContext {
@@ -40,6 +41,12 @@ export function WorkspacePage() {
   const { setIsTrayOpen, setTrayContent } = useInfoTray();
   const { addSharedMembers, getExtraCount } = useSharedMembers();
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
   const [isProjectShareOpen, setIsProjectShareOpen] = useState(false);
   const [projectShareRow, setProjectShareRow] = useState<RowData | null>(null);
   const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
@@ -187,6 +194,8 @@ export function WorkspacePage() {
             { icon: 'users', label: `${memberCount} member${memberCount !== 1 ? 's' : ''}` },
             { icon: 'calendar', label: `Created ${workspace.created}` },
           ]}
+          onShareClick={() => setIsShareOpen(true)}
+          onInfoClick={() => setIsTrayOpen(v => !v)}
         />
       )}
 
@@ -229,20 +238,36 @@ export function WorkspacePage() {
         />
       )}
 
-      {/* Workspace-level ShareModal */}
-      <ShareModal
-        isOpen={isShareOpen}
-        onClose={() => setIsShareOpen(false)}
-        entityName={workspace?.name ?? 'Workspace'}
-        entityId={workspaceId ?? ''}
-        currentMembers={accounts
-          .filter(a => a.workspaceIds.includes(workspaceId ?? ''))
-          .map((a): CurrentMember => ({ id: a.id, name: a.name, role: a.role }))}
-        onShare={(ids) => {
-          addSharedMembers(workspaceId ?? '', ids);
-          toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`);
-        }}
-      />
+      {/* Workspace-level Share (modal on desktop, drawer on mobile) */}
+      {isMobile ? (
+        <ShareDrawer
+          isOpen={isShareOpen}
+          onClose={() => setIsShareOpen(false)}
+          entityName={workspace?.name ?? 'Workspace'}
+          entityId={workspaceId ?? ''}
+          currentMembers={accounts
+            .filter(a => a.workspaceIds.includes(workspaceId ?? ''))
+            .map((a): CurrentMember => ({ id: a.id, name: a.name, role: a.role }))}
+          onShare={(ids) => {
+            addSharedMembers(workspaceId ?? '', ids);
+            toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`);
+          }}
+        />
+      ) : (
+        <ShareModal
+          isOpen={isShareOpen}
+          onClose={() => setIsShareOpen(false)}
+          entityName={workspace?.name ?? 'Workspace'}
+          entityId={workspaceId ?? ''}
+          currentMembers={accounts
+            .filter(a => a.workspaceIds.includes(workspaceId ?? ''))
+            .map((a): CurrentMember => ({ id: a.id, name: a.name, role: a.role }))}
+          onShare={(ids) => {
+            addSharedMembers(workspaceId ?? '', ids);
+            toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`);
+          }}
+        />
+      )}
 
       {/* Project-level ShareModal (triggered from MembersModal) */}
       <ShareModal

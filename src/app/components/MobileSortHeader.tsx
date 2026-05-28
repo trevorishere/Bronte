@@ -1,4 +1,4 @@
-import { ArrowUp, ArrowDown, Grid3x3, List } from 'lucide-react';
+import { ArrowUp, ArrowDown, LayoutGrid, List, Check } from 'lucide-react';
 import { IconButton } from './IconButton';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -71,9 +71,10 @@ export function MobileSortHeader({
             style={{
               fontFamily: 'var(--font-family)',
               fontWeight: 'var(--font-weight-semibold)',
-              fontSize: '13px',
+              fontSize: '12px',
               color: 'var(--primary)',
-              letterSpacing: '0.13px'
+              letterSpacing: 'var(--letter-spacing-lg)',
+              textTransform: 'uppercase',
             }}
           >
             {sortLabel}
@@ -91,7 +92,7 @@ export function MobileSortHeader({
             icon={viewMode === 'grid' ? (
               <List className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
             ) : (
-              <Grid3x3 className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
+              <LayoutGrid className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />
             )}
             onClick={() => onViewModeChange(viewMode === 'grid' ? 'list' : 'grid')}
             size={40}
@@ -117,7 +118,7 @@ export function MobileSortHeader({
             style={{
               border: '1px solid var(--border-interactive-hover)',
               borderRadius: 'var(--radius-16)',
-              minWidth: '200px',
+              right: '128px',
               transformOrigin: 'top center'
             }}
           >
@@ -125,7 +126,7 @@ export function MobileSortHeader({
               <button
                 key={option.key}
                 onClick={() => handleSortOptionClick(option.key)}
-                className="w-full px-[12px] py-[10px] transition-colors rounded-xl text-left"
+                className="w-full flex items-center justify-between px-[12px] py-[10px] transition-colors rounded-xl"
                 style={{
                   backgroundColor: sortColumn === option.key ? 'var(--muted)' : 'transparent',
                   fontFamily: 'var(--font-family)',
@@ -147,7 +148,10 @@ export function MobileSortHeader({
                   }
                 }}
               >
-                {option.label}
+                <span>{option.label}</span>
+                {sortColumn === option.key && (
+                  <Check className="size-[14px] shrink-0" style={{ color: 'var(--primary)' }} strokeWidth={2.5} />
+                )}
               </button>
             ))}
           </motion.div>

@@ -6,6 +6,7 @@ import { TeamIcon } from './TeamIcon';
 import { Avatar, roleColors, Role } from './Avatar';
 import { ProjectIcon } from './ProjectIcon';
 import { DropdownMenu, createDefaultMenuItems } from './DropdownMenu';
+import { MobileDrawer } from './MobileDrawer';
 import { accounts } from '../data/accounts';
 import { toast } from 'sonner';
 
@@ -53,7 +54,15 @@ export function GridView({
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const [hoveredFavorite, setHoveredFavorite] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [drawerItem, setDrawerItem] = useState<GridItemData | null>(null);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
   const moreButtonRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -64,6 +73,19 @@ export function GridView({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedCard]);
+
+  const renderSmallIcon = (item: GridItemData) => {
+    if (item.iconType === 'workspace') return <WorkspaceIcon name={item.name} size="medium" />;
+    if (item.iconType === 'team') return <TeamIcon size="medium" />;
+    if (item.iconType === 'account') return (
+      <Avatar
+        name={item.name}
+        role={accounts.find(acc => acc.name === item.name)?.role || item.role || 'Creator'}
+        size="medium"
+      />
+    );
+    return <ProjectIcon size="medium" />;
+  };
 
   const renderPictogram = (item: GridItemData) => {
     return (
@@ -172,11 +194,11 @@ export function GridView({
 
       {/* Mobile header row — matches MobileSortHeader height/position, toggle on right */}
       {onViewModeChange && (
-        <div className="md:hidden shrink-0 px-4 h-[40px] mt-[8px] flex items-center justify-end">
+        <div className="md:hidden shrink-0 px-4 h-[40px] flex items-center justify-end">
           <IconButton
-            icon={<List className="size-[16px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />}
+            icon={<List className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />}
             onClick={() => onViewModeChange('list')}
-            size={36}
+            size={40}
             title="Switch to list view"
           />
         </div>
@@ -280,7 +302,7 @@ export function GridView({
                       backgroundColor: hoveredFavorite === `${item.id}-more` || openMenuId === item.id ? 'var(--bg-icon-hover)' : 'transparent',
                       transition: `background-color var(--transition-duration) var(--transition-timing)`,
                     }}
-                    onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === item.id ? null : item.id); }}
+                    onClick={(e) => { e.stopPropagation(); if (openMenuId !== item.id) setDrawerItem(item); setOpenMenuId(openMenuId === item.id ? null : item.id); }}
                     onMouseEnter={() => setHoveredFavorite(`${item.id}-more`)}
                     onMouseLeave={() => setHoveredFavorite(null)}
                     title="More options"
@@ -295,8 +317,8 @@ export function GridView({
       </div>
       </div>
 
-      {/* Dropdown menus — rendered outside the grid to avoid overflow clipping */}
-      {data.map((item) => {
+      {/* Desktop: per-item dropdown menus */}
+      {!isMobile && data.map((item) => {
         const anchorRef = { current: moreButtonRefs.current.get(item.id) || null };
         const menuItems = createDefaultMenuItems(
           item.name,
@@ -316,6 +338,24 @@ export function GridView({
           />
         );
       })}
+
+      {/* Mobile: single bottom drawer */}
+      {isMobile && (
+        <MobileDrawer
+          items={drawerItem ? createDefaultMenuItems(
+            drawerItem.name,
+            () => { toast.success(`Rename: ${drawerItem.name}`); setOpenMenuId(null); },
+            () => { toast.success(`Share: ${drawerItem.name}`); setOpenMenuId(null); },
+            () => { toast.success(`Duplicate: ${drawerItem.name}`); setOpenMenuId(null); },
+            () => { toast.success(`Move: ${drawerItem.name}`); setOpenMenuId(null); },
+            () => { toast.success(`Delete: ${drawerItem.name}`); setOpenMenuId(null); }
+          ) : []}
+          isOpen={openMenuId !== null}
+          onClose={() => setOpenMenuId(null)}
+          entityName={drawerItem?.name ?? ''}
+          entityIcon={drawerItem ? renderSmallIcon(drawerItem) : undefined}
+        />
+      )}
     </div>
   );
 }

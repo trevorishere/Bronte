@@ -419,10 +419,10 @@ function CalendarView({
                 fontWeight: 'var(--font-weight-regular)',
                 lineHeight: 'var(--line-height-20)',
                 letterSpacing: 'var(--letter-spacing-md)',
-                color: isFuture 
-                  ? 'var(--muted-foreground)' 
-                  : isSelected 
-                    ? '#ffffff' 
+                color: isFuture
+                  ? 'var(--muted-foreground)'
+                  : isSelected || inRange
+                    ? '#ffffff'
                     : 'var(--foreground)',
                 cursor: isFuture ? 'not-allowed' : 'pointer',
                 opacity: isFuture ? 0.4 : 1

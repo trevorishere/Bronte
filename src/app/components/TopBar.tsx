@@ -1,4 +1,4 @@
-import { ChevronLeft, Plus, UserRoundPlus, Info } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MoreHorizontal, Plus, UserRoundPlus, Info } from 'lucide-react';
 import { ReactNode, useRef, useState, useEffect, cloneElement, isValidElement } from 'react';
 import { useNavigate } from 'react-router';
 import { ActionButtons } from './ActionButtons';
@@ -18,11 +18,12 @@ import type { BreadcrumbEntry } from '../contexts/NavigationContext';
 // Internal BreadcrumbNav component
 // entries = full trail including current page as last item
 // ============================================================
-function BreadcrumbNav({ entries, titleSuffix, ancMaxLen = 14, badgeIconOnly = false }: {
+function BreadcrumbNav({ entries, titleSuffix, ancMaxLen = 14, badgeIconOnly = false, isMobile = false }: {
   entries: BreadcrumbEntry[];
   titleSuffix?: ReactNode;
   ancMaxLen?: number;
   badgeIconOnly?: boolean;
+  isMobile?: boolean;
 }) {
   const navigate = useNavigate();
 
@@ -53,6 +54,70 @@ function BreadcrumbNav({ entries, titleSuffix, ancMaxLen = 14, badgeIconOnly = f
     const ancestorsUpToThis = entries.slice(0, indexInFull);
     navigate(entry.path, { state: { breadcrumbs: ancestorsUpToThis } });
   };
+
+  // ── MOBILE: two-line layout (ancestors on line 1, title on line 2) ──────
+  if (isMobile) {
+    return (
+      <div className="flex flex-col min-w-0 w-full" style={{ gap: 8 }}>
+        {/* Row 1: ancestor trail — separators between items, none at end */}
+        {ancestors.length > 0 && (
+          <div className="flex items-center overflow-hidden" style={{ gap: 2 }}>
+            {showEllipsis && firstAncestor && (
+              <>
+                <button
+                  className="whitespace-nowrap transition-colors"
+                  style={{ fontFamily: 'var(--font-family)', fontSize: '13px', color: 'var(--muted-foreground)', letterSpacing: 'var(--letter-spacing-md)' }}
+                  onClick={() => handleAncestorClick(firstAncestor!, 0)}
+                  title={firstAncestor.label}
+                >
+                  {truncate(firstAncestor.label, 10)}
+                </button>
+                <ChevronRight className="size-[11px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
+                <MoreHorizontal className="size-[13px] shrink-0" style={{ color: 'var(--muted-foreground)' }} />
+                <ChevronRight className="size-[11px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
+              </>
+            )}
+            {visibleAncestors.map((entry, i) => {
+              const idx = entries.findIndex(e => e.path === entry.path);
+              const isLast = i === visibleAncestors.length - 1;
+              return (
+                <div key={entry.path} className="flex items-center shrink-0" style={{ gap: 2 }}>
+                  <button
+                    className="whitespace-nowrap transition-colors"
+                    style={{ fontFamily: 'var(--font-family)', fontSize: '13px', color: 'var(--muted-foreground)', letterSpacing: 'var(--letter-spacing-md)' }}
+                    onClick={() => handleAncestorClick(entry, idx)}
+                    title={entry.label}
+                  >
+                    {truncate(entry.label, 10)}
+                  </button>
+                  {!isLast && (
+                    <ChevronRight className="size-[11px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+        {/* Row 2: current page title */}
+        <div className="flex items-center gap-[8px] min-w-0 overflow-hidden">
+          <h1
+            className="font-medium truncate min-w-0"
+            style={{ fontFamily: 'var(--font-family)', fontSize: '24px', color: 'var(--primary)', letterSpacing: 'var(--letter-spacing-lg)', lineHeight: 'normal' }}
+            title={current.label}
+          >
+            {current.label}
+          </h1>
+          {titleSuffix && (
+            <span className="shrink-0">
+              {isValidElement(titleSuffix)
+                ? cloneElement(titleSuffix as React.ReactElement<{ iconOnly?: boolean }>, { iconOnly: badgeIconOnly })
+                : titleSuffix}
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Breadcrumb className="min-w-0 overflow-hidden">
@@ -242,10 +307,10 @@ export function TopBar({
       {/* ================================================================ */}
       {/* MOBILE LAYOUT                                                    */}
       {/* ================================================================ */}
-      <div className="md:hidden flex items-center gap-1 pt-[20px] pb-[12px] px-[16px] w-full">
+      <div className="md:hidden flex items-center gap-1 pt-[20px] pb-[24px] px-[16px] w-full">
         <div className="flex items-center flex-1 min-w-0 gap-[10px] overflow-hidden">
           {hasBreadcrumbs ? (
-            <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} ancMaxLen={ancMaxLen} badgeIconOnly={badgeIconOnly} />
+            <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} ancMaxLen={ancMaxLen} badgeIconOnly={badgeIconOnly} isMobile={true} />
           ) : showBackButton ? (
             backBtn()
           ) : title ? (

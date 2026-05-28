@@ -51,13 +51,117 @@ const PERM_ROWS: { id: keyof PermissionsState; label: string }[] = [
 
 const PERM_COLS: PermLevel[] = ['View', 'Edit', 'Admin'];
 
-// ─── Main component ───────────────────────────────────────────────────────────
+// ─── Shared prop type ─────────────────────────────────────────────────────────
 
 interface InfoTrayProps {
   isOpen:   boolean;
   onClose:  () => void;
   content:  InfoTrayContent | null;
 }
+
+// ─── Mobile bottom-sheet drawer ───────────────────────────────────────────────
+
+export function InfoDrawer({ isOpen, onClose, content }: InfoTrayProps) {
+  const title = content ? String(content.data.name ?? content.data.title ?? 'Details') : 'Details';
+  const touchStartY = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [isOpen, onClose]);
+
+  const handleTouchStart = (e: React.TouchEvent) => { touchStartY.current = e.touches[0].clientY; };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartY.current === null) return;
+    if (e.changedTouches[0].clientY - touchStartY.current > 60) onClose();
+    touchStartY.current = null;
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop — mobile only */}
+          <motion.div
+            className="fixed inset-0 z-[62] md:hidden"
+            style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={onClose}
+          />
+
+          {/* Sheet — mobile only */}
+          <motion.div
+            className="fixed bottom-0 left-0 right-0 z-[63] md:hidden rounded-t-[24px] flex flex-col"
+            style={{ backgroundColor: 'var(--background)', maxHeight: '90vh' }}
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', stiffness: 380, damping: 34 }}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            {/* Drag handle */}
+            <div
+              className="absolute top-[12px] left-1/2 -translate-x-1/2 rounded-full shrink-0"
+              style={{ width: 36, height: 4, backgroundColor: 'var(--border-interactive)' }}
+            />
+
+            {/* Header */}
+            <div className="shrink-0 flex items-center justify-between px-[24px] pt-[36px] pb-[16px]">
+              <span style={{
+                fontFamily:    'var(--font-family)',
+                fontSize:      '22px',
+                fontWeight:    'var(--font-weight-semibold)',
+                color:         'var(--primary)',
+                flex:          1,
+                minWidth:      0,
+                overflow:      'hidden',
+                textOverflow:  'ellipsis',
+                whiteSpace:    'nowrap',
+                marginRight:   8,
+              }}>
+                {title}
+              </span>
+              <button
+                onClick={onClose}
+                className="shrink-0 flex items-center justify-center size-[32px] rounded-[8px] transition-colors"
+                style={{ backgroundColor: 'transparent', color: 'var(--muted-foreground)', border: 'none', cursor: 'pointer' }}
+                onMouseOver={e  => (e.currentTarget.style.backgroundColor = 'var(--muted)')}
+                onMouseOut={e   => (e.currentTarget.style.backgroundColor = 'transparent')}
+              >
+                <X className="size-[18px]" strokeWidth={2} />
+              </button>
+            </div>
+
+            {/* Divider */}
+            <div className="shrink-0" style={{ height: 1, backgroundColor: 'var(--border)' }} />
+
+            {/* Panel body — panels own their scroll + footer */}
+            {content?.type === 'account' ? (
+              <AccountPanel
+                key={String(content.data.id ?? content.data.name)}
+                data={content.data}
+              />
+            ) : content?.type === 'page' ? (
+              <PageInfoPanel data={content.data} />
+            ) : content ? (
+              <ReadOnlyPanel content={content} />
+            ) : (
+              <EmptyPanel />
+            )}
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
 
 export function InfoTray({ isOpen, onClose, content }: InfoTrayProps) {
   const title = content ? String(content.data.name ?? content.data.title ?? 'Details') : 'Details';

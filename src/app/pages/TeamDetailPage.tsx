@@ -17,6 +17,8 @@ import { useNavigationContext, BreadcrumbEntry } from '../contexts/NavigationCon
 import { useInfoTray } from '../contexts/InfoTrayContext';
 import { useSharedMembers } from '../contexts/SharedMembersContext';
 import { ShareModal, CurrentMember } from '../components/ShareModal';
+import { ShareDrawer } from '../components/ShareDrawer';
+import { MembersModal } from '../components/MembersModal';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -34,6 +36,16 @@ export function TeamDetailPage() {
   const { setIsTrayOpen, setTrayContent } = useInfoTray();
   const { addSharedMembers, getExtraCount } = useSharedMembers();
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
+  const [membersModalRow, setMembersModalRow] = useState<RowData | null>(null);
+  const [isRowShareOpen, setIsRowShareOpen] = useState(false);
+  const [rowToShare, setRowToShare] = useState<RowData | null>(null);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   const location = useLocation();
   const { ancestors, setAncestors } = useNavigationContext();
@@ -230,6 +242,18 @@ export function TeamDetailPage() {
   const [extraRows, setExtraRows] = useState<RowData[]>([]);
   const displayData = [...filteredData, ...extraRows];
 
+  const getMembersForRow = (row: RowData): CurrentMember[] => {
+    const id = String(row.id);
+    if (row.iconType === 'project') return accounts.filter(a => a.projectIds.includes(id)).map(a => ({ id: a.id, name: a.name, role: a.role }));
+    if (row.iconType === 'account') return accounts.filter(a => a.teamIds.includes(id)).map(a => ({ id: a.id, name: a.name, role: a.role }));
+    return [];
+  };
+
+  const handleMemberCountClick = (row: RowData) => {
+    setMembersModalRow(row);
+    setIsMembersModalOpen(true);
+  };
+
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     setSelectedFilters({});
@@ -272,6 +296,8 @@ export function TeamDetailPage() {
               { icon: 'users', label: `${totalMembers} member${totalMembers !== 1 ? 's' : ''}` },
               { icon: 'calendar', label: `Created ${team.created}` }
             ]}
+            onShareClick={() => setIsShareOpen(true)}
+            onInfoClick={() => setIsTrayOpen(v => !v)}
           />
         );
       })()}
@@ -331,6 +357,7 @@ export function TeamDetailPage() {
               }
             }}
             onSelectionChange={handleSelectionChange}
+            onMemberCountClick={handleMemberCountClick}
             onDuplicate={(copy) => setExtraRows(prev => [...prev, copy])}
             onDelete={(deleted) => setExtraRows(prev => prev.filter(r => r.id !== deleted.id))}
             viewMode={viewMode}
@@ -339,19 +366,52 @@ export function TeamDetailPage() {
         )
       )}
 
-      <ShareModal
-        isOpen={isShareOpen}
-        onClose={() => setIsShareOpen(false)}
-        entityName={team.name}
-        entityId={team.id}
-        currentMembers={accounts
-          .filter(a => a.teamIds?.includes(team.id))
-          .map((a): CurrentMember => ({ id: a.id, name: a.name, role: a.role }))}
-        onShare={(ids) => {
-          addSharedMembers(team.id, ids);
-          toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`);
-        }}
+      <MembersModal
+        isOpen={isMembersModalOpen}
+        onClose={() => { setIsMembersModalOpen(false); setMembersModalRow(null); }}
+        entityName={membersModalRow?.name ?? ''}
+        members={membersModalRow ? getMembersForRow(membersModalRow) : []}
+        onAddMembers={() => { if (membersModalRow) { setRowToShare(membersModalRow); setIsRowShareOpen(true); } }}
       />
+
+      <ShareModal
+        isOpen={isRowShareOpen}
+        onClose={() => { setIsRowShareOpen(false); setRowToShare(null); }}
+        entityName={rowToShare?.name ?? ''}
+        entityId={rowToShare?.id ?? ''}
+        currentMembers={rowToShare ? getMembersForRow(rowToShare) : []}
+        onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
+      />
+
+      {isMobile ? (
+        <ShareDrawer
+          isOpen={isShareOpen}
+          onClose={() => setIsShareOpen(false)}
+          entityName={team.name}
+          entityId={team.id}
+          currentMembers={accounts
+            .filter(a => a.teamIds?.includes(team.id))
+            .map((a): CurrentMember => ({ id: a.id, name: a.name, role: a.role }))}
+          onShare={(ids) => {
+            addSharedMembers(team.id, ids);
+            toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`);
+          }}
+        />
+      ) : (
+        <ShareModal
+          isOpen={isShareOpen}
+          onClose={() => setIsShareOpen(false)}
+          entityName={team.name}
+          entityId={team.id}
+          currentMembers={accounts
+            .filter(a => a.teamIds?.includes(team.id))
+            .map((a): CurrentMember => ({ id: a.id, name: a.name, role: a.role }))}
+          onShare={(ids) => {
+            addSharedMembers(team.id, ids);
+            toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`);
+          }}
+        />
+      )}
     </div>
   );
 }
