@@ -97,7 +97,7 @@ export function InfoDrawer({ isOpen, onClose, content }: InfoTrayProps) {
           {/* Sheet — mobile only */}
           <motion.div
             className="fixed bottom-0 left-0 right-0 z-[63] md:hidden rounded-t-[24px] flex flex-col"
-            style={{ backgroundColor: 'var(--background)', maxHeight: '90vh' }}
+            style={{ backgroundColor: 'var(--background)', maxHeight: '90vh', minHeight: '50vh' }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
