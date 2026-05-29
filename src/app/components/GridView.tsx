@@ -194,7 +194,7 @@ export function GridView({
 
       {/* Mobile header row — matches MobileSortHeader height/position, toggle on right */}
       {onViewModeChange && (
-        <div className="md:hidden shrink-0 px-4 h-[40px] flex items-center justify-end">
+        <div className="md:hidden shrink-0 px-4 h-[40px] flex items-center justify-end mt-[16px]">
           <IconButton
             icon={<List className="size-[20px]" style={{ color: 'var(--icon)' }} strokeWidth={2} />}
             onClick={() => onViewModeChange('list')}

@@ -80,10 +80,10 @@ export function Sidebar({
   };
 
   const sidebarBody = (
-    <div className="flex flex-col h-full pt-[20px] pb-[24px]">
+    <nav aria-label="Sidebar navigation" className="flex flex-col h-full pt-[20px] pb-[24px]">
 
       {/* ── HEADER ───────────────────────────────────────────────── */}
-      <div className="shrink-0 w-full pl-[16px]">
+      <div className="shrink-0 w-full pl-[16px] pt-[4px]">
         {/* Desktop collapsed: just the re-open button */}
         {!isDesktopOpen && (
           <div className="hidden md:flex h-[40px] items-center mb-[12px]">
@@ -98,7 +98,7 @@ export function Sidebar({
         )}
 
         {/* Logo row — always on mobile, only when expanded on desktop */}
-        <div className={`flex items-center justify-between pb-[12px] pl-[12px] ${!isDesktopOpen ? 'flex md:hidden' : 'flex'}`}>
+        <div className={`flex items-center justify-between pb-[24px] pl-[12px] ${!isDesktopOpen ? 'flex md:hidden' : 'flex'}`}>
           <div
             className="h-[40px] flex items-center"
             style={{ fontFamily: 'Aleo, serif', fontWeight: 700, fontSize: '22px', letterSpacing: '0.3px', color: 'var(--primary)', whiteSpace: 'nowrap' }}
@@ -125,8 +125,8 @@ export function Sidebar({
           </div>
         </div>
 
-        {/* Search */}
-        <div className="pr-[16px]" style={textFade}>
+        {/* Search — decorative placeholder, no function yet */}
+        <div className="pr-[16px] pt-[16px]" style={textFade} aria-hidden="true">
           <div
             className="flex items-center gap-[12px] px-[12px] py-[10px] rounded-[12px] transition-colors duration-150"
             style={{
@@ -155,7 +155,7 @@ export function Sidebar({
       </div>
 
       {/* ── TOP NAV (Recent / Favorites / Shared) ────────────────── */}
-      <div className="shrink-0 w-full pt-[12px] px-[16px]">
+      <div className="shrink-0 w-full pt-[24px] px-[16px]">
         <div className="flex flex-col gap-px">
           {myWorkspaceItems.map(item => (
             <button
@@ -163,6 +163,7 @@ export function Sidebar({
               onClick={() => handleItemClick(item.id)}
               onMouseEnter={() => setHoveredItem(item.id)}
               onMouseLeave={() => setHoveredItem(null)}
+              aria-current={activeItem === item.id ? 'page' : undefined}
               className="w-full rounded-[12px] transition-colors duration-150"
               style={{
                 backgroundColor: navBg(item.id),
@@ -279,6 +280,7 @@ export function Sidebar({
             onClick={() => handleItemClick('admin')}
             onMouseEnter={() => setHoveredItem('admin')}
             onMouseLeave={() => setHoveredItem(null)}
+            aria-current={activeItem === 'admin' ? 'page' : undefined}
             className="w-full rounded-[12px] transition-colors duration-150"
             style={{
               backgroundColor: navBg('admin'),
@@ -286,14 +288,14 @@ export function Sidebar({
               overflow: 'hidden',
             }}
           >
-            <div className="flex gap-[12px] items-center px-[12px] py-[9px]">
+            <div className="flex gap-[12px] items-center px-[12px] py-[10px]">
               <div className="shrink-0 size-[20px]">
                 <ShieldUser className="size-full" style={{ color: iconColor('admin') }} />
               </div>
               <p style={{
                 fontFamily: 'var(--font-family)',
                 fontWeight: 'var(--font-weight-medium)',
-                fontSize: '14px',
+                fontSize: 'var(--font-size-15)',
                 letterSpacing: '0.3px',
                 lineHeight: '20px',
                 color: textColor('admin'),
@@ -325,7 +327,7 @@ export function Sidebar({
                 className="shrink-0 size-[24px] rounded-full flex items-center justify-center"
                 style={{ backgroundColor: 'var(--bg-account-avatar)' }}
               >
-                <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'bold', fontSize: '9px', color: 'white', letterSpacing: '0.5px' }}>LD</span>
+                <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'bold', fontSize: 'var(--font-size-10)', color: 'white', letterSpacing: '0.5px' }}>LD</span>
               </div>
               <div className="flex-1 min-w-0" style={textFade}>
                 <p className="truncate" style={{
@@ -345,7 +347,7 @@ export function Sidebar({
         </div>
       </div>
 
-    </div>
+    </nav>
   );
 
   return (

@@ -1,8 +1,10 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { X, ChevronRight, Search, FolderOpen, File } from 'lucide-react';
 import { Button } from './Button';
 import { workspaces, projects } from '../data/workspaces';
 import type { RowData } from './DataTable';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useRestoreFocus } from '../hooks/useRestoreFocus';
 
 interface TreeNode {
   id: string;
@@ -145,6 +147,9 @@ export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(workspaces.map(w => w.id)));
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(panelRef, isOpen);
+  useRestoreFocus(isOpen);
 
   // Reset on open
   useEffect(() => {
@@ -243,10 +248,14 @@ export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+      style={{ backgroundColor: 'var(--backdrop-color-modal)' }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="move-title"
         className="relative flex flex-col rounded-2xl shadow-lg"
         style={{
           width: '560px',
@@ -257,10 +266,11 @@ export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
       >
         {/* Header */}
         <div
-          className="flex items-center justify-between px-[32px] py-[28px] shrink-0"
+          className="flex items-start justify-between px-[32px] pt-[24px] pb-[28px] shrink-0"
         >
-          <div className="flex flex-col gap-[4px] min-w-0 pr-[8px]">
+          <div className="flex flex-col gap-[8px] min-w-0 pr-[8px]">
             <h2
+              id="move-title"
               style={{
                 fontFamily: 'var(--font-family)',
                 fontWeight: 'var(--font-weight-semibold)',
@@ -285,6 +295,7 @@ export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
           </div>
           <button
             onClick={onClose}
+            aria-label="Close"
             className="flex items-center justify-center size-[32px] rounded-full transition-colors ml-[16px] shrink-0"
             style={{ backgroundColor: 'transparent' }}
             onMouseOver={e => (e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)')}
@@ -310,7 +321,7 @@ export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
               placeholder="Search locations…"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="flex-1 min-w-0 outline-none bg-transparent"
+              className="flex-1 min-w-0 bg-transparent"
               style={{
                 fontFamily: 'var(--font-family)',
                 fontSize: 'var(--font-size-15)',
@@ -353,7 +364,7 @@ export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
 
         {/* Footer */}
         <div
-          className="flex items-center justify-between px-[32px] py-[28px] shrink-0"
+          className="flex items-center justify-between px-[32px] pt-[24px] pb-[32px] shrink-0"
         >
           <span
             style={{

@@ -63,7 +63,7 @@ export function RoleBadge({ role, iconOnly = false }: RoleBadgeProps) {
         border: `1px solid ${colors.border}`,
       }}
     >
-      <span style={{ color: 'var(--role-pill-text)', display: 'flex', alignItems: 'center' }}>
+      <span aria-hidden="true" style={{ color: 'var(--role-pill-text)', display: 'flex', alignItems: 'center' }}>
         {icon}
       </span>
       {!iconOnly && (

@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Button } from './Button';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useRestoreFocus } from '../hooks/useRestoreFocus';
 
 interface RenameModalProps {
   isOpen: boolean;
@@ -10,15 +12,18 @@ interface RenameModalProps {
   title?: string;
 }
 
-export function RenameModal({ 
-  isOpen, 
-  currentName, 
-  onClose, 
+export function RenameModal({
+  isOpen,
+  currentName,
+  onClose,
   onRename,
   title = 'Rename'
 }: RenameModalProps) {
   const [newName, setNewName] = useState(currentName);
   const inputRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(panelRef, isOpen);
+  useRestoreFocus(isOpen);
 
   // Helper functions for file name and extension
   const getFileNameWithoutExtension = (fullName: string): string => {
@@ -41,14 +46,14 @@ export function RenameModal({
   useEffect(() => {
     if (isOpen) {
       setNewName(currentName);
-      
+
       // Auto-focus and select the name part (without extension) after a brief delay
       setTimeout(() => {
         if (inputRef.current) {
           inputRef.current.focus();
           const extension = getFileExtension(currentName);
           const nameWithoutExt = getFileNameWithoutExtension(currentName);
-          
+
           if (extension) {
             // Select only the name part, not the extension
             inputRef.current.setSelectionRange(0, nameWithoutExt.length);
@@ -63,7 +68,7 @@ export function RenameModal({
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
-    
+
     if (newName.trim() && newName.trim() !== currentName) {
       onRename(newName.trim());
       onClose();
@@ -94,13 +99,17 @@ export function RenameModal({
 
   return (
     // Backdrop
-    <div 
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+      style={{ backgroundColor: 'var(--backdrop-color-modal)' }}
       onClick={handleBackdropClick}
     >
       {/* Modal */}
-      <div 
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="rename-title"
         className="relative flex flex-col rounded-2xl shadow-lg"
         style={{
           width: '560px',
@@ -110,10 +119,11 @@ export function RenameModal({
       >
         {/* Header */}
         <div
-          className="flex items-center justify-between px-[32px] py-[28px]"
+          className="flex items-start justify-between px-[32px] pt-[24px] pb-[28px]"
         >
-          <div className="flex flex-col gap-[4px] min-w-0 pr-[8px]">
+          <div className="flex flex-col gap-[8px] min-w-0 pr-[8px]">
             <h2
+              id="rename-title"
               style={{
                 fontFamily: 'var(--font-family)',
                 fontWeight: 'var(--font-weight-semibold)',
@@ -135,6 +145,7 @@ export function RenameModal({
           </div>
           <button
             onClick={handleCancel}
+            aria-label="Close"
             className="flex items-center justify-center size-[32px] rounded-full transition-colors ml-[16px] shrink-0"
             style={{ backgroundColor: 'transparent' }}
             onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
@@ -155,8 +166,7 @@ export function RenameModal({
                   fontWeight: 'var(--font-weight-medium)',
                   fontSize: 'var(--font-size-11)',
                   lineHeight: 'var(--line-height-normal)',
-                  color: 'var(--foreground)',
-                  opacity: 0.5,
+                  color: 'var(--muted-foreground)',
                 }}
               >
                 New Name
@@ -177,7 +187,6 @@ export function RenameModal({
                     lineHeight: 'var(--line-height-normal)',
                     color: 'var(--primary)',
                     border: '1px solid var(--border-interactive)',
-                    outline: 'none',
                     backgroundColor: 'var(--background)'
                   }}
                   onFocus={(e) => {
@@ -205,8 +214,8 @@ export function RenameModal({
           </div>
 
           {/* Footer */}
-          <div 
-            className="flex items-center justify-end gap-[12px] px-[32px] py-[28px]"
+          <div
+            className="flex items-center justify-end gap-[12px] px-[32px] pt-[24px] pb-[32px]"
           >
             <Button
               variant="secondary"

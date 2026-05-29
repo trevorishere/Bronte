@@ -1,6 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { Button } from './Button';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useRestoreFocus } from '../hooks/useRestoreFocus';
 
 interface DeleteConfirmModalProps {
   isOpen: boolean;
@@ -10,6 +12,10 @@ interface DeleteConfirmModalProps {
 }
 
 export function DeleteConfirmModal({ isOpen, itemName, onClose, onConfirm }: DeleteConfirmModalProps) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(panelRef, isOpen);
+  useRestoreFocus(isOpen);
+
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -33,19 +39,24 @@ export function DeleteConfirmModal({ isOpen, itemName, onClose, onConfirm }: Del
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+      style={{ backgroundColor: 'var(--backdrop-color-modal)' }}
       onClick={handleBackdropClick}
     >
       <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-confirm-title"
         className="relative flex flex-col rounded-2xl shadow-lg"
         style={{ width: '560px', backgroundColor: 'var(--background)', border: '1px solid var(--border)' }}
       >
         {/* Header */}
         <div
-          className="flex items-center justify-between px-[32px] py-[28px]"
+          className="flex items-start justify-between px-[32px] pt-[24px] pb-[28px]"
         >
-          <div className="flex flex-col gap-[4px] min-w-0 pr-[8px]">
+          <div className="flex flex-col gap-[8px] min-w-0 pr-[8px]">
             <h2
+              id="delete-confirm-title"
               style={{
                 fontFamily: 'var(--font-family)',
                 fontWeight: 'var(--font-weight-semibold)',
@@ -67,6 +78,7 @@ export function DeleteConfirmModal({ isOpen, itemName, onClose, onConfirm }: Del
           </div>
           <button
             onClick={onClose}
+            aria-label="Close"
             className="flex items-center justify-center size-[32px] rounded-full transition-colors ml-[16px] shrink-0"
             style={{ backgroundColor: 'transparent' }}
             onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)')}
@@ -93,7 +105,7 @@ export function DeleteConfirmModal({ isOpen, itemName, onClose, onConfirm }: Del
 
         {/* Footer */}
         <div
-          className="flex items-center justify-end gap-[12px] px-[32px] py-[28px]"
+          className="flex items-center justify-end gap-[12px] px-[32px] pt-[24px] pb-[32px]"
         >
           <Button variant="secondary" onClick={onClose} type="button">
             Cancel

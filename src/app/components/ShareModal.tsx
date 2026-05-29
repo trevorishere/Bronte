@@ -5,6 +5,8 @@ import { accounts } from '../data/accounts';
 import { roleColors } from './Avatar';
 import type { Role } from './Avatar';
 import { useSharedMembers } from '../contexts/SharedMembersContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useRestoreFocus } from '../hooks/useRestoreFocus';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -78,12 +80,15 @@ function Chip({ account, onRemove }: { account: SelectedAccount; onRemove: () =>
       }}>
         {account.name}
       </span>
-      <div
+      <button
+        type="button"
         onClick={onRemove}
+        aria-label={`Remove ${account.name}`}
         className="shrink-0 flex items-center justify-center size-[12px] rounded-full transition-opacity hover:opacity-70 cursor-pointer"
+        style={{ background: 'none', border: 'none', padding: 0 }}
       >
         <X className="size-[10px]" style={{ color: 'var(--foreground)' }} strokeWidth={2.5} />
-      </div>
+      </button>
     </div>
   );
 }
@@ -178,13 +183,20 @@ function AccountListRow({
 
 // ─── Access row (accounts with access list) ───────────────────────────────────
 
-function AccessRow({ member, onRemove, isPending = false }: { member: CurrentMember; onRemove: () => void; isPending?: boolean }) {
+function AccessRow({ member, onRemove, isPending = false, entityName }: { member: CurrentMember; onRemove: () => void; isPending?: boolean; entityName?: string }) {
   const [hovered, setHovered] = useState(false);
   const [hoveredX, setHoveredX] = useState(false);
   return (
-    <div
+    <button
+      type="button"
       className="group w-full flex items-center gap-[12px] px-[12px] h-[40px] rounded-xl transition-colors cursor-pointer"
-      style={{ backgroundColor: hovered ? 'var(--muted)' : 'transparent' }}
+      style={{
+        backgroundColor: hovered ? 'var(--muted)' : 'transparent',
+        border: 'none',
+        padding: '0 12px',
+        textAlign: 'left',
+      }}
+      aria-label={entityName ? `Remove ${member.name} from ${entityName}` : `Remove ${member.name}`}
       onClick={onRemove}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -202,8 +214,7 @@ function AccessRow({ member, onRemove, isPending = false }: { member: CurrentMem
         {member.name}
       </span>
       {isPending ? (
-        <button
-          onClick={onRemove}
+        <span
           className="shrink-0 transition-colors"
           style={{
             fontFamily: 'var(--font-family)',
@@ -211,15 +222,11 @@ function AccessRow({ member, onRemove, isPending = false }: { member: CurrentMem
             fontSize: '12px',
             letterSpacing: '0.3px',
             color: hovered ? 'var(--primary)' : 'var(--muted-foreground)',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: 0,
             whiteSpace: 'nowrap',
           }}
         >
           Revoke Invitation
-        </button>
+        </span>
       ) : (
         <div
           role="button"
@@ -232,7 +239,7 @@ function AccessRow({ member, onRemove, isPending = false }: { member: CurrentMem
           <X className="size-[11px]" style={{ color: hoveredX ? 'var(--primary)' : 'var(--foreground)' }} strokeWidth={2} />
         </div>
       )}
-    </div>
+    </button>
   );
 }
 
@@ -260,6 +267,9 @@ export function ShareModal({
   isOpen, onClose, entityName, entityId, onShare, currentMembers = [],
 }: ShareModalProps) {
   const { pendingInvitations, revokeInvitation } = useSharedMembers();
+  const panelRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(panelRef, isOpen);
+  useRestoreFocus(isOpen);
 
   const currentMemberIds = new Set(currentMembers.map(m => m.id));
   const pendingIds = new Set(pendingInvitations[entityId] ?? []);
@@ -332,10 +342,14 @@ export function ShareModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+      style={{ backgroundColor: 'var(--backdrop-color-modal)' }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="share-title"
         className="relative flex flex-col rounded-2xl shadow-lg overflow-hidden"
         style={{
           width: '560px',
@@ -346,16 +360,19 @@ export function ShareModal({
       >
         {/* ── Header ──────────────────────────────────────────────────── */}
         <div
-          className="shrink-0 flex items-center justify-between px-[32px] py-[28px]"
+          className="shrink-0 flex items-start justify-between px-[32px] py-[28px]"
         >
           <div className="flex flex-col gap-[4px] min-w-0 pr-[8px]">
-            <h2 style={{
-              fontFamily: 'var(--font-family)',
-              fontWeight: 'var(--font-weight-semibold)',
-              fontSize: 'var(--font-size-24)',
-              lineHeight: 'var(--line-height-normal)',
-              color: 'var(--primary)',
-            }}>
+            <h2
+              id="share-title"
+              style={{
+                fontFamily: 'var(--font-family)',
+                fontWeight: 'var(--font-weight-semibold)',
+                fontSize: 'var(--font-size-24)',
+                lineHeight: 'var(--line-height-normal)',
+                color: 'var(--primary)',
+              }}
+            >
               Share
             </h2>
             <p className="truncate" style={{
@@ -369,6 +386,7 @@ export function ShareModal({
           </div>
           <button
             onClick={onClose}
+            aria-label="Close"
             className="flex items-center justify-center size-[32px] rounded-full transition-colors ml-[16px] shrink-0"
             style={{ backgroundColor: 'transparent' }}
             onMouseOver={e => (e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)')}
@@ -379,7 +397,7 @@ export function ShareModal({
         </div>
 
         {/* ── Search input + chips ─────────────────────────────────────── */}
-        <div className="shrink-0 px-[32px] pt-[0px] pb-[24px]">
+        <div className="shrink-0 px-[32px] pt-[8px] pb-[32px]">
           <div
             className={`flex gap-[8px] min-h-[40px] px-[10px] py-[6px] rounded-[12px] cursor-text ${selected.length > 0 ? 'items-start' : 'items-center'}`}
             style={{
@@ -403,7 +421,7 @@ export function ShareModal({
                   onFocus={() => setInputFocused(true)}
                   onBlur={() => setInputFocused(false)}
                   placeholder={selected.length === 0 ? 'Search by name or email…' : ''}
-                  className="w-full outline-none bg-transparent"
+                  className="w-full bg-transparent"
                   style={{
                     fontFamily: 'var(--font-family)',
                     fontWeight: 'var(--font-weight-regular)',
@@ -456,7 +474,7 @@ export function ShareModal({
           {/* ── Accounts with access ─────────────────────────────────────── */}
           {(accessList.length > 0 || pendingList.length > 0) && (
             <>
-              <div style={{ height: 48 }} />
+              <div style={{ height: 32 }} />
               {(() => {
                 const total = accessList.length + pendingList.length;
                 return <SectionLabel text={`Accounts with Access (${total})`} />;
@@ -464,10 +482,10 @@ export function ShareModal({
               <div style={{ maxHeight: '198px', overflowY: 'auto' }}>
                 <div className="flex flex-col gap-[1px]">
                   {accessList.map(m => (
-                    <AccessRow key={m.id} member={m} onRemove={() => removeAccess(m.id)} />
+                    <AccessRow key={m.id} member={m} onRemove={() => removeAccess(m.id)} entityName={entityName} />
                   ))}
                   {pendingList.map(m => (
-                    <AccessRow key={m.id} member={m} onRemove={() => revokeInvitation(entityId, m.id)} isPending />
+                    <AccessRow key={m.id} member={m} onRemove={() => revokeInvitation(entityId, m.id)} isPending entityName={entityName} />
                   ))}
                 </div>
               </div>
