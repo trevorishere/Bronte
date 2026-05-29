@@ -3,20 +3,14 @@ import { ReactNode, useRef, useState, useEffect, cloneElement, isValidElement } 
 import { useNavigate } from 'react-router';
 import { ActionButtons } from './ActionButtons';
 import { IconButton } from './IconButton';
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-  BreadcrumbEllipsis,
-} from './ui/breadcrumb';
 import type { BreadcrumbEntry } from '../contexts/NavigationContext';
 
 // ============================================================
 // Internal BreadcrumbNav component
 // entries = full trail including current page as last item
+// Two-line layout on both mobile and desktop:
+//   Line 1 — ancestor trail (chevrons between, none after last)
+//   Line 2 — current page title
 // ============================================================
 function BreadcrumbNav({ entries, titleSuffix, ancMaxLen = 14, badgeIconOnly = false, isMobile = false }: {
   entries: BreadcrumbEntry[];
@@ -35,7 +29,6 @@ function BreadcrumbNav({ entries, titleSuffix, ancMaxLen = 14, badgeIconOnly = f
   const ancestors = entries.slice(0, -1);
   const current = entries[entries.length - 1];
 
-  // Determine which ancestors to show
   // Max 2 visible ancestors; if more, show first + ellipsis + last
   let visibleAncestors: BreadcrumbEntry[];
   let showEllipsis = false;
@@ -45,151 +38,80 @@ function BreadcrumbNav({ entries, titleSuffix, ancMaxLen = 14, badgeIconOnly = f
     visibleAncestors = ancestors;
   } else {
     firstAncestor = ancestors[0];
-    visibleAncestors = [ancestors[ancestors.length - 1]]; // only last ancestor before current
+    visibleAncestors = [ancestors[ancestors.length - 1]];
     showEllipsis = true;
   }
 
   const handleAncestorClick = (entry: BreadcrumbEntry, indexInFull: number) => {
-    // Pass the ancestors up-to-but-not-including this entry as state
     const ancestorsUpToThis = entries.slice(0, indexInFull);
     navigate(entry.path, { state: { breadcrumbs: ancestorsUpToThis } });
   };
 
-  // ── MOBILE: two-line layout (ancestors on line 1, title on line 2) ──────
-  if (isMobile) {
-    return (
-      <div className="flex flex-col min-w-0 w-full" style={{ gap: 8 }}>
-        {/* Row 1: ancestor trail — separators between items, none at end */}
-        {ancestors.length > 0 && (
-          <div className="flex items-center overflow-hidden" style={{ gap: 2 }}>
-            {showEllipsis && firstAncestor && (
-              <>
-                <button
-                  className="whitespace-nowrap transition-colors"
-                  style={{ fontFamily: 'var(--font-family)', fontSize: '13px', color: 'var(--muted-foreground)', letterSpacing: 'var(--letter-spacing-md)' }}
-                  onClick={() => handleAncestorClick(firstAncestor!, 0)}
-                  title={firstAncestor.label}
-                  aria-label={firstAncestor.label}
-                >
-                  {truncate(firstAncestor.label, 10)}
-                </button>
-                <ChevronRight className="size-[11px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
-                <MoreHorizontal className="size-[13px] shrink-0" style={{ color: 'var(--muted-foreground)' }} />
-                <ChevronRight className="size-[11px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
-              </>
-            )}
-            {visibleAncestors.map((entry, i) => {
-              const idx = entries.findIndex(e => e.path === entry.path);
-              const isLast = i === visibleAncestors.length - 1;
-              return (
-                <div key={entry.path} className="flex items-center shrink-0" style={{ gap: 2 }}>
-                  <button
-                    className="whitespace-nowrap transition-colors"
-                    style={{ fontFamily: 'var(--font-family)', fontSize: '13px', color: 'var(--muted-foreground)', letterSpacing: 'var(--letter-spacing-md)' }}
-                    onClick={() => handleAncestorClick(entry, idx)}
-                    title={entry.label}
-                    aria-label={entry.label}
-                  >
-                    {truncate(entry.label, 10)}
-                  </button>
-                  {!isLast && (
-                    <ChevronRight className="size-[11px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-        {/* Row 2: current page title */}
-        <div className="flex items-center gap-[8px] min-w-0 overflow-hidden">
-          <h1
-            className="font-medium truncate min-w-0"
-            style={{ fontFamily: 'var(--font-family)', fontSize: '24px', color: 'var(--primary)', letterSpacing: 'var(--letter-spacing-md)', lineHeight: 'normal' }}
-            title={current.label}
-          >
-            {current.label}
-          </h1>
-          {titleSuffix && (
-            <span className="shrink-0">
-              {isValidElement(titleSuffix)
-                ? cloneElement(titleSuffix as React.ReactElement<{ iconOnly?: boolean }>, { iconOnly: badgeIconOnly })
-                : titleSuffix}
-            </span>
-          )}
-        </div>
-      </div>
-    );
-  }
+  const ancFontSize = isMobile ? '13px' : '14px';
+  const ancTruncLen = isMobile ? 10 : ancMaxLen;
+  const rowGap = isMobile ? 8 : 4;
 
   return (
-    <Breadcrumb className="min-w-0 overflow-hidden">
-      <BreadcrumbList className="text-[16px] md:text-[16px] flex-nowrap min-w-0 overflow-hidden">
-        {/* First ancestor (when ellipsis applies) */}
-        {showEllipsis && firstAncestor && (() => {
-          const idx = 0; // firstAncestor is always at index 0 in entries
-          return (
+    <div className="flex flex-col min-w-0 w-full" style={{ gap: rowGap }}>
+      {/* Row 1: ancestor trail — chevrons between items, none after last */}
+      {ancestors.length > 0 && (
+        <div className="flex items-center overflow-hidden" style={{ gap: 2 }}>
+          {showEllipsis && firstAncestor && (
             <>
-              <BreadcrumbItem className="shrink-0">
-                <BreadcrumbLink asChild>
-                  <button
-                    className="whitespace-nowrap"
-                    onClick={() => handleAncestorClick(firstAncestor!, idx)}
-                    title={firstAncestor.label}
-                    aria-label={firstAncestor.label}
-                  >
-                    {truncate(firstAncestor.label)}
-                  </button>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="shrink-0" />
-              <BreadcrumbItem className="shrink-0">
-                <BreadcrumbEllipsis className="size-[16px]" />
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="shrink-0" />
+              <button
+                className="whitespace-nowrap transition-colors"
+                style={{ fontFamily: 'var(--font-family)', fontSize: ancFontSize, color: 'var(--muted-foreground)', letterSpacing: 'var(--letter-spacing-md)' }}
+                onClick={() => handleAncestorClick(firstAncestor!, 0)}
+                title={firstAncestor.label}
+                aria-label={firstAncestor.label}
+              >
+                {truncate(firstAncestor.label, ancTruncLen)}
+              </button>
+              <ChevronRight className="size-[11px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
+              <MoreHorizontal className="size-[13px] shrink-0" style={{ color: 'var(--muted-foreground)' }} />
+              <ChevronRight className="size-[11px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
             </>
-          );
-        })()}
-
-        {/* Visible ancestors */}
-        {visibleAncestors.map((entry) => {
-          // Find the real index in the full entries array
-          const idx = entries.findIndex(e => e.path === entry.path);
-          return (
-            <BreadcrumbItem key={entry.path} className="shrink-0">
-              <BreadcrumbLink asChild>
+          )}
+          {visibleAncestors.map((entry, i) => {
+            const idx = entries.findIndex(e => e.path === entry.path);
+            const isLast = i === visibleAncestors.length - 1;
+            return (
+              <div key={entry.path} className="flex items-center shrink-0" style={{ gap: 2 }}>
                 <button
-                  className="whitespace-nowrap"
+                  className="whitespace-nowrap transition-colors"
+                  style={{ fontFamily: 'var(--font-family)', fontSize: ancFontSize, color: 'var(--muted-foreground)', letterSpacing: 'var(--letter-spacing-md)' }}
                   onClick={() => handleAncestorClick(entry, idx)}
                   title={entry.label}
                   aria-label={entry.label}
                 >
-                  {truncate(entry.label)}
+                  {truncate(entry.label, ancTruncLen)}
                 </button>
-              </BreadcrumbLink>
-              <BreadcrumbSeparator />
-            </BreadcrumbItem>
-          );
-        })}
-
-        {/* Current page — not clickable, truncates to fill remaining space */}
-        <BreadcrumbItem className="flex items-center gap-[8px] min-w-0 overflow-hidden">
-          <BreadcrumbPage
-            className="font-medium truncate min-w-0"
-            style={{ fontSize: '24px', color: 'var(--primary)', letterSpacing: 'var(--letter-spacing-md)', lineHeight: 'normal' }}
-            title={current.label}
-          >
-            {current.label}
-          </BreadcrumbPage>
-          {titleSuffix && (
-            <span className="shrink-0">
-              {isValidElement(titleSuffix)
-                ? cloneElement(titleSuffix as React.ReactElement<{ iconOnly?: boolean }>, { iconOnly: badgeIconOnly })
-                : titleSuffix}
-            </span>
-          )}
-        </BreadcrumbItem>
-      </BreadcrumbList>
-    </Breadcrumb>
+                {!isLast && (
+                  <ChevronRight className="size-[11px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {/* Row 2: current page title */}
+      <div className="flex items-center gap-[8px] min-w-0 overflow-hidden">
+        <h1
+          className="font-medium truncate min-w-0"
+          style={{ fontFamily: 'var(--font-family)', fontSize: '24px', color: 'var(--primary)', letterSpacing: 'var(--letter-spacing-md)', lineHeight: 'normal' }}
+          title={current.label}
+        >
+          {current.label}
+        </h1>
+        {titleSuffix && (
+          <span className="shrink-0">
+            {isValidElement(titleSuffix)
+              ? cloneElement(titleSuffix as React.ReactElement<{ iconOnly?: boolean }>, { iconOnly: badgeIconOnly })
+              : titleSuffix}
+          </span>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -342,7 +264,7 @@ export function TopBar({
       {/* ================================================================ */}
       {/* DESKTOP LAYOUT                                                   */}
       {/* ================================================================ */}
-      <div className="hidden md:flex items-center gap-[24px] pt-[20px] pb-[12px] pl-[24px] pr-[24px] w-full">
+      <div className="hidden md:flex items-start gap-[24px] pt-[20px] pb-[16px] pl-[24px] pr-[24px] w-full">
         <div ref={leftRef} className="flex items-center flex-1 min-w-0 gap-[16px] overflow-hidden">
           {hasBreadcrumbs ? (
             <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} ancMaxLen={ancMaxLen} badgeIconOnly={badgeIconOnly} />
@@ -363,8 +285,8 @@ export function TopBar({
           ) : null}
         </div>
 
-        {/* Top bar actions: Share, Info */}
-        <div className="flex items-center gap-[8px] shrink-0">
+        {/* Top bar actions: Share, Info — offset to sit alongside the ancestor row */}
+        <div className="flex items-center gap-[8px] shrink-0 mt-[-2px]">
           {!hideShare && (
           <button
             className="flex items-center gap-[8px] h-[40px] rounded-[12px] transition-colors"
