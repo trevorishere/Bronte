@@ -91,7 +91,7 @@ export function Toolbar({
       <div className="hidden md:flex h-[104px] shrink-0 w-full px-[24px] items-center justify-between gap-[16px]">
 
         {/* Filter Buttons Section - Left Side */}
-        <div className="flex flex-wrap gap-[8px] items-center flex-1 min-w-0">
+        <div className="flex gap-[8px] items-center flex-1 min-w-0 overflow-hidden">
           {filters.map((filter) => {
             if ('type' in filter && filter.type === 'date') {
               const dateFilter = dateFilters[filter.label] || { start: null, end: null };

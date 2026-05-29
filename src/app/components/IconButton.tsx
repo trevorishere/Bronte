@@ -8,6 +8,7 @@ interface IconButtonProps {
   title?: string;
   className?: string;
   disabled?: boolean;
+  noHover?: boolean;     // suppress the rollover background change
   'aria-label'?: string;
 }
 
@@ -19,6 +20,7 @@ export function IconButton({
   title,
   className = '',
   disabled,
+  noHover = false,
   'aria-label': ariaLabel,
 }: IconButtonProps) {
   const radiusClass = rounded === 'full' ? 'rounded-full' : rounded === 'xl' ? 'rounded-xl' : 'rounded-lg';
@@ -31,7 +33,7 @@ export function IconButton({
       disabled={disabled}
       className={`flex items-center justify-center transition-colors shrink-0 ${radiusClass} ${className}`}
       style={{ width: size, height: size, backgroundColor: 'transparent', border: 'none', cursor: disabled ? 'not-allowed' : 'pointer', padding: 0 }}
-      onMouseOver={(e) => { if (!disabled) e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'; }}
+      onMouseOver={(e) => { if (!disabled && !noHover) e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'; }}
       onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
     >
       {icon}

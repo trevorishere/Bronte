@@ -80,18 +80,19 @@ export function Sidebar({
   };
 
   const sidebarBody = (
-    <nav aria-label="Sidebar navigation" className="flex flex-col h-full pt-[20px] pb-[24px]">
+    <nav aria-label="Sidebar navigation" className="flex flex-col h-full pt-[12px] pb-[24px]">
 
       {/* ── HEADER ───────────────────────────────────────────────── */}
       <div className="shrink-0 w-full pl-[16px] pt-[4px]">
         {/* Desktop collapsed: just the re-open button */}
         {!isDesktopOpen && (
-          <div className="hidden md:flex h-[40px] items-center mb-[12px]">
+          <div className="hidden md:flex h-[40px] items-center mb-[12px] mt-[-4px]">
             <IconButton
               icon={<PanelLeftClose className="size-[20px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
               onClick={onDesktopToggle}
               size={40}
               rounded="full"
+              noHover
               title="Open sidebar"
             />
           </div>
@@ -114,12 +115,13 @@ export function Sidebar({
             title="Close sidebar"
           />
           {/* Desktop collapse */}
-          <div className="hidden md:flex items-center justify-center w-[52px] h-[40px]">
+          <div className="hidden md:flex items-center justify-center w-[52px] h-[40px] mt-[-4px]">
             <IconButton
               icon={<PanelLeftClose className="size-[20px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
               onClick={onDesktopToggle}
               size={40}
               rounded="full"
+              noHover
               title="Collapse sidebar"
             />
           </div>
