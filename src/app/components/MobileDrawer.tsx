@@ -48,6 +48,7 @@ export function MobileDrawer({ items, isOpen, onClose, entityName, entityIcon }:
               paddingTop: '40px',
               paddingBottom: '72px',
               minHeight: '50vh',
+              maxHeight: '88dvh',
             }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
