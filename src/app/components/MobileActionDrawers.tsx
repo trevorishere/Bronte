@@ -49,7 +49,7 @@ interface DrawerChromeProps {
 function DrawerChrome({ isOpen, onClose, title, subtitle, titleId, maxHeight, children, footer }: DrawerChromeProps) {
   const { handleTouchStart, handleTouchEnd } = useDrawerInteraction(isOpen, onClose);
   const panelRef = useRef<HTMLDivElement>(null);
-  useFocusTrap(panelRef, isOpen);
+  useFocusTrap(panelRef, isOpen, { focusOnOpen: false });
   useRestoreFocus(isOpen);
 
   return (
