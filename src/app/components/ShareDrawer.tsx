@@ -202,7 +202,7 @@ export function ShareDrawer({ isOpen, onClose, entityName, entityId, onShare, cu
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const { handleTouchStart, handleTouchEnd } = useDrawerInteraction(isOpen, onClose);
-  useFocusTrap(panelRef, isOpen);
+  useFocusTrap(panelRef, isOpen, { focusOnOpen: false });
   useRestoreFocus(isOpen);
 
   useEffect(() => {

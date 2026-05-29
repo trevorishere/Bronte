@@ -11,8 +11,18 @@ const FOCUSABLE = [
 
 export function useFocusTrap(
   containerRef: React.RefObject<HTMLElement | null>,
-  isActive: boolean
+  isActive: boolean,
+  options?: {
+    /**
+     * Whether to move focus to the first focusable element when the trap
+     * activates. Default true. Set false for mobile drawers where auto-
+     * focusing an input would fire the keyboard during the open animation.
+     */
+    focusOnOpen?: boolean;
+  }
 ) {
+  const { focusOnOpen = true } = options ?? {};
+
   useEffect(() => {
     if (!isActive) return;
     const el = containerRef.current;
@@ -21,7 +31,7 @@ export function useFocusTrap(
     const getFocusable = () => Array.from(el.querySelectorAll<HTMLElement>(FOCUSABLE));
 
     // focus first element only if nothing inside is already focused
-    if (!el.contains(document.activeElement)) {
+    if (focusOnOpen && !el.contains(document.activeElement)) {
       const first = getFocusable()[0];
       if (first) first.focus();
     }

@@ -18,7 +18,7 @@ interface MobileDrawerProps {
 export function MobileDrawer({ items, isOpen, onClose, entityName, entityIcon }: MobileDrawerProps) {
   const { handleTouchStart, handleTouchEnd } = useDrawerInteraction(isOpen, onClose);
   const panelRef = useRef<HTMLDivElement>(null);
-  useFocusTrap(panelRef, isOpen);
+  useFocusTrap(panelRef, isOpen, { focusOnOpen: false });
   useRestoreFocus(isOpen);
 
   return (
