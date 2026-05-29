@@ -266,7 +266,7 @@ export function ShareDrawer({ isOpen, onClose, entityName, entityId, onShare, cu
             aria-modal="true"
             aria-labelledby="share-drawer-title"
             className="fixed bottom-0 left-0 right-0 z-[61] rounded-t-[24px] flex flex-col"
-            style={{ backgroundColor: 'var(--background)', height: '88vh' }}
+            style={{ backgroundColor: 'var(--background)', height: '88vh', maxHeight: '88dvh' }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -322,7 +322,7 @@ export function ShareDrawer({ isOpen, onClose, entityName, entityId, onShare, cu
                       className="w-full bg-transparent"
                       style={{
                         fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-regular)',
-                        fontSize: 'var(--font-size-15)', lineHeight: 'var(--line-height-20)',
+                        fontSize: '16px', lineHeight: 'var(--line-height-20)',
                         color: 'var(--foreground)',
                       }}
                     />

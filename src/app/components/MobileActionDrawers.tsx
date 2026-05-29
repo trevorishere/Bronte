@@ -74,7 +74,7 @@ function DrawerChrome({ isOpen, onClose, title, subtitle, titleId, maxHeight, ch
             aria-modal="true"
             aria-labelledby={titleId}
             className="fixed bottom-0 left-0 right-0 z-[63] rounded-t-[24px] flex flex-col"
-            style={{ backgroundColor: 'var(--background)', maxHeight: maxHeight ?? 'auto', minHeight: '50vh' }}
+            style={{ backgroundColor: 'var(--background)', maxHeight: maxHeight ?? '88dvh', minHeight: '50vh' }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -390,7 +390,7 @@ export function MoveActionDrawer({ isOpen, row, onClose, onConfirm }: MoveAction
       title="Move"
       subtitle={row?.name ?? ''}
       titleId="move-drawer-title"
-      maxHeight="85vh"
+      maxHeight="85dvh"
       footer={
         <>
           <span style={{
@@ -418,7 +418,7 @@ export function MoveActionDrawer({ isOpen, row, onClose, onConfirm }: MoveAction
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             className="flex-1 min-w-0 bg-transparent"
-            style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-15)', color: 'var(--foreground)' }}
+            style={{ fontFamily: 'var(--font-family)', fontSize: '16px', color: 'var(--foreground)' }}
           />
           {searchQuery && (
             <button onClick={() => setSearchQuery('')} style={{ color: 'var(--muted-foreground)' }}>
