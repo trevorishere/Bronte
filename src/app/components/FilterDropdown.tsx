@@ -104,6 +104,8 @@ export function FilterDropdown({
     <div className="relative" ref={dropdownRef}>
       <button
         className="flex h-[40px] items-center pr-[12px] transition-colors bg-background group"
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
         style={{
           border: `1px solid ${isHovered || isOpen ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}`,
           borderRadius: 'var(--radius-12)',
@@ -225,7 +227,7 @@ export function FilterDropdown({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search..."
-                  className="flex-1 outline-none bg-transparent"
+                  className="flex-1 bg-transparent"
                   style={{
                     fontFamily: 'var(--font-family)',
                     fontWeight: 'var(--font-weight-regular)',
@@ -240,6 +242,7 @@ export function FilterDropdown({
 
             {/* Options List */}
             <div
+              role="listbox"
               className="mt-[8px] flex flex-col gap-[1px]"
               style={{
                 maxHeight: '240px',
@@ -253,6 +256,8 @@ export function FilterDropdown({
                   return (
                     <button
                       key={option}
+                      role="option"
+                      aria-selected={isSelected}
                       onClick={() => toggleOption(option)}
                       onMouseEnter={() => setHoveredOption(option)}
                       onMouseLeave={() => setHoveredOption(null)}

@@ -18,7 +18,7 @@ export function Button({
 
   const baseStyles: React.CSSProperties = {
     fontFamily: 'var(--font-family)',
-    fontSize: 'var(--font-size-14)',
+    fontSize: 'var(--font-size-15)',
     fontWeight: 'var(--font-weight-medium)',
     lineHeight: 'var(--line-height-20)',
     letterSpacing: 'var(--letter-spacing-md)',

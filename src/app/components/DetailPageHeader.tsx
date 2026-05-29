@@ -147,7 +147,7 @@ export function DetailPageHeader({ title, badge, icon, metadata, onShareClick, o
                     fontFamily: 'var(--font-family)',
                     fontSize: '24px',
                     color: 'var(--primary)',
-                    letterSpacing: 'var(--letter-spacing-lg)',
+                    letterSpacing: 'var(--letter-spacing-md)',
                     lineHeight: 'normal',
                   }}
                 >

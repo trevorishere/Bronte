@@ -17,6 +17,8 @@ import { TopBar } from '../components/TopBar';
 import { ShareModal, CurrentMember } from '../components/ShareModal';
 import { ShareDrawer } from '../components/ShareDrawer';
 import { MembersModal } from '../components/MembersModal';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { getMembersForRow, countMembers } from '../utils/members';
 import { useNavigationContext, BreadcrumbEntry } from '../contexts/NavigationContext';
 import { useInfoTray } from '../contexts/InfoTrayContext';
 import { useSharedMembers } from '../contexts/SharedMembersContext';
@@ -42,12 +44,7 @@ export function AccountDetailPage() {
   const [membersModalRow, setMembersModalRow] = useState<RowData | null>(null);
   const [isRowShareOpen, setIsRowShareOpen] = useState(false);
   const [rowToShare, setRowToShare] = useState<RowData | null>(null);
-  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
+  const isMobile = useIsMobile();
   const { ancestors, setAncestors } = useNavigationContext();
 
   const account = accounts.find(acc => acc.id === accountId);
@@ -107,7 +104,7 @@ export function AccountDetailPage() {
             lastModified: project.lastModified,
             workspace: project.workspace,
             iconType: 'project' as const,
-            accountCount: accounts.filter(a => a.projectIds.includes(project.id)).length,
+            accountCount: countMembers('project', project.id, project.owner),
           }))
         };
       case 'Teams':
@@ -122,8 +119,8 @@ export function AccountDetailPage() {
             id: team.id,
             name: team.name,
             owner: team.owner,
-            membersCount: team.membersCount,
-            members: team.membersCount,
+            membersCount: countMembers('team', team.id, team.owner),
+            members: countMembers('team', team.id, team.owner),
             created: team.created,
             lastModified: team.created,
             iconType: 'team' as const,
@@ -150,8 +147,8 @@ export function AccountDetailPage() {
             iconType: 'workspace' as const,
             projectsCount: projects.filter(p => p.workspace === workspace.id).length,
             workspaceProjectCount: projects.filter(p => p.workspace === workspace.id).length,
-            membersCount: accounts.filter(a => a.workspaceIds.includes(workspace.id)).length,
-            workspaceMemberCount: accounts.filter(a => a.workspaceIds.includes(workspace.id)).length,
+            membersCount: countMembers('workspace', workspace.id, workspace.owner),
+            workspaceMemberCount: countMembers('workspace', workspace.id, workspace.owner),
           }))
         };
       default:
@@ -251,14 +248,6 @@ export function AccountDetailPage() {
 
     return true;
   });
-
-  const getMembersForRow = (row: RowData): CurrentMember[] => {
-    const id = String(row.id);
-    if (row.iconType === 'project')   return accounts.filter(a => a.projectIds.includes(id)).map(a => ({ id: a.id, name: a.name, role: a.role }));
-    if (row.iconType === 'team')      return accounts.filter(a => a.teamIds.includes(id)).map(a => ({ id: a.id, name: a.name, role: a.role }));
-    if (row.iconType === 'workspace') return accounts.filter(a => a.workspaceIds.includes(id)).map(a => ({ id: a.id, name: a.name, role: a.role }));
-    return [];
-  };
 
   const handleMemberCountClick = (row: RowData) => {
     setMembersModalRow(row);
@@ -381,6 +370,7 @@ export function AccountDetailPage() {
               }}
               onSelectionChange={handleSelectionChange}
               onMemberCountClick={handleMemberCountClick}
+              onShare={(row) => { setRowToShare(row); setIsRowShareOpen(true); }}
               viewMode={viewMode}
               onViewModeChange={setViewMode}
             />
@@ -395,14 +385,26 @@ export function AccountDetailPage() {
         onAddMembers={() => { if (membersModalRow) { setRowToShare(membersModalRow); setIsRowShareOpen(true); } }}
       />
 
-      <ShareModal
-        isOpen={isRowShareOpen}
-        onClose={() => { setIsRowShareOpen(false); setRowToShare(null); }}
-        entityName={rowToShare?.name ?? ''}
-        entityId={rowToShare?.id ?? ''}
-        currentMembers={rowToShare ? getMembersForRow(rowToShare) : []}
-        onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
-      />
+      {/* Row-level share — drawer on mobile, modal on desktop */}
+      {isMobile ? (
+        <ShareDrawer
+          isOpen={isRowShareOpen}
+          onClose={() => { setIsRowShareOpen(false); setRowToShare(null); }}
+          entityName={rowToShare?.name ?? ''}
+          entityId={rowToShare?.id ?? ''}
+          currentMembers={rowToShare ? getMembersForRow(rowToShare) : []}
+          onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
+        />
+      ) : (
+        <ShareModal
+          isOpen={isRowShareOpen}
+          onClose={() => { setIsRowShareOpen(false); setRowToShare(null); }}
+          entityName={rowToShare?.name ?? ''}
+          entityId={rowToShare?.id ?? ''}
+          currentMembers={rowToShare ? getMembersForRow(rowToShare) : []}
+          onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
+        />
+      )}
 
       {/* Share — drawer on mobile, modal on desktop */}
       {isMobile ? (

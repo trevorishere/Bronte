@@ -1,4 +1,4 @@
-import { LayoutGrid, List } from 'lucide-react';
+import { LayoutGrid, List, Plus } from 'lucide-react';
 import { useState, ReactNode } from 'react';
 import { FilterDropdown } from './FilterDropdown';
 import { DateFilterDropdown } from './DateFilterDropdown';
@@ -23,6 +23,8 @@ interface ToolbarProps {
   onDateFilterChange?: (filterLabel: string, start: Date | null, end: Date | null) => void;
   /** Desktop-only action buttons rendered to the right of filters */
   actionButtons?: ReactNode;
+  /** Called when the New… button is clicked (desktop only, rendered right of view toggle) */
+  onAddClick?: () => void;
 }
 
 export function Toolbar({
@@ -37,14 +39,15 @@ export function Toolbar({
   onFilterChange,
   dateFilters = {},
   onDateFilterChange,
-  actionButtons
+  actionButtons,
+  onAddClick
 }: ToolbarProps) {
   const [isToggleHovered, setIsToggleHovered] = useState(false);
   const [hoveredToggle, setHoveredToggle] = useState<'list' | 'grid' | null>(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const getIconColor = (mode: 'list' | 'grid') => {
-    if (viewMode === mode) return 'var(--icon-toggle-active)';
+    if (viewMode === mode) return 'var(--primary)';
     if (hoveredToggle === mode) return 'var(--icon-toggle-hover)';
     return 'var(--icon-toggle-inactive)';
   };
@@ -117,9 +120,9 @@ export function Toolbar({
           })}
         </div>
 
-        {/* Right Side: action buttons + view toggle */}
+        {/* Right Side: action buttons + view toggle + New button */}
         <div className="flex items-center gap-[12px] shrink-0">
-          {/* Page action buttons (Share, New, etc.) */}
+          {/* Page action buttons (Share, etc.) */}
           {actionButtons && (
             <>
               {actionButtons}
@@ -159,6 +162,18 @@ export function Toolbar({
               <LayoutGrid size={18} strokeWidth={2} color={getIconColor('grid')} />
             </button>
           </div>
+
+          {/* New… button — right of view toggle */}
+          <button
+            onClick={onAddClick}
+            className="flex items-center gap-[8px] h-[40px] rounded-[12px] transition-colors"
+            style={{ border: 'none', paddingLeft: '11px', paddingRight: '13px', backgroundColor: 'var(--btn-primary-bg)', cursor: 'pointer' }}
+            onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'var(--btn-primary-hover)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'var(--btn-primary-bg)'; }}
+          >
+            <Plus className="size-[18px] shrink-0" style={{ color: 'var(--btn-primary-text)' }} strokeWidth={2.5} />
+            <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: '15px', letterSpacing: '0.32px', color: 'var(--btn-primary-text)', whiteSpace: 'nowrap' }}>New…</span>
+          </button>
         </div>
       </div>
     </>

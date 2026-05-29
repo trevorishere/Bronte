@@ -1,4 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
+import { DragHandle } from './DragHandle';
+import { useDrawerInteraction } from '../hooks/useDrawerInteraction';
+import { SPRING_DRAWER } from '../constants/animation';
 import { Search, Check, CircleCheck, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { accounts } from '../data/accounts';
@@ -7,6 +10,8 @@ import type { Role } from './Avatar';
 import { useSharedMembers } from '../contexts/SharedMembersContext';
 import { Button } from './Button';
 import type { CurrentMember } from './ShareModal';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useRestoreFocus } from '../hooks/useRestoreFocus';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -66,12 +71,15 @@ function Chip({ account, onRemove }: { account: SelectedAccount; onRemove: () =>
       }}>
         {account.name}
       </span>
-      <div
+      <button
+        type="button"
         onClick={onRemove}
+        aria-label={`Remove ${account.name}`}
         className="shrink-0 flex items-center justify-center size-[12px] rounded-full transition-opacity hover:opacity-70 cursor-pointer"
+        style={{ background: 'none', border: 'none', padding: 0 }}
       >
         <X className="size-[10px]" style={{ color: 'var(--foreground)' }} strokeWidth={2.5} />
-      </div>
+      </button>
     </div>
   );
 }
@@ -125,12 +133,19 @@ function AccountListRow({
 
 // ─── Access row ───────────────────────────────────────────────────────────────
 
-function AccessRow({ member, onRemove, isPending = false }: { member: CurrentMember; onRemove: () => void; isPending?: boolean }) {
+function AccessRow({ member, onRemove, isPending = false, entityName }: { member: CurrentMember; onRemove: () => void; isPending?: boolean; entityName?: string }) {
   const [hovered, setHovered] = useState(false);
   return (
-    <div
+    <button
+      type="button"
       className="w-full flex items-center gap-[12px] px-[12px] h-[40px] rounded-xl transition-colors cursor-pointer"
-      style={{ backgroundColor: hovered ? 'var(--muted)' : 'transparent' }}
+      style={{
+        backgroundColor: hovered ? 'var(--muted)' : 'transparent',
+        border: 'none',
+        padding: '0 12px',
+        textAlign: 'left',
+      }}
+      aria-label={entityName ? `Remove ${member.name} from ${entityName}` : `Remove ${member.name}`}
       onClick={onRemove}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -151,9 +166,9 @@ function AccessRow({ member, onRemove, isPending = false }: { member: CurrentMem
           color: hovered ? 'var(--primary)' : 'var(--muted-foreground)', whiteSpace: 'nowrap',
         }}>Revoke</span>
       ) : (
-        <X className="size-[11px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
+        <X className="size-[11px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} aria-hidden="true" />
       )}
-    </div>
+    </button>
   );
 }
 
@@ -185,7 +200,10 @@ export function ShareDrawer({ isOpen, onClose, entityName, entityId, onShare, cu
   const [removedMemberIds, setRemovedMemberIds] = useState<Set<string>>(new Set());
   const [inputFocused, setInputFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const touchStartY = useRef<number | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const { handleTouchStart, handleTouchEnd } = useDrawerInteraction(isOpen, onClose);
+  useFocusTrap(panelRef, isOpen);
+  useRestoreFocus(isOpen);
 
   useEffect(() => {
     if (!isOpen) {
@@ -194,13 +212,6 @@ export function ShareDrawer({ isOpen, onClose, entityName, entityId, onShare, cu
       setRemovedMemberIds(new Set());
     }
   }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, [isOpen, onClose]);
 
   const selectedIds = new Set(selected.map(a => a.id));
 
@@ -233,17 +244,6 @@ export function ShareDrawer({ isOpen, onClose, entityName, entityId, onShare, cu
     onClose();
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartY.current === null) return;
-    const delta = e.changedTouches[0].clientY - touchStartY.current;
-    if (delta > 60) onClose();
-    touchStartY.current = null;
-  };
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -251,7 +251,7 @@ export function ShareDrawer({ isOpen, onClose, entityName, entityId, onShare, cu
           {/* Backdrop */}
           <motion.div
             className="fixed inset-0 z-[60]"
-            style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
+            style={{ backgroundColor: 'var(--backdrop-color)' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -261,27 +261,30 @@ export function ShareDrawer({ isOpen, onClose, entityName, entityId, onShare, cu
 
           {/* Drawer */}
           <motion.div
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="share-drawer-title"
             className="fixed bottom-0 left-0 right-0 z-[61] rounded-t-[24px] flex flex-col"
             style={{ backgroundColor: 'var(--background)', height: '88vh' }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ type: 'spring', stiffness: 380, damping: 34 }}
+            transition={SPRING_DRAWER}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
-            {/* Drag handle */}
-            <div
-              className="absolute top-[12px] left-1/2 -translate-x-1/2 rounded-full shrink-0"
-              style={{ width: 36, height: 4, backgroundColor: 'var(--border-interactive)' }}
-            />
+            <DragHandle />
 
             {/* Header */}
-            <div className="shrink-0 px-[24px] pt-[36px] pb-[16px] flex flex-col gap-[8px]">
-              <h2 style={{
-                fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)',
-                fontSize: '22px', lineHeight: 'normal', color: 'var(--primary)',
-              }}>Share</h2>
+            <div className="shrink-0 px-[24px] pt-[36px] pb-[24px] flex flex-col gap-[8px]">
+              <h2
+                id="share-drawer-title"
+                style={{
+                  fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)',
+                  fontSize: '22px', lineHeight: 'normal', color: 'var(--primary)',
+                }}
+              >Share</h2>
               <p className="truncate" style={{
                 fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-15)',
                 color: 'var(--muted-foreground)', lineHeight: '1.3',
@@ -292,7 +295,7 @@ export function ShareDrawer({ isOpen, onClose, entityName, entityId, onShare, cu
             <div className="shrink-0" style={{ height: 1, backgroundColor: 'var(--border)' }} />
 
             {/* Search input + chips */}
-            <div className="shrink-0 px-[24px] py-[14px]">
+            <div className="shrink-0 px-[24px] py-[24px]">
               <div
                 className={`flex gap-[8px] min-h-[40px] px-[10px] py-[6px] rounded-[12px] cursor-text ${selected.length > 0 ? 'items-start' : 'items-center'}`}
                 style={{
@@ -316,7 +319,7 @@ export function ShareDrawer({ isOpen, onClose, entityName, entityId, onShare, cu
                       onFocus={() => setInputFocused(true)}
                       onBlur={() => setInputFocused(false)}
                       placeholder={selected.length === 0 ? 'Search by name or email…' : ''}
-                      className="w-full outline-none bg-transparent"
+                      className="w-full bg-transparent"
                       style={{
                         fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-regular)',
                         fontSize: 'var(--font-size-15)', lineHeight: 'var(--line-height-20)',
@@ -367,10 +370,10 @@ export function ShareDrawer({ isOpen, onClose, entityName, entityId, onShare, cu
                   <SectionLabel text={`Accounts with Access (${accessList.length + pendingList.length})`} />
                   <div className="flex flex-col gap-[1px]">
                     {accessList.map(m => (
-                      <AccessRow key={m.id} member={m} onRemove={() => removeAccess(m.id)} />
+                      <AccessRow key={m.id} member={m} onRemove={() => removeAccess(m.id)} entityName={entityName} />
                     ))}
                     {pendingList.map(m => (
-                      <AccessRow key={m.id} member={m} onRemove={() => revokeInvitation(entityId, m.id)} isPending />
+                      <AccessRow key={m.id} member={m} onRemove={() => revokeInvitation(entityId, m.id)} isPending entityName={entityName} />
                     ))}
                   </div>
                 </div>
@@ -381,8 +384,7 @@ export function ShareDrawer({ isOpen, onClose, entityName, entityId, onShare, cu
 
             {/* Footer */}
             <div
-              className="shrink-0 flex items-center justify-end gap-[12px] px-[24px] pt-[12px] pb-[32px]"
-              style={{ borderTop: '1px solid var(--border)' }}
+              className="shrink-0 flex items-center justify-end gap-[12px] px-[24px] pt-[24px] pb-[32px]"
             >
               <Button variant="secondary" onClick={onClose} type="button">Cancel</Button>
               <Button

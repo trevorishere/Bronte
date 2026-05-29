@@ -97,6 +97,7 @@
 
   /* Font sizes */
   --font-size-8: 8px;
+  --font-size-10: 10px;
   --font-size-11: 11px;
   --font-size-13: 13px;
   --font-size-14: 14px;
@@ -112,9 +113,9 @@
   --line-height-22: 22px;
 
   /* Letter spacing */
-  --letter-spacing-sm: 0.16px;
-  --letter-spacing-md: 0.4px;
-  --letter-spacing-lg: 0.7px;
+  --letter-spacing-sm: 0.5%;
+  --letter-spacing-md: 1%;
+  --letter-spacing-lg: 5%;
 
   /* Border radius */
   --radius-4: 4px;
@@ -131,12 +132,10 @@
 
   /* Additional icon/UI colors */
   --icon: #5a5048;
-  --icon-toggle-active: #2b2520;
   --icon-toggle-inactive: #d0c8c0;
   --icon-toggle-hover: #7a7068;
   --bg-account-avatar: #934790;
   --bg-beta-badge: #36609e;
-  --text-white: white;
   --icon-team-bg: #7FA073;
   --icon-workspace-bg: #6BA0D2;
 
@@ -146,12 +145,17 @@
   --btn-primary-text: #ffffff;
 
   /* Roles tray + role pill + radio circles */
-  --tray-bg: #F0EDEA;
   --role-pill-text: rgba(43, 37, 32, 0.8);
   --radio-unchecked-border: #9a8f86;
   --radio-checked-bg: #665e56;
   --radio-checked-border: #665e56;
-  --radio-check-color: #faf7f4;
+
+  /* Overlay backdrops */
+  --backdrop-color: rgba(0, 0, 0, 0.4);       /* drawers */
+  --backdrop-color-modal: rgba(0, 0, 0, 0.5); /* modals */
+
+  /* Additional font sizes */
+  --font-size-20: 20px;
 }
 
 .dark {
@@ -196,12 +200,10 @@
   --bg-icon-hover: rgba(255, 255, 255, 0.06);
   --icon-nav-hover: #b0a898;
   --icon: #a09890;
-  --icon-toggle-active: #ede8e2;
   --icon-toggle-inactive: #4a4440;
   --icon-toggle-hover: #9a9088;
   --bg-account-avatar: #934790;
   --bg-beta-badge: #36609e;
-  --text-white: white;
   --bg-grid-card: #261e1a; /* Warm dark grid card */
   --icon-team-bg: #406831;
   --icon-workspace-bg: #2166A6;
@@ -212,12 +214,17 @@
   --btn-primary-text: #ffffff;
 
   /* Roles tray + role pill + radio circles */
-  --tray-bg: #262421;
   --role-pill-text: rgba(255, 255, 255, 0.7);
   --radio-unchecked-border: #9a9088;
   --radio-checked-bg: #d8d0c8;
   --radio-checked-border: #d8d0c8;
-  --radio-check-color: #241F1A;
+
+  /* Overlay backdrops */
+  --backdrop-color: rgba(0, 0, 0, 0.4);
+  --backdrop-color-modal: rgba(0, 0, 0, 0.5);
+
+  /* Additional font sizes */
+  --font-size-20: 20px;
 }
 
 

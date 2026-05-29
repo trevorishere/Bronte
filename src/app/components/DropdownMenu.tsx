@@ -20,6 +20,7 @@ interface DropdownMenuProps {
 export function DropdownMenu({ items, isOpen, onClose, anchorRef }: DropdownMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const [hoveredOption, setHoveredOption] = useState<string | null>(null);
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -38,6 +39,7 @@ export function DropdownMenu({ items, isOpen, onClose, anchorRef }: DropdownMenu
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         onClose();
+        anchorRef.current?.focus();
       }
     };
 
@@ -49,6 +51,33 @@ export function DropdownMenu({ items, isOpen, onClose, anchorRef }: DropdownMenu
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen, onClose, anchorRef]);
+
+  // Focus first item when menu opens
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        itemRefs.current[0]?.focus();
+      }, 50);
+    }
+  }, [isOpen]);
+
+  const handleMenuKeyDown = (e: React.KeyboardEvent, index: number) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      const next = (index + 1) % items.length;
+      itemRefs.current[next]?.focus();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      const prev = (index - 1 + items.length) % items.length;
+      itemRefs.current[prev]?.focus();
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      itemRefs.current[0]?.focus();
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      itemRefs.current[items.length - 1]?.focus();
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -66,7 +95,7 @@ export function DropdownMenu({ items, isOpen, onClose, anchorRef }: DropdownMenu
         initial={{ opacity: 0, scaleY: 0 }}
         animate={{ opacity: 1, scaleY: 1 }}
         exit={{ opacity: 0, scaleY: 0 }}
-        transition={{ 
+        transition={{
           duration: 0.25,
           type: 'spring',
           stiffness: 400,
@@ -74,6 +103,7 @@ export function DropdownMenu({ items, isOpen, onClose, anchorRef }: DropdownMenu
         }}
       >
         <div
+          role="menu"
           className="bg-background shadow-lg overflow-hidden p-[8px]"
           style={{
             border: '1px solid var(--border-interactive-hover)',
@@ -81,15 +111,18 @@ export function DropdownMenu({ items, isOpen, onClose, anchorRef }: DropdownMenu
             minWidth: '200px',
           }}
         >
-          {items.map((item) => (
+          {items.map((item, index) => (
             <button
               key={item.id}
+              role="menuitem"
+              ref={el => { itemRefs.current[index] = el; }}
               onClick={() => {
                 item.onClick();
                 onClose();
               }}
               onMouseEnter={() => setHoveredOption(item.id)}
               onMouseLeave={() => setHoveredOption(null)}
+              onKeyDown={e => handleMenuKeyDown(e, index)}
               className="w-full flex items-center gap-4 px-[12px] py-[10px] transition-colors rounded-xl"
               style={{
                 fontFamily: 'var(--font-family)',
@@ -97,12 +130,12 @@ export function DropdownMenu({ items, isOpen, onClose, anchorRef }: DropdownMenu
                 fontSize: 'var(--font-size-14)',
                 letterSpacing: 'var(--letter-spacing-md)',
                 lineHeight: 'var(--line-height-20)',
-                color: hoveredOption === item.id ? 'var(--primary)' : item.variant === 'danger' ? '#D32F2F' : 'var(--foreground)',
+                color: hoveredOption === item.id ? 'var(--primary)' : item.variant === 'danger' ? 'var(--destructive)' : 'var(--foreground)',
                 backgroundColor: hoveredOption === item.id ? 'var(--muted)' : 'transparent',
                 textAlign: 'left',
               }}
             >
-              <div className="size-4" style={{ color: item.variant === 'danger' ? '#D32F2F' : 'var(--foreground)' }}>
+              <div className="size-4" style={{ color: item.variant === 'danger' ? 'var(--destructive)' : 'var(--foreground)' }}>
                 {item.icon}
               </div>
               <span>{item.label}</span>

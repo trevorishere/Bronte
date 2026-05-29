@@ -1,6 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MenuItem } from './DropdownMenu';
+import { DragHandle } from './DragHandle';
+import { useDrawerInteraction } from '../hooks/useDrawerInteraction';
+import { SPRING_DRAWER } from '../constants/animation';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useRestoreFocus } from '../hooks/useRestoreFocus';
 
 interface MobileDrawerProps {
   items: MenuItem[];
@@ -11,26 +16,10 @@ interface MobileDrawerProps {
 }
 
 export function MobileDrawer({ items, isOpen, onClose, entityName, entityIcon }: MobileDrawerProps) {
-  const touchStartY = useRef<number | null>(null);
-
-  // Escape key
-  useEffect(() => {
-    if (!isOpen) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, [isOpen, onClose]);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartY.current === null) return;
-    const delta = e.changedTouches[0].clientY - touchStartY.current;
-    if (delta > 60) onClose();
-    touchStartY.current = null;
-  };
+  const { handleTouchStart, handleTouchEnd } = useDrawerInteraction(isOpen, onClose);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(panelRef, isOpen);
+  useRestoreFocus(isOpen);
 
   return (
     <AnimatePresence>
@@ -39,7 +28,7 @@ export function MobileDrawer({ items, isOpen, onClose, entityName, entityIcon }:
           {/* Backdrop */}
           <motion.div
             className="fixed inset-0 z-[60]"
-            style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
+            style={{ backgroundColor: 'var(--backdrop-color)' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -49,6 +38,10 @@ export function MobileDrawer({ items, isOpen, onClose, entityName, entityIcon }:
 
           {/* Drawer */}
           <motion.div
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={entityName}
             className="fixed bottom-0 left-0 right-0 z-[61] rounded-t-[24px]"
             style={{
               backgroundColor: 'var(--background)',
@@ -59,15 +52,11 @@ export function MobileDrawer({ items, isOpen, onClose, entityName, entityIcon }:
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ type: 'spring', stiffness: 380, damping: 34 }}
+            transition={SPRING_DRAWER}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
-            {/* Drag handle */}
-            <div
-              className="absolute top-[12px] left-1/2 -translate-x-1/2 rounded-full"
-              style={{ width: 36, height: 4, backgroundColor: 'var(--border-interactive)' }}
-            />
+            <DragHandle />
 
             {/* Entity header */}
             <div className="flex items-center gap-[12px] px-[32px] pb-[24px]">
@@ -104,7 +93,7 @@ export function MobileDrawer({ items, isOpen, onClose, entityName, entityIcon }:
                     fontWeight: 'var(--font-weight-medium)',
                     fontSize: 'var(--font-size-16)',
                     letterSpacing: 'var(--letter-spacing-md)',
-                    color: item.variant === 'danger' ? '#D32F2F' : 'var(--foreground)',
+                    color: item.variant === 'danger' ? 'var(--destructive)' : 'var(--foreground)',
                     backgroundColor: 'transparent',
                   }}
                   onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--muted)')}
@@ -112,7 +101,7 @@ export function MobileDrawer({ items, isOpen, onClose, entityName, entityIcon }:
                 >
                   <div
                     className="size-[18px] flex items-center justify-center shrink-0"
-                    style={{ color: item.variant === 'danger' ? '#D32F2F' : 'var(--icon)' }}
+                    style={{ color: item.variant === 'danger' ? 'var(--destructive)' : 'var(--icon)' }}
                   >
                     {item.icon}
                   </div>

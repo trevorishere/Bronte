@@ -1,10 +1,16 @@
 import { X, Check, ChevronDown } from 'lucide-react';
-import { RoleBadge, roleColors } from './Avatar';
+import { Avatar, RoleBadge, roleColors } from './Avatar';
 import type { Role } from './Avatar';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { workspaces } from '../data/workspaces';
+import { accounts } from '../data/accounts';
+import type { Account } from '../data/accounts';
+import { DragHandle } from './DragHandle';
+import { useDrawerInteraction } from '../hooks/useDrawerInteraction';
+import { SPRING_DRAWER } from '../constants/animation';
 
 // ─── Public types ─────────────────────────────────────────────────────────────
 
@@ -63,21 +69,7 @@ interface InfoTrayProps {
 
 export function InfoDrawer({ isOpen, onClose, content }: InfoTrayProps) {
   const title = content ? String(content.data.name ?? content.data.title ?? 'Details') : 'Details';
-  const touchStartY = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, [isOpen, onClose]);
-
-  const handleTouchStart = (e: React.TouchEvent) => { touchStartY.current = e.touches[0].clientY; };
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartY.current === null) return;
-    if (e.changedTouches[0].clientY - touchStartY.current > 60) onClose();
-    touchStartY.current = null;
-  };
+  const { handleTouchStart, handleTouchEnd } = useDrawerInteraction(isOpen, onClose);
 
   return (
     <AnimatePresence>
@@ -86,7 +78,7 @@ export function InfoDrawer({ isOpen, onClose, content }: InfoTrayProps) {
           {/* Backdrop — mobile only */}
           <motion.div
             className="fixed inset-0 z-[62] md:hidden"
-            style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
+            style={{ backgroundColor: 'var(--backdrop-color)' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -101,15 +93,11 @@ export function InfoDrawer({ isOpen, onClose, content }: InfoTrayProps) {
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ type: 'spring', stiffness: 380, damping: 34 }}
+            transition={SPRING_DRAWER}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
-            {/* Drag handle */}
-            <div
-              className="absolute top-[12px] left-1/2 -translate-x-1/2 rounded-full shrink-0"
-              style={{ width: 36, height: 4, backgroundColor: 'var(--border-interactive)' }}
-            />
+            <DragHandle />
 
             {/* Header */}
             <div className="shrink-0 flex items-center justify-between px-[24px] pt-[36px] pb-[16px]">
@@ -129,6 +117,7 @@ export function InfoDrawer({ isOpen, onClose, content }: InfoTrayProps) {
               </span>
               <button
                 onClick={onClose}
+                aria-label="Close"
                 className="shrink-0 flex items-center justify-center size-[32px] rounded-[8px] transition-colors"
                 style={{ backgroundColor: 'transparent', color: 'var(--muted-foreground)', border: 'none', cursor: 'pointer' }}
                 onMouseOver={e  => (e.currentTarget.style.backgroundColor = 'var(--muted)')}
@@ -184,7 +173,7 @@ export function InfoTray({ isOpen, onClose, content }: InfoTrayProps) {
             opacity: { duration: 0.18, ease: 'easeInOut' },
           }}
           className="shrink-0 overflow-hidden hidden md:flex flex-col"
-          style={{ borderLeft: '1px solid var(--border)', backgroundColor: 'var(--tray-bg)' }}
+          style={{ borderLeft: '1px solid var(--border)', backgroundColor: 'var(--muted)' }}
         >
           <div className="flex flex-col h-full" style={{ minWidth: 380 }}>
 
@@ -205,6 +194,7 @@ export function InfoTray({ isOpen, onClose, content }: InfoTrayProps) {
               </span>
               <button
                 onClick={onClose}
+                aria-label="Close"
                 className="shrink-0 flex items-center justify-center size-[32px] rounded-[6px] transition-colors"
                 style={{ backgroundColor: 'transparent', color: 'var(--muted-foreground)', border: 'none', cursor: 'pointer' }}
                 onMouseOver={e  => (e.currentTarget.style.backgroundColor = 'var(--muted)')}
@@ -371,7 +361,7 @@ function AccountPanel({ data }: { data: Record<string, unknown> }) {
                   <span className="flex-1" style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-semibold)', color: 'var(--muted-foreground)', letterSpacing: '0.77px', textTransform: 'uppercase' }}>
                     {row.label}
                   </span>
-                  <div className="flex items-center gap-[8px]">
+                  <div role="radiogroup" aria-label={row.label} className="flex items-center gap-[8px]">
                     {PERM_COLS.map(level => (
                       <div key={level} className="flex items-center justify-center w-[64px] h-[24px]">
                         <RadioCircle
@@ -391,7 +381,6 @@ function AccountPanel({ data }: { data: Record<string, unknown> }) {
       {/* Footer */}
       <div
         className="shrink-0 flex items-center justify-end px-[24px] py-[24px]"
-        style={{ borderTop: `1px solid ${borderColor}` }}
       >
         <button
           className="flex items-center justify-center h-[40px] transition-colors"
@@ -449,6 +438,45 @@ function PageInfoPanel({ data }: { data: Record<string, unknown> }) {
 function ReadOnlyPanel({ content }: { content: InfoTrayContent }) {
   const { type, data } = content;
 
+  // Derive members from the accounts list, sorted by access level → role → name
+  const members = useMemo<Account[]>(() => {
+    const id = String(data.id ?? '');
+    let list: Account[] = [];
+    if (id) {
+      if (type === 'project')        list = accounts.filter(a => a.projectIds.includes(id));
+      else if (type === 'team')      list = accounts.filter(a => a.teamIds.includes(id));
+      else if (type === 'workspace') list = accounts.filter(a => a.workspaceIds.includes(id));
+    }
+
+    // Owners always count as members — add if not already present
+    const ownerName = String(data.owner ?? '');
+    if (ownerName && ['project', 'team', 'workspace'].includes(type)) {
+      const ownerAccount = accounts.find(a => a.name === ownerName);
+      if (ownerAccount && !list.some(m => m.id === ownerAccount.id)) {
+        list = [...list, ownerAccount];
+      }
+    }
+
+    // Sort: access level → role → name
+    const ACCESS_ORDER: Record<string, number> = {
+      'Super Admin': 0,
+      'Owner':       1,
+      'Editor':      2,
+      'Viewer':      3,
+      'None':        4,
+    };
+
+    return [...list].sort((a, b) => {
+      const accessDiff = (ACCESS_ORDER[a.accessLevel] ?? 5) - (ACCESS_ORDER[b.accessLevel] ?? 5);
+      if (accessDiff !== 0) return accessDiff;
+      const roleDiff = a.role.localeCompare(b.role);
+      if (roleDiff !== 0) return roleDiff;
+      return a.name.localeCompare(b.name);
+    });
+  }, [type, data.id, data.owner]);
+
+  const hasMembersSection = ['project', 'team', 'workspace'].includes(type);
+
   const rows: Array<{ label: string; value: unknown }> = [];
 
   if (type === 'project') {
@@ -456,13 +484,13 @@ function ReadOnlyPanel({ content }: { content: InfoTrayContent }) {
       { label: 'Owner',         value: data.owner },
       { label: 'Workspace',     value: workspaces.find(w => w.id === data.workspace)?.name ?? data.workspace },
       { label: 'Last Modified', value: data.lastModified },
-      { label: 'Members',       value: data.accountCount ?? data.members },
+      { label: 'Members',       value: members.length },
     );
   } else if (type === 'team') {
     rows.push(
       { label: 'Owner',   value: data.owner },
       { label: 'Created', value: data.created },
-      { label: 'Members', value: data.membersCount ?? data.members },
+      { label: 'Members', value: members.length },
     );
   } else if (type === 'workspace') {
     rows.push(
@@ -470,7 +498,7 @@ function ReadOnlyPanel({ content }: { content: InfoTrayContent }) {
       ...(data.type ? [{ label: 'Type', value: data.type }] : []),
       { label: 'Created',  value: data.created },
       { label: 'Projects', value: data.projectsCount },
-      { label: 'Members',  value: data.membersCount },
+      { label: 'Members',  value: members.length },
     );
   } else if (type === 'shared-project') {
     rows.push(
@@ -486,12 +514,95 @@ function ReadOnlyPanel({ content }: { content: InfoTrayContent }) {
 
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="flex flex-col pt-[8px] pb-[24px] mx-[24px]">
+      <div className={`flex flex-col pt-[8px] mx-[24px] ${hasMembersSection ? 'pb-[4px]' : 'pb-[24px]'}`}>
         {visibleRows.map(({ label, value }) => (
           <InfoRow key={label} label={label} value={String(value)} />
         ))}
       </div>
+
+      {hasMembersSection && (
+        <>
+          {/* Divider below member count */}
+          <div className="mx-[24px] shrink-0" style={{ height: 1, backgroundColor: 'var(--border-interactive)' }} />
+
+          {/* Member list */}
+          <div className="flex flex-col pt-[8px] pb-[24px] px-[24px]">
+            {members.map(member => (
+              <MemberRow
+                key={member.id}
+                member={member}
+                isOwner={member.name === String(data.owner ?? '')}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
+  );
+}
+
+// ─── Member row ───────────────────────────────────────────────────────────────
+
+function MemberRow({ member, isOwner = false }: { member: Account; isOwner?: boolean }) {
+  const navigate = useNavigate();
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <button
+      onClick={() => navigate(`/admin/account/${member.id}`)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="flex items-center gap-[10px] h-[44px] w-full rounded-[8px] transition-colors"
+      style={{
+        paddingLeft:     '8px',
+        paddingRight:    '8px',
+        backgroundColor: hovered ? 'var(--muted)' : 'transparent',
+        border:          'none',
+        cursor:          'pointer',
+        textAlign:       'left',
+      }}
+    >
+      {/* Avatar */}
+      <div className="shrink-0">
+        <Avatar name={member.name} role={member.role} size="small" />
+      </div>
+
+      {/* Name */}
+      <span
+        className="flex-1 min-w-0 truncate"
+        style={{
+          fontFamily:    'var(--font-family)',
+          fontSize:      '14px',
+          fontWeight:    'var(--font-weight-regular)',
+          color:         hovered ? 'var(--primary)' : 'var(--foreground)',
+          letterSpacing: '0.3px',
+          transition:    'color 150ms',
+        }}
+      >
+        {member.name}
+      </span>
+
+      {/* Role badge (icon-only to save space) */}
+      <RoleBadge role={member.role} iconOnly />
+
+      {/* Access level — fixed width sized to "Super Admin" so role icons align.
+          Shows "Owner" when this member is the entity owner. */}
+      <span
+        className="shrink-0"
+        style={{
+          fontFamily:    'var(--font-family)',
+          fontSize:      '12px',
+          fontWeight:    isOwner ? 'var(--font-weight-medium)' : 'var(--font-weight-regular)',
+          color:         isOwner ? 'var(--foreground)' : 'var(--muted-foreground)',
+          letterSpacing: '0.3px',
+          whiteSpace:    'nowrap',
+          width:         '76px',
+          textAlign:     'right',
+        }}
+      >
+        {isOwner ? 'Owner' : member.accessLevel}
+      </span>
+    </button>
   );
 }
 
@@ -557,6 +668,8 @@ function DropdownTrigger({ children, onClick, isOpen = false }: { children: Reac
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      aria-expanded={isOpen}
+      aria-haspopup="listbox"
       className="flex items-center justify-between w-full h-[40px] pl-[6px] pr-[12px] rounded-[12px] transition-colors"
       style={{
         border:          `1px solid ${hovered ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}`,
@@ -617,6 +730,8 @@ function RadioCircle({ checked, onClick }: { checked: boolean; onClick: () => vo
   const [hovered, setHovered] = useState(false);
   return (
     <button
+      role="radio"
+      aria-checked={checked}
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -627,7 +742,7 @@ function RadioCircle({ checked, onClick }: { checked: boolean; onClick: () => vo
         cursor:          'pointer',
       }}
     >
-      {checked && <Check className="size-[11px]" style={{ color: 'var(--radio-check-color)' }} strokeWidth={3} />}
+      {checked && <Check className="size-[11px]" style={{ color: 'var(--background)' }} strokeWidth={3} />}
     </button>
   );
 }

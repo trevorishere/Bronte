@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Star, MoreHorizontal, ArrowUp, ArrowDown, File } from 'lucide-react';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router';
 import { DropdownMenu, createDefaultMenuItems } from './DropdownMenu';
 import { Avatar, RoleBadge } from './Avatar';
 import { TeamIcon } from './TeamIcon';
@@ -10,9 +9,13 @@ import { ProjectIcon } from './ProjectIcon';
 import { RenameModal } from './RenameModal';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { MoveModal } from './MoveModal';
+import { RenameActionDrawer, DeleteActionDrawer, MoveActionDrawer } from './MobileActionDrawers';
 import { MobileCardView } from './MobileCardView';
 import { MobileSortHeader } from './MobileSortHeader';
+import { OwnerModal } from './OwnerModal';
+import { useIsMobile } from '../hooks/useIsMobile';
 import { accounts } from '../data/accounts';
+import type { Account } from '../data/accounts';
 
 // ========================================
 // TYPE DEFINITIONS
@@ -110,7 +113,6 @@ export function DataTable({
   // ========================================
   // STATE MANAGEMENT
   // ========================================
-  const navigate = useNavigate();
   const [sortConfig, setSortConfig] = useState<SortConfig>(getDefaultSort());
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const [selectedRow, setSelectedRow] = useState<string | null>(null); // Toggle-able selection (click same row to deselect)
@@ -121,6 +123,11 @@ export function DataTable({
     return defaultSort ? new Set([defaultSort.key]) : new Set();
   });
   const [openMenuRowId, setOpenMenuRowId] = useState<string | null>(null);
+
+  const isMobile = useIsMobile();
+
+  // Owner Modal State
+  const [ownerModalAccount, setOwnerModalAccount] = useState<Account | null>(null);
 
   // Rename Modal State
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
@@ -357,12 +364,12 @@ export function DataTable({
       {/* ======================================== */}
       {/* TABLE (header + rows inside the same border) */}
       {/* ======================================== */}
-      <div className="flex flex-col overflow-hidden rounded-2xl w-full flex-1 min-h-0" style={{ border: '1px solid var(--border-interactive)' }}>
+      <div role="grid" className="flex flex-col overflow-hidden rounded-2xl w-full flex-1 min-h-0" style={{ border: '1px solid var(--border-interactive)' }}>
       {/* TABLE HEADER SECTION */}
       <div className="shrink-0 overflow-hidden w-full" style={{ borderBottom: '1px solid var(--border-interactive)' }}>
-        <div className="w-full flex" style={{ minWidth: '100%' }}>
+        <div className="w-full flex" role="row" style={{ minWidth: '100%' }}>
           {/* Header Columns */}
-          <div className="flex flex-1 min-w-0">
+          <div className="flex flex-1 min-w-0" role="rowgroup">
             {visibleColumns.map((column, index) => {
               const totalColumns = visibleColumns.length;
               let flexStyle: React.CSSProperties = {};
@@ -389,83 +396,124 @@ export function DataTable({
                 flexStyle = { flex: '1 1 0px', minWidth: '140px' };
               }
 
+              const ariaSortValue = sortConfig?.key === column.key
+                ? (sortConfig.direction === 'asc' ? 'ascending' : 'descending')
+                : 'none';
+
+              const headerCellStyle: React.CSSProperties = {
+                ...flexStyle,
+                fontFamily: 'var(--font-family)',
+                fontWeight: 'var(--font-weight-semibold)',
+                color: sortConfig?.key === column.key || hoveredHeader === column.key ? 'var(--primary)' : 'var(--muted-foreground)',
+                fontSize: '12px',
+                letterSpacing: 'var(--letter-spacing-lg)',
+                textTransform: 'uppercase',
+                textAlign: column.align || 'left',
+                paddingLeft: '20px',
+                paddingRight: '20px',
+                position: 'relative',
+                boxSizing: 'border-box',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+              };
+
+              if (column.sortable) {
+                return (
+                  <div
+                    key={column.key}
+                    role="columnheader"
+                    aria-sort={ariaSortValue as 'ascending' | 'descending' | 'none'}
+                    style={headerCellStyle}
+                    onMouseEnter={() => setHoveredHeader(column.key)}
+                    onMouseLeave={() => setHoveredHeader(null)}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => handleSort(column.key)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        width: '100%',
+                        padding: '16px 0',
+                        textAlign: 'inherit',
+                        fontFamily: 'inherit',
+                        fontWeight: 'inherit',
+                        fontSize: 'inherit',
+                        letterSpacing: 'inherit',
+                        textTransform: 'inherit',
+                        color: 'inherit',
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                    >
+                      {column.align === 'right' ? (
+                        <div className="flex items-center justify-end gap-[8px] w-full">
+                          <div className="flex flex-col w-[16px]">
+                            {(sortConfig?.key === column.key || hoveredHeader === column.key) && (
+                              <>
+                                {sortConfig?.key === column.key ? (
+                                  sortConfig.direction === 'asc' ? (
+                                    <ArrowUp className="size-[16px] text-primary" />
+                                  ) : (
+                                    <ArrowDown className="size-[16px] text-primary" />
+                                  )
+                                ) : (
+                                  isDateColumn(column.key) ? (
+                                    <ArrowDown className="size-[16px] text-muted-foreground" />
+                                  ) : (
+                                    <ArrowUp className="size-[16px] text-muted-foreground" />
+                                  )
+                                )}
+                              </>
+                            )}
+                          </div>
+                          <span>{column.label}</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-[8px] w-full">
+                          <span>{column.label}</span>
+                          <div className="flex flex-col w-[16px]">
+                            {(sortConfig?.key === column.key || hoveredHeader === column.key) && (
+                              <>
+                                {sortConfig?.key === column.key ? (
+                                  sortConfig.direction === 'asc' ? (
+                                    <ArrowUp className="size-[16px] text-primary" />
+                                  ) : (
+                                    <ArrowDown className="size-[16px] text-primary" />
+                                  )
+                                ) : (
+                                  isDateColumn(column.key) ? (
+                                    <ArrowDown className="size-[16px] text-muted-foreground" />
+                                  ) : (
+                                    <ArrowUp className="size-[16px] text-muted-foreground" />
+                                  )
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </button>
+                  </div>
+                );
+              }
+
+              // Non-sortable header
               return (
                 <div
                   key={column.key}
-                  className={`${column.sortable ? 'cursor-pointer' : ''} py-[16px]`}
-                  style={{
-                    ...flexStyle,
-                    fontFamily: 'var(--font-family)',
-                    fontWeight: 'var(--font-weight-semibold)',
-                    color: sortConfig?.key === column.key || hoveredHeader === column.key ? 'var(--primary)' : 'var(--muted-foreground)',
-                    fontSize: '12px',
-                    letterSpacing: 'var(--letter-spacing-lg)',
-                    textTransform: 'uppercase',
-                    textAlign: column.align || 'left',
-                    paddingLeft: '20px',
-                    paddingRight: '20px',
-                    position: 'relative',
-                    boxSizing: 'border-box',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden'
-                  }}
-                  onClick={() => handleSort(column.key)}
-                  onMouseEnter={() => column.sortable && setHoveredHeader(column.key)}
-                  onMouseLeave={() => setHoveredHeader(null)}
+                  role="columnheader"
+                  className="py-[16px]"
+                  style={headerCellStyle}
                 >
                   {column.align === 'right' ? (
-                    // Right-aligned columns: arrow on left, text right-aligned
                     <div className="flex items-center justify-end gap-[8px]">
-                      {column.sortable && (
-                        <div className="flex flex-col w-[16px]">
-                          {(sortConfig?.key === column.key || hoveredHeader === column.key) && (
-                            <>
-                              {sortConfig?.key === column.key ? (
-                                sortConfig.direction === 'asc' ? (
-                                  <ArrowUp className="size-[16px] text-primary" />
-                                ) : (
-                                  <ArrowDown className="size-[16px] text-primary" />
-                                )
-                              ) : (
-                                // Show preview arrow based on what the initial sort direction will be
-                                isDateColumn(column.key) ? (
-                                  <ArrowDown className="size-[16px] text-muted-foreground" />
-                                ) : (
-                                  <ArrowUp className="size-[16px] text-muted-foreground" />
-                                )
-                              )}
-                            </>
-                          )}
-                        </div>
-                      )}
                       <span>{column.label}</span>
                     </div>
                   ) : (
-                    // Left-aligned columns: text on left, arrow on right
                     <div className="flex items-center gap-[8px]">
                       <span>{column.label}</span>
-                      {column.sortable && (
-                        <div className="flex flex-col w-[16px]">
-                          {(sortConfig?.key === column.key || hoveredHeader === column.key) && (
-                            <>
-                              {sortConfig?.key === column.key ? (
-                                sortConfig.direction === 'asc' ? (
-                                  <ArrowUp className="size-[16px] text-primary" />
-                                ) : (
-                                  <ArrowDown className="size-[16px] text-primary" />
-                                )
-                              ) : (
-                                // Show preview arrow based on what the initial sort direction will be
-                                isDateColumn(column.key) ? (
-                                  <ArrowDown className="size-[16px] text-muted-foreground" />
-                                ) : (
-                                  <ArrowUp className="size-[16px] text-muted-foreground" />
-                                )
-                              )}
-                            </>
-                          )}
-                        </div>
-                      )}
                     </div>
                   )}
                 </div>
@@ -473,22 +521,24 @@ export function DataTable({
             })}
           </div>
           {/* Icons column header */}
-          <div style={{ flex: '0 0 116px', minWidth: '116px', maxWidth: '116px', paddingLeft: '24px', paddingRight: '20px' }}></div>
+          <div role="columnheader" style={{ flex: '0 0 116px', minWidth: '116px', maxWidth: '116px', paddingLeft: '24px', paddingRight: '20px' }}></div>
         </div>
       </div>
 
       {/* ======================================== */}
       {/* TABLE ROWS SECTION (Scrollable) */}
       {/* ======================================== */}
-      <div className="overflow-hidden flex-1 min-h-0">
+      <div className="overflow-hidden flex-1 min-h-0" role="rowgroup">
         <div className="overflow-y-auto w-full h-full" style={{ paddingBottom: '4px' }} onClick={handleTableAreaClick}>
-          <div className="w-full" style={{ minWidth: '100%' }}>
+          <div className="w-full" role="grid" style={{ minWidth: '100%' }}>
             {displayData.map((row, rowIndex) => {
               const totalColumns = visibleColumns.length;
 
               return (
                 <div
                   key={row.id}
+                  role="row"
+                  tabIndex={0}
                   className="cursor-pointer transition-colors flex items-center w-full"
                   style={{
                     height: '64px',
@@ -498,6 +548,7 @@ export function DataTable({
                   }}
                   onClick={() => handleRowClick(row)}
                   onDoubleClick={() => handleRowDoubleClick(row)}
+                  onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleRowClick(row); } }}
                   onMouseEnter={() => setHoveredRow(row.id)}
                   onMouseLeave={() => setHoveredRow(null)}
                   onMouseOver={(e) => {
@@ -531,6 +582,7 @@ export function DataTable({
                       return (
                         <div
                           key={column.key}
+                          role="gridcell"
                           className="flex items-center"
                           style={{
                             ...flexStyle,
@@ -538,7 +590,7 @@ export function DataTable({
                             fontSize: 'var(--font-size-15)',
                             fontWeight: 'var(--font-weight-regular)',
                             textAlign: column.align || 'left',
-                            letterSpacing: 'var(--letter-spacing-md)',
+                            letterSpacing: 'var(--letter-spacing-sm)',
                             paddingLeft: '20px',
                             paddingRight: '20px',
                             boxSizing: 'border-box'
@@ -584,7 +636,7 @@ export function DataTable({
                                   fontFamily: 'var(--font-family)',
                                   fontSize: 'var(--font-size-16)',
                                   fontWeight: 'var(--font-weight-medium)',
-                                  letterSpacing: 'var(--letter-spacing-md)',
+                                  letterSpacing: 'var(--letter-spacing-sm)',
                                   whiteSpace: 'nowrap',
                                   overflow: 'hidden',
                                   textOverflow: 'ellipsis'
@@ -597,21 +649,22 @@ export function DataTable({
                             // ========================================
                             // MIDDLE COLUMNS: Role badges or text
                             // ========================================
-                            column.key === 'owner' ? (
+                            (column.key === 'owner' || column.key === 'sharedBy') ? (
                               (() => {
                                 const ownerAccount = accounts.find(a => a.name === row[column.key]);
                                 return ownerAccount ? (
                                   <div
-                                    className="flex items-center gap-[12px] min-w-0 cursor-pointer"
+                                    className="flex items-center gap-[8px] min-w-0 cursor-pointer"
                                     style={{
                                       padding: '8px 12px',
+                                      marginLeft: '-12px',
                                       borderRadius: '24px',
                                       backgroundColor: 'transparent',
                                       transition: 'background-color var(--transition-duration) var(--transition-timing)',
                                     }}
                                     onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'; }}
                                     onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-                                    onClick={e => { e.stopPropagation(); navigate(`/admin/account/${ownerAccount.id}`); }}
+                                    onClick={e => { e.stopPropagation(); setOwnerModalAccount(ownerAccount); }}
                                   >
                                     <Avatar name={ownerAccount.name} role={ownerAccount.role} size="small" />
                                     <span
@@ -620,7 +673,7 @@ export function DataTable({
                                         fontFamily: 'var(--font-family)',
                                         fontSize: 'var(--font-size-16)',
                                         fontWeight: 'var(--font-weight-regular)',
-                                        letterSpacing: 'var(--letter-spacing-md)',
+                                        letterSpacing: 'var(--letter-spacing-sm)',
                                         color: (hoveredRow === row.id || selectedRow === row.id) ? 'var(--primary)' : 'var(--foreground)',
                                         whiteSpace: 'nowrap',
                                         overflow: 'hidden',
@@ -631,7 +684,7 @@ export function DataTable({
                                     </span>
                                   </div>
                                 ) : (
-                                  <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-16)', fontWeight: 'var(--font-weight-regular)', letterSpacing: 'var(--letter-spacing-md)', color: 'var(--foreground)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                  <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-16)', fontWeight: 'var(--font-weight-regular)', letterSpacing: 'var(--letter-spacing-sm)', color: 'var(--foreground)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                     {row[column.key]}
                                   </span>
                                 );
@@ -645,7 +698,7 @@ export function DataTable({
                                 fontFamily: 'var(--font-family)',
                                 fontSize: 'var(--font-size-16)',
                                 fontWeight: 'var(--font-weight-regular)',
-                                letterSpacing: 'var(--letter-spacing-md)',
+                                letterSpacing: 'var(--letter-spacing-sm)',
                                 color: (hoveredRow === row.id || selectedRow === row.id) ? 'var(--primary)' : 'var(--foreground)',
                                 whiteSpace: 'nowrap',
                               }}>
@@ -662,7 +715,7 @@ export function DataTable({
                                       fontFamily: 'var(--font-family)',
                                       fontSize: 'var(--font-size-16)',
                                       fontWeight: 'var(--font-weight-regular)',
-                                      letterSpacing: 'var(--letter-spacing-md)',
+                                      letterSpacing: 'var(--letter-spacing-sm)',
                                       color: (hoveredRow === row.id || selectedRow === row.id) ? 'var(--primary)' : 'var(--foreground)',
                                       display: 'inline-flex',
                                       alignItems: 'center',
@@ -690,7 +743,7 @@ export function DataTable({
                                       fontFamily: 'var(--font-family)',
                                       fontSize: 'var(--font-size-16)',
                                       fontWeight: 'var(--font-weight-regular)',
-                                      letterSpacing: 'var(--letter-spacing-md)',
+                                      letterSpacing: 'var(--letter-spacing-sm)',
                                       whiteSpace: 'nowrap',
                                       overflow: 'hidden',
                                       textOverflow: 'ellipsis'
@@ -708,7 +761,7 @@ export function DataTable({
                                   fontFamily: 'var(--font-family)',
                                   fontSize: 'var(--font-size-16)',
                                   fontWeight: 'var(--font-weight-regular)',
-                                  letterSpacing: 'var(--letter-spacing-md)',
+                                  letterSpacing: 'var(--letter-spacing-sm)',
                                   whiteSpace: 'nowrap',
                                   overflow: 'hidden',
                                   textOverflow: 'ellipsis'
@@ -724,13 +777,14 @@ export function DataTable({
                   </div>
 
                   {/* Separate icons column */}
-                  <div className="flex items-center" style={{ flex: '0 0 116px', minWidth: '116px', maxWidth: '116px', paddingLeft: '24px', paddingRight: '20px' }}>
+                  <div role="gridcell" className="flex items-center" style={{ flex: '0 0 116px', minWidth: '116px', maxWidth: '116px', paddingLeft: '24px', paddingRight: '20px' }}>
                     <div className={`flex items-center justify-end gap-[0px] ${(hoveredRow === row.id || openMenuRowId === row.id) ? 'opacity-100' : 'opacity-0'}`} style={{ transition: `opacity var(--transition-duration) var(--transition-timing)` }}>
                       {/* ========================================
                           STAR BUTTON - Uses theme variables
                           ========================================*/}
                       <button
                         className="size-[36px] flex items-center justify-center rounded-full"
+                        aria-label={starredItems?.has(row.id) ? `Remove ${row.name} from favorites` : `Add ${row.name} to favorites`}
                         style={{
                           backgroundColor: 'transparent',
                           transition: `background-color var(--transition-duration) var(--transition-timing)`
@@ -740,6 +794,7 @@ export function DataTable({
                         onClick={(e) => handleStarClick(e, row)}
                       >
                         <Star
+                          aria-hidden="true"
                           className="size-[16px]"
                           style={{ color: 'var(--text-foreground)' }}
                           strokeWidth={1.5}
@@ -751,6 +806,9 @@ export function DataTable({
                           ========================================*/}
                       <button
                         className="size-[36px] flex items-center justify-center rounded-full"
+                        aria-label={`More options for ${row.name}`}
+                        aria-expanded={openMenuRowId === row.id}
+                        aria-haspopup="menu"
                         style={{
                           backgroundColor: openMenuRowId === row.id ? 'var(--bg-icon-hover)' : 'transparent',
                           transition: `background-color var(--transition-duration) var(--transition-timing)`
@@ -765,6 +823,7 @@ export function DataTable({
                         ref={el => { if (el) moreButtonRefs.current.set(row.id, el); }}
                       >
                         <MoreHorizontal
+                          aria-hidden="true"
                           className="size-[16px]"
                           style={{ color: 'var(--text-foreground)' }}
                           />
@@ -790,7 +849,7 @@ export function DataTable({
           fontFamily: 'var(--font-family)',
           fontSize: '12px',
           fontWeight: 'var(--font-weight-regular)',
-          letterSpacing: 'var(--letter-spacing-md)',
+          letterSpacing: 'var(--letter-spacing-sm)',
           color: 'var(--text-secondary)',
         }}>
           {displayData.length} {displayData.length === 1 ? 'item' : 'items'}
@@ -830,46 +889,76 @@ export function DataTable({
     </div>
 
       {/* ── Modals (top-level so they render on mobile and desktop) ─────── */}
-      {rowToRename && (
-        <RenameModal
-          isOpen={isRenameModalOpen}
-          currentName={rowToRename.name}
-          onClose={() => {
-            setIsRenameModalOpen(false);
-            setRowToRename(null);
-          }}
-          onRename={(newName) => {
-            onRename?.(rowToRename, newName);
-            toast.success(`Renamed to "${newName}"`);
-          }}
-          title={`Rename "${rowToRename.name}"`}
-        />
-      )}
-
-      <MoveModal
-        isOpen={isMoveModalOpen}
-        row={rowToMove}
-        onClose={() => { setIsMoveModalOpen(false); setRowToMove(null); }}
-        onMove={(row, _destId, destLabel) => {
-          toast.success(`"${row.name}" moved to ${destLabel}`);
-        }}
+      <OwnerModal
+        account={ownerModalAccount}
+        onClose={() => setOwnerModalAccount(null)}
       />
 
-      {rowToDelete && (
-        <DeleteConfirmModal
-          isOpen={isDeleteModalOpen}
-          itemName={rowToDelete.name}
-          onClose={() => {
-            setIsDeleteModalOpen(false);
-            setRowToDelete(null);
-          }}
-          onConfirm={() => {
-            const deleted = rowToDelete;
-            onDelete?.(deleted);
-            setRowToDelete(null);
-            toast.success(`"${deleted.name}" deleted`);
-          }}
-        />
+      {isMobile ? (
+        <>
+          <RenameActionDrawer
+            isOpen={isRenameModalOpen}
+            row={rowToRename}
+            onClose={() => { setIsRenameModalOpen(false); setRowToRename(null); }}
+            onConfirm={(newName) => {
+              if (rowToRename) onRename?.(rowToRename, newName);
+              toast.success(`Renamed to "${newName}"`);
+            }}
+          />
+          <MoveActionDrawer
+            isOpen={isMoveModalOpen}
+            row={rowToMove}
+            onClose={() => { setIsMoveModalOpen(false); setRowToMove(null); }}
+            onConfirm={(_destId, destLabel) => {
+              if (rowToMove) toast.success(`"${rowToMove.name}" moved to ${destLabel}`);
+            }}
+          />
+          <DeleteActionDrawer
+            isOpen={isDeleteModalOpen}
+            row={rowToDelete}
+            onClose={() => { setIsDeleteModalOpen(false); setRowToDelete(null); }}
+            onConfirm={() => {
+              const deleted = rowToDelete;
+              if (deleted) { onDelete?.(deleted); setRowToDelete(null); toast.success(`"${deleted.name}" deleted`); }
+            }}
+          />
+        </>
+      ) : (
+        <>
+          {rowToRename && (
+            <RenameModal
+              isOpen={isRenameModalOpen}
+              currentName={rowToRename.name}
+              onClose={() => { setIsRenameModalOpen(false); setRowToRename(null); }}
+              onRename={(newName) => {
+                onRename?.(rowToRename, newName);
+                toast.success(`Renamed to "${newName}"`);
+              }}
+              title={`Rename "${rowToRename.name}"`}
+            />
+          )}
+          <MoveModal
+            isOpen={isMoveModalOpen}
+            row={rowToMove}
+            onClose={() => { setIsMoveModalOpen(false); setRowToMove(null); }}
+            onMove={(row, _destId, destLabel) => {
+              toast.success(`"${row.name}" moved to ${destLabel}`);
+            }}
+          />
+          {rowToDelete && (
+            <DeleteConfirmModal
+              isOpen={isDeleteModalOpen}
+              itemName={rowToDelete.name}
+              onClose={() => { setIsDeleteModalOpen(false); setRowToDelete(null); }}
+              onConfirm={() => {
+                const deleted = rowToDelete;
+                onDelete?.(deleted);
+                setRowToDelete(null);
+                toast.success(`"${deleted.name}" deleted`);
+              }}
+            />
+          )}
+        </>
       )}
     </>
   );

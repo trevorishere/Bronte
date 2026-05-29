@@ -1,3 +1,9 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+
+/* Suppress browser outline for pointer/touch focus only;
+   keyboard (Tab) users keep the native :focus-visible ring */
+*:focus:not(:focus-visible) {
+  outline: none;
+}

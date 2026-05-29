@@ -7,9 +7,11 @@ import { DataTable, Column, RowData } from '../components/DataTable';
 import { GridView, GridItemData } from '../components/GridView';
 import { EmptyState } from '../components/EmptyState';
 import { useInfoTray } from '../contexts/InfoTrayContext';
-import { ShareModal, CurrentMember } from '../components/ShareModal';
+import { ShareModal } from '../components/ShareModal';
+import { ShareDrawer } from '../components/ShareDrawer';
+import { getMembersForRow, countMembers } from '../utils/members';
 import { MembersModal } from '../components/MembersModal';
-import { useSharedMembers } from '../contexts/SharedMembersContext';
+import { useIsMobile } from '../hooks/useIsMobile';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { projects } from '../data/workspaces';
 import { accounts } from '../data/accounts';
@@ -32,11 +34,11 @@ export function FavoritesPage() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const { setIsTrayOpen, setTrayContent } = useInfoTray();
+  const isMobile = useIsMobile();
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [shareRow, setShareRow] = useState<RowData | null>(null);
   const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
   const [membersModalRow, setMembersModalRow] = useState<RowData | null>(null);
-  const { getExtraCount } = useSharedMembers();
   const { favorites, addFavorite, removeFavorite } = useFavorites();
   const [extraRows, setExtraRows] = useState<RowData[]>([]);
 
@@ -50,7 +52,7 @@ export function FavoritesPage() {
       lastModified: project.lastModified,
       workspace: project.workspace,
       iconType: 'project' as const,
-      accountCount: accounts.filter(a => a.projectIds.includes(project.id)).length,
+      accountCount: countMembers('project', project.id, project.owner),
     }));
 
   // Get unique owners for filter options
@@ -116,8 +118,6 @@ export function FavoritesPage() {
 
   const handleShareRow = (row: RowData) => { setShareRow(row); setIsShareOpen(true); };
 
-  const getMembersForRow = (row: RowData): CurrentMember[] =>
-    accounts.filter(a => a.projectIds.includes(String(row.id))).map(a => ({ id: a.id, name: a.name, role: a.role }));
 
   const handleMemberCountClick = (row: RowData) => { setMembersModalRow(row); setIsMembersModalOpen(true); };
 
@@ -183,14 +183,25 @@ export function FavoritesPage() {
         <EmptyState message="You currently have no favorite projects yet." />
       )}
 
-      <ShareModal
-        isOpen={isShareOpen}
-        onClose={() => { setIsShareOpen(false); setShareRow(null); }}
-        entityName={shareRow?.name ?? "Favorites"}
-        entityId={shareRow?.id ?? "favorites"}
-        currentMembers={shareRow ? getMembersForRow(shareRow) : []}
-        onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
-      />
+      {isMobile ? (
+        <ShareDrawer
+          isOpen={isShareOpen}
+          onClose={() => { setIsShareOpen(false); setShareRow(null); }}
+          entityName={shareRow?.name ?? "Favorites"}
+          entityId={shareRow?.id ?? "favorites"}
+          currentMembers={shareRow ? getMembersForRow(shareRow) : []}
+          onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
+        />
+      ) : (
+        <ShareModal
+          isOpen={isShareOpen}
+          onClose={() => { setIsShareOpen(false); setShareRow(null); }}
+          entityName={shareRow?.name ?? "Favorites"}
+          entityId={shareRow?.id ?? "favorites"}
+          currentMembers={shareRow ? getMembersForRow(shareRow) : []}
+          onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
+        />
+      )}
 
       <MembersModal
         isOpen={isMembersModalOpen}

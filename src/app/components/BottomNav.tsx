@@ -18,7 +18,8 @@ export function BottomNav({ activeItem = 'workspaces', onItemClick, userInitials
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
       {/* Bottom Nav Bar */}
-      <div
+      <nav
+        aria-label="Bottom navigation"
         className="flex items-center justify-around px-4"
         style={{
           backgroundColor: 'var(--sidebar)',
@@ -37,6 +38,8 @@ export function BottomNav({ activeItem = 'workspaces', onItemClick, userInitials
             <button
               key={item.id}
               onClick={() => onItemClick?.(item.id)}
+              aria-label={item.label}
+              aria-current={isActive ? 'page' : undefined}
               className="flex flex-col items-center justify-center gap-[4px] min-w-0 flex-1"
             >
               {item.id === 'account' ? (
@@ -60,7 +63,7 @@ export function BottomNav({ activeItem = 'workspaces', onItemClick, userInitials
                   <span
                     className="absolute"
                     style={{
-                      fontSize: '8px',
+                      fontSize: 'var(--font-size-8)',
                       fontWeight: 'var(--font-weight-semibold)',
                       color: isActive ? 'var(--primary)' : 'var(--muted-foreground)',
                       letterSpacing: '0.3px',
@@ -83,7 +86,7 @@ export function BottomNav({ activeItem = 'workspaces', onItemClick, userInitials
                 style={{
                   fontFamily: 'var(--font-family)',
                   fontWeight: 'var(--font-weight-medium)',
-                  fontSize: '10px',
+                  fontSize: 'var(--font-size-10)',
                   lineHeight: 'normal',
                   letterSpacing: 'var(--letter-spacing-md)',
                   color: isActive ? 'var(--primary)' : 'var(--muted-foreground)',
@@ -98,7 +101,7 @@ export function BottomNav({ activeItem = 'workspaces', onItemClick, userInitials
             </button>
           );
         })}
-      </div>
+      </nav>
     </div>
   );
 }

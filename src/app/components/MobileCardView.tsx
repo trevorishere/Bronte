@@ -209,7 +209,7 @@ export function MobileCardView({
                             fontWeight: 'var(--font-weight-regular)',
                             fontSize: '12px',
                             lineHeight: '18px',
-                            letterSpacing: 'var(--letter-spacing-md)',
+                            letterSpacing: 'var(--letter-spacing-sm)',
                             color: 'var(--muted-foreground)',
                           }}>
                             {row.accessLevel}
@@ -224,7 +224,7 @@ export function MobileCardView({
                             fontWeight: 'var(--font-weight-regular)',
                             fontSize: '12px',
                             lineHeight: '18px',
-                            letterSpacing: 'var(--letter-spacing-md)',
+                            letterSpacing: 'var(--letter-spacing-sm)',
                             color: 'var(--muted-foreground)',
                           }}>
                             {row.workspaceProjectCount} {row.workspaceProjectCount === 1 ? 'Project' : 'Projects'}
@@ -236,7 +236,7 @@ export function MobileCardView({
                             fontWeight: 'var(--font-weight-regular)',
                             fontSize: '12px',
                             lineHeight: '18px',
-                            letterSpacing: 'var(--letter-spacing-md)',
+                            letterSpacing: 'var(--letter-spacing-sm)',
                             color: 'var(--muted-foreground)',
                           }}>
                             {row.workspaceMemberCount} {row.workspaceMemberCount === 1 ? 'Member' : 'Members'}
@@ -252,7 +252,7 @@ export function MobileCardView({
                             fontWeight: 'var(--font-weight-semibold)',
                             fontSize: '12px',
                             lineHeight: '20px',
-                            letterSpacing: 'var(--letter-spacing-md)',
+                            letterSpacing: 'var(--letter-spacing-sm)',
                             color: 'var(--muted-foreground)',
                           }}>
                             {row.owner}
@@ -264,7 +264,7 @@ export function MobileCardView({
                             fontWeight: 'var(--font-weight-regular)',
                             fontSize: '12px',
                             lineHeight: '20px',
-                            letterSpacing: 'var(--letter-spacing-md)',
+                            letterSpacing: 'var(--letter-spacing-sm)',
                             color: 'var(--muted-foreground)',
                           }}>
                             {row.accountCount} {row.accountCount === 1 ? 'Member' : 'Members'}
@@ -365,7 +365,7 @@ export function MobileCardView({
                     fontWeight: 'var(--font-weight-medium)',
                     fontSize: '15px',
                     lineHeight: '21px',
-                    letterSpacing: 'var(--letter-spacing-md)',
+                    letterSpacing: 'var(--letter-spacing-sm)',
                     color: 'var(--primary)',
                   }}
                 >
@@ -378,7 +378,7 @@ export function MobileCardView({
                       fontFamily: 'var(--font-family)',
                       fontWeight: 'var(--font-weight-regular)',
                       fontSize: '11px',
-                      letterSpacing: 'var(--letter-spacing-md)',
+                      letterSpacing: 'var(--letter-spacing-sm)',
                       lineHeight: 'normal',
                       color: 'var(--muted-foreground)',
                     }}

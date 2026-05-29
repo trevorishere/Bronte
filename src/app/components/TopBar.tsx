@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, MoreHorizontal, Plus, UserRoundPlus, Info } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MoreHorizontal, UserRoundPlus, Info } from 'lucide-react';
 import { ReactNode, useRef, useState, useEffect, cloneElement, isValidElement } from 'react';
 import { useNavigate } from 'react-router';
 import { ActionButtons } from './ActionButtons';
@@ -69,6 +69,7 @@ function BreadcrumbNav({ entries, titleSuffix, ancMaxLen = 14, badgeIconOnly = f
                   style={{ fontFamily: 'var(--font-family)', fontSize: '13px', color: 'var(--muted-foreground)', letterSpacing: 'var(--letter-spacing-md)' }}
                   onClick={() => handleAncestorClick(firstAncestor!, 0)}
                   title={firstAncestor.label}
+                  aria-label={firstAncestor.label}
                 >
                   {truncate(firstAncestor.label, 10)}
                 </button>
@@ -87,6 +88,7 @@ function BreadcrumbNav({ entries, titleSuffix, ancMaxLen = 14, badgeIconOnly = f
                     style={{ fontFamily: 'var(--font-family)', fontSize: '13px', color: 'var(--muted-foreground)', letterSpacing: 'var(--letter-spacing-md)' }}
                     onClick={() => handleAncestorClick(entry, idx)}
                     title={entry.label}
+                    aria-label={entry.label}
                   >
                     {truncate(entry.label, 10)}
                   </button>
@@ -102,7 +104,7 @@ function BreadcrumbNav({ entries, titleSuffix, ancMaxLen = 14, badgeIconOnly = f
         <div className="flex items-center gap-[8px] min-w-0 overflow-hidden">
           <h1
             className="font-medium truncate min-w-0"
-            style={{ fontFamily: 'var(--font-family)', fontSize: '24px', color: 'var(--primary)', letterSpacing: 'var(--letter-spacing-lg)', lineHeight: 'normal' }}
+            style={{ fontFamily: 'var(--font-family)', fontSize: '24px', color: 'var(--primary)', letterSpacing: 'var(--letter-spacing-md)', lineHeight: 'normal' }}
             title={current.label}
           >
             {current.label}
@@ -133,6 +135,7 @@ function BreadcrumbNav({ entries, titleSuffix, ancMaxLen = 14, badgeIconOnly = f
                     className="whitespace-nowrap"
                     onClick={() => handleAncestorClick(firstAncestor!, idx)}
                     title={firstAncestor.label}
+                    aria-label={firstAncestor.label}
                   >
                     {truncate(firstAncestor.label)}
                   </button>
@@ -158,6 +161,7 @@ function BreadcrumbNav({ entries, titleSuffix, ancMaxLen = 14, badgeIconOnly = f
                   className="whitespace-nowrap"
                   onClick={() => handleAncestorClick(entry, idx)}
                   title={entry.label}
+                  aria-label={entry.label}
                 >
                   {truncate(entry.label)}
                 </button>
@@ -171,7 +175,7 @@ function BreadcrumbNav({ entries, titleSuffix, ancMaxLen = 14, badgeIconOnly = f
         <BreadcrumbItem className="flex items-center gap-[8px] min-w-0 overflow-hidden">
           <BreadcrumbPage
             className="font-medium truncate min-w-0"
-            style={{ fontSize: '24px', color: 'var(--primary)', letterSpacing: 'var(--letter-spacing-lg)', lineHeight: 'normal' }}
+            style={{ fontSize: '24px', color: 'var(--primary)', letterSpacing: 'var(--letter-spacing-md)', lineHeight: 'normal' }}
             title={current.label}
           >
             {current.label}
@@ -320,7 +324,7 @@ export function TopBar({
                 fontFamily: 'var(--font-family)',
                 lineHeight: 'normal',
                 color: 'var(--primary)',
-                letterSpacing: 'var(--letter-spacing-lg)',
+                letterSpacing: 'var(--letter-spacing-md)',
               }}
             >
               {title}
@@ -351,7 +355,7 @@ export function TopBar({
                 fontFamily: 'var(--font-family)',
                 lineHeight: 'normal',
                 color: 'var(--primary)',
-                letterSpacing: 'var(--letter-spacing-lg)',
+                letterSpacing: 'var(--letter-spacing-md)',
               }}
             >
               {title}
@@ -359,18 +363,8 @@ export function TopBar({
           ) : null}
         </div>
 
-        {/* Top bar actions: Add, Share, Info */}
+        {/* Top bar actions: Share, Info */}
         <div className="flex items-center gap-[8px] shrink-0">
-          <button
-            className="flex items-center gap-[8px] h-[40px] rounded-[12px] transition-colors"
-            style={{ border: '1px solid var(--border-interactive)', paddingLeft: '11px', paddingRight: '13px', paddingTop: '1px', paddingBottom: '1px', backgroundColor: 'transparent', cursor: 'pointer' }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-            title="Add"
-          >
-            <Plus className="size-[18px] shrink-0" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2.5} />
-            <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: '15px', letterSpacing: '0.32px', color: 'var(--secondary-foreground)', whiteSpace: 'nowrap' }}>New…</span>
-          </button>
           {!hideShare && (
           <button
             className="flex items-center gap-[8px] h-[40px] rounded-[12px] transition-colors"
@@ -387,7 +381,7 @@ export function TopBar({
                 width: 24,
                 height: 24,
                 borderRadius: 8,
-                backgroundColor: 'rgba(74,68,64,0.5)',
+                backgroundColor: 'var(--accent)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -395,7 +389,7 @@ export function TopBar({
                 fontWeight: 600,
                 fontSize: '13px',
                 lineHeight: '20px',
-                color: 'var(--secondary-foreground)',
+                color: 'var(--foreground)',
                 flexShrink: 0,
               }}>
                 {shareCount}

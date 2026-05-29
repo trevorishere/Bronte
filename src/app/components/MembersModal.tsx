@@ -1,8 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { Button } from './Button';
 import { Avatar, RoleBadge } from './Avatar';
 import type { CurrentMember } from './ShareModal';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useRestoreFocus } from '../hooks/useRestoreFocus';
 
 interface MembersModalProps {
   isOpen: boolean;
@@ -13,6 +15,10 @@ interface MembersModalProps {
 }
 
 export function MembersModal({ isOpen, onClose, entityName, members, onAddMembers }: MembersModalProps) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(panelRef, isOpen);
+  useRestoreFocus(isOpen);
+
   useEffect(() => {
     if (!isOpen) return;
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -30,10 +36,14 @@ export function MembersModal({ isOpen, onClose, entityName, members, onAddMember
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+      style={{ backgroundColor: 'var(--backdrop-color-modal)' }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="members-title"
         className="relative flex flex-col rounded-2xl shadow-lg overflow-hidden"
         style={{
           width: '560px',
@@ -43,15 +53,18 @@ export function MembersModal({ isOpen, onClose, entityName, members, onAddMember
         }}
       >
         {/* Header */}
-        <div className="shrink-0 flex items-center justify-between px-[32px] py-[28px]">
-          <div className="flex flex-col gap-[4px] min-w-0 pr-[8px]">
-            <h2 style={{
-              fontFamily: 'var(--font-family)',
-              fontWeight: 'var(--font-weight-semibold)',
-              fontSize: 'var(--font-size-24)',
-              lineHeight: 'var(--line-height-normal)',
-              color: 'var(--primary)',
-            }}>
+        <div className="shrink-0 flex items-start justify-between px-[32px] pt-[24px] pb-[28px]">
+          <div className="flex flex-col gap-[8px] min-w-0 pr-[8px]">
+            <h2
+              id="members-title"
+              style={{
+                fontFamily: 'var(--font-family)',
+                fontWeight: 'var(--font-weight-semibold)',
+                fontSize: 'var(--font-size-24)',
+                lineHeight: 'var(--line-height-normal)',
+                color: 'var(--primary)',
+              }}
+            >
               Members
             </h2>
             <p className="truncate" style={{
@@ -65,6 +78,7 @@ export function MembersModal({ isOpen, onClose, entityName, members, onAddMember
           </div>
           <button
             onClick={onClose}
+            aria-label="Close"
             className="flex items-center justify-center size-[32px] rounded-full transition-colors ml-[16px] shrink-0"
             style={{ backgroundColor: 'transparent' }}
             onMouseOver={e => (e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)')}
@@ -115,7 +129,7 @@ export function MembersModal({ isOpen, onClose, entityName, members, onAddMember
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 flex items-center justify-end gap-[12px] px-[32px] py-[28px]">
+        <div className="shrink-0 flex items-center justify-end gap-[12px] px-[32px] pt-[24px] pb-[32px]">
           <Button variant="secondary" onClick={onClose} type="button">
             Done
           </Button>

@@ -2,8 +2,13 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, Search, ChevronRight, FolderOpen, File } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from './Button';
+import { DragHandle } from './DragHandle';
+import { useDrawerInteraction } from '../hooks/useDrawerInteraction';
+import { SPRING_DRAWER } from '../constants/animation';
 import { workspaces, projects } from '../data/workspaces';
 import type { RowData } from './DataTable';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useRestoreFocus } from '../hooks/useRestoreFocus';
 
 // ── Shared tree types (mirrors MoveModal) ────────────────────────────────────
 
@@ -35,27 +40,17 @@ interface DrawerChromeProps {
   onClose: () => void;
   title: string;
   subtitle: string;
+  titleId: string;
   maxHeight?: string;
   children: React.ReactNode;
   footer: React.ReactNode;
 }
 
-function DrawerChrome({ isOpen, onClose, title, subtitle, maxHeight, children, footer }: DrawerChromeProps) {
-  const touchStartY = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, [isOpen, onClose]);
-
-  const handleTouchStart = (e: React.TouchEvent) => { touchStartY.current = e.touches[0].clientY; };
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartY.current === null) return;
-    if (e.changedTouches[0].clientY - touchStartY.current > 60) onClose();
-    touchStartY.current = null;
-  };
+function DrawerChrome({ isOpen, onClose, title, subtitle, titleId, maxHeight, children, footer }: DrawerChromeProps) {
+  const { handleTouchStart, handleTouchEnd } = useDrawerInteraction(isOpen, onClose);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(panelRef, isOpen);
+  useRestoreFocus(isOpen);
 
   return (
     <AnimatePresence>
@@ -64,7 +59,7 @@ function DrawerChrome({ isOpen, onClose, title, subtitle, maxHeight, children, f
           {/* Backdrop */}
           <motion.div
             className="fixed inset-0 z-[62]"
-            style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
+            style={{ backgroundColor: 'var(--backdrop-color)' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -74,27 +69,30 @@ function DrawerChrome({ isOpen, onClose, title, subtitle, maxHeight, children, f
 
           {/* Drawer */}
           <motion.div
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
             className="fixed bottom-0 left-0 right-0 z-[63] rounded-t-[24px] flex flex-col"
             style={{ backgroundColor: 'var(--background)', maxHeight: maxHeight ?? 'auto', minHeight: '50vh' }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ type: 'spring', stiffness: 380, damping: 34 }}
+            transition={SPRING_DRAWER}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
-            {/* Drag handle */}
-            <div
-              className="absolute top-[12px] left-1/2 -translate-x-1/2 rounded-full shrink-0"
-              style={{ width: 36, height: 4, backgroundColor: 'var(--border-interactive)' }}
-            />
+            <DragHandle />
 
             {/* Header */}
-            <div className="shrink-0 px-[24px] pt-[36px] pb-[16px] flex flex-col gap-[8px]">
-              <h2 style={{
-                fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)',
-                fontSize: '22px', lineHeight: 'normal', color: 'var(--primary)',
-              }}>
+            <div className="shrink-0 px-[24px] pt-[36px] pb-[24px] flex flex-col gap-[8px]">
+              <h2
+                id={titleId}
+                style={{
+                  fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)',
+                  fontSize: '22px', lineHeight: 'normal', color: 'var(--primary)',
+                }}
+              >
                 {title}
               </h2>
               <p className="truncate" style={{
@@ -161,6 +159,7 @@ export function RenameActionDrawer({ isOpen, row, onClose, onConfirm }: RenameAc
       onClose={onClose}
       title="Rename"
       subtitle={row?.name ?? ''}
+      titleId="rename-drawer-title"
       footer={
         <>
           <Button variant="secondary" onClick={onClose} type="button">Cancel</Button>
@@ -170,11 +169,11 @@ export function RenameActionDrawer({ isOpen, row, onClose, onConfirm }: RenameAc
         </>
       }
     >
-      <div className="px-[24px] py-[20px]">
+      <div className="px-[24px] py-[24px]">
         <div className="flex flex-col gap-[8px]">
           <label style={{
             fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)',
-            fontSize: '11px', color: 'var(--foreground)', opacity: 0.5,
+            fontSize: '11px', color: 'var(--muted-foreground)',
           }}>
             New Name
           </label>
@@ -185,7 +184,7 @@ export function RenameActionDrawer({ isOpen, row, onClose, onConfirm }: RenameAc
               value={value}
               onChange={e => setValue(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleConfirm(); }}
-              className="w-full pl-[12px] pr-[36px] rounded-lg outline-none bg-transparent"
+              className="w-full pl-[12px] pr-[36px] rounded-lg bg-transparent"
               style={{
                 height: '44px',
                 fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-16)',
@@ -233,6 +232,7 @@ export function DeleteActionDrawer({ isOpen, row, onClose, onConfirm }: DeleteAc
       onClose={onClose}
       title="Delete"
       subtitle={row?.name ?? ''}
+      titleId="delete-drawer-title"
       footer={
         <>
           <Button variant="secondary" onClick={onClose} type="button">Cancel</Button>
@@ -240,7 +240,7 @@ export function DeleteActionDrawer({ isOpen, row, onClose, onConfirm }: DeleteAc
         </>
       }
     >
-      <div className="px-[24px] py-[20px]">
+      <div className="px-[24px] py-[24px]">
         <p style={{
           fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-regular)',
           fontSize: 'var(--font-size-15)', lineHeight: '1.5',
@@ -389,6 +389,7 @@ export function MoveActionDrawer({ isOpen, row, onClose, onConfirm }: MoveAction
       onClose={onClose}
       title="Move"
       subtitle={row?.name ?? ''}
+      titleId="move-drawer-title"
       maxHeight="85vh"
       footer={
         <>
@@ -407,7 +408,7 @@ export function MoveActionDrawer({ isOpen, row, onClose, onConfirm }: MoveAction
       }
     >
       {/* Search */}
-      <div className="shrink-0 px-[24px] pt-[16px] pb-[12px]">
+      <div className="shrink-0 px-[24px] py-[24px]">
         <div className="flex items-center gap-[8px] rounded-[10px] px-[10px]"
           style={{ height: '40px', border: '1px solid var(--border-interactive)', backgroundColor: 'var(--background)' }}>
           <Search className="size-[16px] shrink-0" style={{ color: 'var(--muted-foreground)' }} />
@@ -416,7 +417,7 @@ export function MoveActionDrawer({ isOpen, row, onClose, onConfirm }: MoveAction
             placeholder="Search locations…"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="flex-1 min-w-0 outline-none bg-transparent"
+            className="flex-1 min-w-0 bg-transparent"
             style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-15)', color: 'var(--foreground)' }}
           />
           {searchQuery && (

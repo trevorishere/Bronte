@@ -8,8 +8,11 @@ import { GridView, GridItemData } from '../components/GridView';
 import { EmptyState } from '../components/EmptyState';
 import { useInfoTray } from '../contexts/InfoTrayContext';
 import { ShareModal } from '../components/ShareModal';
-import { useSharedMembers } from '../contexts/SharedMembersContext';
+import { ShareDrawer } from '../components/ShareDrawer';
+import { MembersModal } from '../components/MembersModal';
+import { getMembersForRow, countMembers } from '../utils/members';
 import { sharedProjects } from '../data/shared';
+import { useIsMobile } from '../hooks/useIsMobile';
 import { useFavorites } from '../contexts/FavoritesContext';
 
 interface OutletContext {
@@ -33,7 +36,7 @@ const tableData: RowData[] = sharedProjects.map(project => ({
   lastModified: project.lastModified,
   workspace: project.workspace,
   iconType: 'project' as const,
-  accountCount: project.membersCount,
+  accountCount: countMembers('project', project.id, project.owner),
 }));
 
 export function SharedPage() {
@@ -42,9 +45,11 @@ export function SharedPage() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [dateFilters, setDateFilters] = useState<Record<string, { start: Date | null; end: Date | null }>>({});
   const { setIsTrayOpen, setTrayContent } = useInfoTray();
+  const isMobile = useIsMobile();
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [shareRow, setShareRow] = useState<RowData | null>(null);
-  const { getExtraCount } = useSharedMembers();
+  const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
+  const [membersModalRow, setMembersModalRow] = useState<RowData | null>(null);
   const { favorites, addFavorite, removeFavorite } = useFavorites();
   const [extraRows, setExtraRows] = useState<RowData[]>([]);
 
@@ -110,11 +115,12 @@ export function SharedPage() {
   const handleMoreClick = (_row: RowData) => {};
 
   const handleShareRow = (row: RowData) => { setShareRow(row); setIsShareOpen(true); };
+  const handleMemberCountClick = (row: RowData) => { setMembersModalRow(row); setIsMembersModalOpen(true); };
 
   return (
     <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       <TopBar
-        title="Shared with me"
+        title="Shared With Me"
         userInitials="LD"
         isDarkMode={isDarkMode}
         onThemeToggle={onThemeToggle}
@@ -170,6 +176,7 @@ export function SharedPage() {
             onStarClick={handleStarClick}
             onMoreClick={handleMoreClick}
             onShare={handleShareRow}
+            onMemberCountClick={handleMemberCountClick}
             onDuplicate={(copy) => setExtraRows(prev => [...prev, copy])}
             onDelete={(deleted) => setExtraRows(prev => prev.filter(r => r.id !== deleted.id))}
             starredItems={favorites}
@@ -179,12 +186,30 @@ export function SharedPage() {
         )
       )}
 
-      <ShareModal
-        isOpen={isShareOpen}
-        onClose={() => { setIsShareOpen(false); setShareRow(null); }}
-        entityName={shareRow?.name ?? "Shared with me"}
-        entityId={shareRow?.id ?? "shared"}
-        onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
+      {isMobile ? (
+        <ShareDrawer
+          isOpen={isShareOpen}
+          onClose={() => { setIsShareOpen(false); setShareRow(null); }}
+          entityName={shareRow?.name ?? "Shared With Me"}
+          entityId={shareRow?.id ?? "shared"}
+          onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
+        />
+      ) : (
+        <ShareModal
+          isOpen={isShareOpen}
+          onClose={() => { setIsShareOpen(false); setShareRow(null); }}
+          entityName={shareRow?.name ?? "Shared With Me"}
+          entityId={shareRow?.id ?? "shared"}
+          onShare={(ids) => toast(`Shared with ${ids.length} person${ids.length !== 1 ? 's' : ''}`)}
+        />
+      )}
+
+      <MembersModal
+        isOpen={isMembersModalOpen}
+        onClose={() => { setIsMembersModalOpen(false); setMembersModalRow(null); }}
+        entityName={membersModalRow?.name ?? ''}
+        members={membersModalRow ? getMembersForRow(membersModalRow) : []}
+        onAddMembers={() => { if (membersModalRow) handleShareRow(membersModalRow); }}
       />
     </div>
   );

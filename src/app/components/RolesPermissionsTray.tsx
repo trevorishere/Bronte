@@ -127,7 +127,7 @@ export function RolesPermissionsTray({
             opacity: { duration: 0.18, ease: 'easeInOut' },
           }}
           className="shrink-0 overflow-hidden hidden md:flex flex-col"
-          style={{ borderLeft: `1px solid var(--border)`, backgroundColor: 'var(--tray-bg)' }}
+          style={{ borderLeft: `1px solid var(--border)`, backgroundColor: 'var(--muted)' }}
         >
           <div className="flex flex-col h-full" style={{ minWidth: 380 }}>
 
@@ -145,6 +145,7 @@ export function RolesPermissionsTray({
               </span>
               <button
                 onClick={onClose}
+                aria-label="Close"
                 className="shrink-0 flex items-center justify-center size-[32px] rounded-[6px] transition-colors"
                 style={{ backgroundColor: 'transparent', color: 'var(--muted-foreground)', border: 'none', cursor: 'pointer' }}
                 onMouseOver={e  => (e.currentTarget.style.backgroundColor = 'var(--muted)')}
@@ -283,7 +284,7 @@ export function RolesPermissionsTray({
                         }}>
                           {row.label}
                         </span>
-                        <div className="flex items-center gap-[8px]">
+                        <div role="radiogroup" aria-label={row.label} className="flex items-center gap-[8px]">
                           {PERM_COLS.map(level => (
                             <div key={level} className="flex items-center justify-center w-[64px] h-[24px]">
                               <RadioCircle
@@ -406,6 +407,8 @@ function DropdownTrigger({ children, onClick, isOpen = false }: { children: Reac
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      aria-expanded={isOpen}
+      aria-haspopup="listbox"
       className="flex items-center justify-between w-full h-[40px] pl-[6px] pr-[12px] rounded-[12px] transition-colors"
       style={{
         border: `1px solid ${hovered ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}`,
@@ -466,6 +469,8 @@ function RadioCircle({ checked, onClick }: { checked: boolean; onClick: () => vo
   const [hovered, setHovered] = useState(false);
   return (
     <button
+      role="radio"
+      aria-checked={checked}
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -476,7 +481,7 @@ function RadioCircle({ checked, onClick }: { checked: boolean; onClick: () => vo
         cursor: 'pointer',
       }}
     >
-      {checked && <Check className="size-[11px]" style={{ color: 'var(--radio-check-color)' }} strokeWidth={3} />}
+      {checked && <Check className="size-[11px]" style={{ color: 'var(--background)' }} strokeWidth={3} />}
     </button>
   );
 }

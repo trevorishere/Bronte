@@ -65,6 +65,9 @@ export function MobileSortHeader({
         {/* Active Sort Column - Opens dropdown when clicked */}
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-expanded={isMenuOpen}
+          aria-haspopup="listbox"
+          aria-label={`Sort by ${sortLabel}, ${sortDirection === 'desc' ? 'descending' : 'ascending'}. Change sort`}
           className="flex items-center gap-1"
         >
           <span
@@ -114,6 +117,8 @@ export function MobileSortHeader({
               stiffness: 400,
               damping: 25
             }}
+            role="listbox"
+            aria-label="Sort options"
             className="absolute top-full left-4 mt-1 bg-background shadow-lg z-50 overflow-hidden p-[8px]"
             style={{
               border: '1px solid var(--border-interactive-hover)',
@@ -125,6 +130,8 @@ export function MobileSortHeader({
             {sortOptions.map((option) => (
               <button
                 key={option.key}
+                role="option"
+                aria-selected={sortColumn === option.key}
                 onClick={() => handleSortOptionClick(option.key)}
                 className="w-full flex items-center justify-between px-[12px] py-[10px] transition-colors rounded-xl"
                 style={{
