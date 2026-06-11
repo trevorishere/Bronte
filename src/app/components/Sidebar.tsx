@@ -76,11 +76,14 @@ export function Sidebar({
 
   const textFade: React.CSSProperties = {
     opacity: isDesktopOpen ? 1 : 0,
-    transition: 'opacity 0.12s ease',
+    transition: 'opacity 0.12s ease, color 300ms cubic-bezier(0.42, 0, 0.58, 1)',
   };
 
+  const navTransition = 'background-color 300ms cubic-bezier(0.42, 0, 0.58, 1)';
+  const colorTransition = 'color 300ms cubic-bezier(0.42, 0, 0.58, 1)';
+
   const sidebarBody = (
-    <nav aria-label="Sidebar navigation" className="flex flex-col h-full pt-[12px] pb-[24px]">
+    <nav aria-label="Sidebar navigation" className="flex flex-col h-full pt-[20px] pb-[24px]">
 
       {/* ── HEADER ───────────────────────────────────────────────── */}
       <div className="shrink-0 w-full pl-[16px] pt-[4px]">
@@ -166,18 +169,19 @@ export function Sidebar({
               onMouseEnter={() => setHoveredItem(item.id)}
               onMouseLeave={() => setHoveredItem(null)}
               aria-current={activeItem === item.id ? 'page' : undefined}
-              className="w-full rounded-[12px] transition-colors duration-150"
+              className="w-full rounded-[12px]"
               style={{
                 backgroundColor: navBg(item.id),
                 maxWidth: !isDesktopOpen ? '44px' : undefined,
                 overflow: 'hidden',
+                transition: navTransition,
               }}
             >
               <div className="flex gap-[12px] items-center px-[12px] py-[10px]">
                 <div className="shrink-0 size-[20px]">
-                  {item.icon === 'Clock'         && <Clock         className="size-full" style={{ color: iconColor(item.id) }} />}
-                  {item.icon === 'Star'          && <Star          className="size-full" style={{ color: iconColor(item.id) }} />}
-                  {item.icon === 'UserRoundPlus' && <UserRoundPlus className="size-full" style={{ color: iconColor(item.id) }} />}
+                  {item.icon === 'Clock'         && <Clock         className="size-full" style={{ color: iconColor(item.id), transition: colorTransition }} />}
+                  {item.icon === 'Star'          && <Star          className="size-full" style={{ color: iconColor(item.id), transition: colorTransition }} />}
+                  {item.icon === 'UserRoundPlus' && <UserRoundPlus className="size-full" style={{ color: iconColor(item.id), transition: colorTransition }} />}
                 </div>
                 <p style={{
                   fontFamily: 'var(--font-family)',
@@ -225,18 +229,25 @@ export function Sidebar({
                 onClick={() => handleItemClick(workspace.id)}
                 onMouseEnter={() => setHoveredItem(workspace.id)}
                 onMouseLeave={() => setHoveredItem(null)}
-                className="w-full rounded-[12px] transition-colors duration-150"
+                className="w-full rounded-[12px]"
                 style={{
                   backgroundColor: navBg(workspace.id),
                   maxWidth: !isDesktopOpen ? '48px' : undefined,
                   overflow: 'hidden',
+                  transition: navTransition,
                 }}
               >
                 <div className="flex gap-[10px] items-center pl-[10px] pr-[12px] py-[8px]">
                   {/* Workspace icon: 24×24 rounded-rect with initials */}
                   <div className="shrink-0 size-[24px] relative">
-                    <svg className="size-full" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="3" y="3" width="18" height="18" rx="4" stroke={iconColor(workspace.id)} strokeWidth="1.5" />
+                    <svg
+                      className="size-full"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      style={{ color: iconColor(workspace.id), transition: colorTransition }}
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" strokeWidth="1.5" />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
                       <p style={{
@@ -246,6 +257,7 @@ export function Sidebar({
                         letterSpacing: '0.3px',
                         color: iconColor(workspace.id),
                         whiteSpace: 'nowrap',
+                        transition: colorTransition,
                       }}>
                         {getWorkspaceInitials(workspace.name)}
                       </p>
@@ -263,6 +275,7 @@ export function Sidebar({
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       textAlign: 'left',
+                      transition: colorTransition,
                     }}>
                       {workspace.name}
                     </p>
@@ -283,16 +296,17 @@ export function Sidebar({
             onMouseEnter={() => setHoveredItem('admin')}
             onMouseLeave={() => setHoveredItem(null)}
             aria-current={activeItem === 'admin' ? 'page' : undefined}
-            className="w-full rounded-[12px] transition-colors duration-150"
+            className="w-full rounded-[12px]"
             style={{
               backgroundColor: navBg('admin'),
               maxWidth: !isDesktopOpen ? '44px' : undefined,
               overflow: 'hidden',
+              transition: navTransition,
             }}
           >
             <div className="flex gap-[12px] items-center px-[12px] py-[10px]">
               <div className="shrink-0 size-[20px]">
-                <ShieldUser className="size-full" style={{ color: iconColor('admin') }} />
+                <ShieldUser className="size-full" style={{ color: iconColor('admin'), transition: colorTransition }} />
               </div>
               <p style={{
                 fontFamily: 'var(--font-family)',
@@ -317,11 +331,12 @@ export function Sidebar({
             onClick={() => handleItemClick('account')}
             onMouseEnter={() => setHoveredItem('account')}
             onMouseLeave={() => setHoveredItem(null)}
-            className="w-full rounded-[12px] transition-colors duration-150"
+            className="w-full rounded-[12px]"
             style={{
               backgroundColor: navBg('account'),
               maxWidth: !isDesktopOpen ? '48px' : undefined,
               overflow: 'hidden',
+              transition: navTransition,
             }}
           >
             <div className="flex gap-[10px] items-center pl-[10px] pr-[12px] py-[8px]">
@@ -329,7 +344,7 @@ export function Sidebar({
                 className="shrink-0 size-[24px] rounded-full flex items-center justify-center"
                 style={{ backgroundColor: 'var(--bg-account-avatar)' }}
               >
-                <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'bold', fontSize: 'var(--font-size-10)', color: 'white', letterSpacing: '0.5px' }}>LD</span>
+                <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'bold', fontSize: 'var(--font-size-10)', lineHeight: 1, color: 'white', letterSpacing: '0.5px' }}>LD</span>
               </div>
               <div className="flex-1 min-w-0" style={textFade}>
                 <p className="truncate" style={{
@@ -340,6 +355,7 @@ export function Sidebar({
                   lineHeight: '18px',
                   color: textColor('account'),
                   textAlign: 'left',
+                  transition: colorTransition,
                 }}>
                   Lena Doe
                 </p>
