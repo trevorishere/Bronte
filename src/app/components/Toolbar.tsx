@@ -1,5 +1,6 @@
 import { LayoutGrid, List, Plus } from 'lucide-react';
-import { useState, ReactNode } from 'react';
+import { useState, useReducer, ReactNode } from 'react';
+import { motion } from 'motion/react';
 import { FilterDropdown } from './FilterDropdown';
 import { DateFilterDropdown } from './DateFilterDropdown';
 
@@ -42,12 +43,16 @@ export function Toolbar({
   actionButtons,
   onAddClick
 }: ToolbarProps) {
+  // Incremented by onAnimationComplete callbacks so layout="position" siblings
+  // get a fresh Toolbar render to snapshot before→after x-positions and animate.
+  const [, forceRerender] = useReducer(x => x + 1, 0);
+
   const [isToggleHovered, setIsToggleHovered] = useState(false);
   const [hoveredToggle, setHoveredToggle] = useState<'list' | 'grid' | null>(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const getIconColor = (mode: 'list' | 'grid') => {
-    if (viewMode === mode) return 'var(--primary)';
+    if (viewMode === mode) return 'var(--foreground)';
     if (hoveredToggle === mode) return 'var(--icon-toggle-hover)';
     return 'var(--icon-toggle-inactive)';
   };
@@ -91,30 +96,42 @@ export function Toolbar({
       <div className="hidden md:flex h-[104px] shrink-0 w-full px-[24px] items-center justify-between gap-[16px]">
 
         {/* Filter Buttons Section - Left Side */}
-        <div className="flex gap-[8px] items-center flex-1 min-w-0 overflow-hidden">
+        <div className="flex gap-[8px] items-center flex-1 min-w-0">
           {filters.map((filter) => {
             if ('type' in filter && filter.type === 'date') {
               const dateFilter = dateFilters[filter.label] || { start: null, end: null };
               return (
-                <DateFilterDropdown
+                <motion.div
                   key={filter.label}
-                  label={filter.label}
-                  startDate={dateFilter.start}
-                  endDate={dateFilter.end}
-                  onDateChange={(start, end) => {
-                    handleDateFilterChange(filter.label, start, end);
-                  }}
-                />
+                  layout="position"
+                  transition={{ layout: { type: 'spring', bounce: 0, duration: 0.5 } }}
+                >
+                  <DateFilterDropdown
+                    label={filter.label}
+                    startDate={dateFilter.start}
+                    endDate={dateFilter.end}
+                    onDateChange={(start, end) => {
+                      handleDateFilterChange(filter.label, start, end);
+                    }}
+                    onAnimationComplete={forceRerender}
+                  />
+                </motion.div>
               );
             } else {
               return (
-                <FilterDropdown
+                <motion.div
                   key={filter.label}
-                  label={filter.label}
-                  options={(filter as FilterConfig).options}
-                  selectedValues={selectedFilters[filter.label] || []}
-                  onSelectionChange={(values) => handleFilterChange(filter.label, values)}
-                />
+                  layout="position"
+                  transition={{ layout: { type: 'spring', bounce: 0, duration: 0.5 } }}
+                >
+                  <FilterDropdown
+                    label={filter.label}
+                    options={(filter as FilterConfig).options}
+                    selectedValues={selectedFilters[filter.label] || []}
+                    onSelectionChange={(values) => handleFilterChange(filter.label, values)}
+                    onAnimationComplete={forceRerender}
+                  />
+                </motion.div>
               );
             }
           })}
@@ -131,43 +148,47 @@ export function Toolbar({
 
           {/* Toggle buttons */}
           <div
-            className="flex items-center p-[4px] rounded-[12px] gap-[4px]"
+            className="flex items-center py-[6px] px-[6px] rounded-[12px] gap-[4px] h-[48px]"
             style={{ border: `1px solid var(--border-interactive)` }}
           >
             {/* List View Button */}
             <button
               onClick={() => onViewModeChange?.('list')}
-              className="flex items-center justify-center size-[32px] rounded-[8px] p-[6px] transition-colors"
+              className="flex items-center justify-center size-[36px] rounded-[8px] p-[9px]"
               style={{
-                backgroundColor: viewMode === 'list' ? 'var(--muted)' : 'transparent',
-                border: viewMode === 'list' ? '1px solid var(--border-interactive)' : '1px solid transparent',
+                backgroundColor: viewMode === 'list' ? 'var(--bg-row-selected)' : 'transparent',
+                border: viewMode === 'list' ? '1px solid color-mix(in srgb, var(--border-interactive) 70%, transparent)' : '1px solid transparent',
+                color: getIconColor('list'),
+                transition: 'color 300ms cubic-bezier(0.42, 0, 0.58, 1), background-color 300ms cubic-bezier(0.42, 0, 0.58, 1), border-color 300ms cubic-bezier(0.42, 0, 0.58, 1)',
               }}
               onMouseEnter={() => setHoveredToggle('list')}
               onMouseLeave={() => setHoveredToggle(null)}
             >
-              <List size={18} strokeWidth={2} color={getIconColor('list')} />
+              <List size={18} strokeWidth={2} />
             </button>
 
             {/* Grid View Button */}
             <button
               onClick={() => onViewModeChange?.('grid')}
-              className="flex items-center justify-center size-[32px] rounded-[8px] p-[6px] transition-colors"
+              className="flex items-center justify-center size-[36px] rounded-[8px] p-[9px]"
               style={{
-                backgroundColor: viewMode === 'grid' ? 'var(--muted)' : 'transparent',
-                border: viewMode === 'grid' ? '1px solid var(--border-interactive)' : '1px solid transparent',
+                backgroundColor: viewMode === 'grid' ? 'var(--bg-row-selected)' : 'transparent',
+                border: viewMode === 'grid' ? '1px solid color-mix(in srgb, var(--border-interactive) 70%, transparent)' : '1px solid transparent',
+                color: getIconColor('grid'),
+                transition: 'color 300ms cubic-bezier(0.42, 0, 0.58, 1), background-color 300ms cubic-bezier(0.42, 0, 0.58, 1), border-color 300ms cubic-bezier(0.42, 0, 0.58, 1)',
               }}
               onMouseEnter={() => setHoveredToggle('grid')}
               onMouseLeave={() => setHoveredToggle(null)}
             >
-              <LayoutGrid size={18} strokeWidth={2} color={getIconColor('grid')} />
+              <LayoutGrid size={18} strokeWidth={2} />
             </button>
           </div>
 
           {/* New… button — right of view toggle */}
           <button
             onClick={onAddClick}
-            className="flex items-center gap-[8px] h-[40px] rounded-[12px] transition-colors"
-            style={{ border: 'none', paddingLeft: '11px', paddingRight: '13px', backgroundColor: 'var(--btn-primary-bg)', cursor: 'pointer' }}
+            className="flex items-center gap-[8px] h-[48px] rounded-[12px] transition-colors"
+            style={{ border: 'none', paddingLeft: '15px', paddingRight: '17px', backgroundColor: 'var(--btn-primary-bg)', cursor: 'pointer' }}
             onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'var(--btn-primary-hover)'; }}
             onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'var(--btn-primary-bg)'; }}
           >
