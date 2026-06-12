@@ -50,6 +50,7 @@ export function Toolbar({
   const [isToggleHovered, setIsToggleHovered] = useState(false);
   const [hoveredToggle, setHoveredToggle] = useState<'list' | 'grid' | null>(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [isNewHovered, setIsNewHovered] = useState(false);
 
   const getIconColor = (mode: 'list' | 'grid') => {
     if (viewMode === mode) return 'var(--foreground)';
@@ -148,52 +149,61 @@ export function Toolbar({
 
           {/* Toggle buttons */}
           <div
-            className="flex items-center py-[6px] px-[6px] rounded-[12px] gap-[4px] h-[48px]"
-            style={{ border: `1px solid var(--border-interactive)` }}
+            className="flex items-center py-[4px] px-[4px] rounded-[12px] gap-[4px] h-[40px]"
+            style={{ border: `1px solid ${isToggleHovered ? 'var(--border-interactive-hover)' : 'var(--border)'}`, transition: `border-color var(--transition-duration) var(--transition-timing)` }}
+            onMouseEnter={() => setIsToggleHovered(true)}
+            onMouseLeave={() => setIsToggleHovered(false)}
           >
             {/* List View Button */}
             <button
               onClick={() => onViewModeChange?.('list')}
-              className="flex items-center justify-center size-[36px] rounded-[8px] p-[9px]"
+              className="flex items-center justify-center size-[32px] rounded-[8px] p-[6px]"
               style={{
                 backgroundColor: viewMode === 'list' ? 'var(--bg-row-selected)' : 'transparent',
-                border: viewMode === 'list' ? '1px solid color-mix(in srgb, var(--border-interactive) 70%, transparent)' : '1px solid transparent',
+                border: viewMode === 'list' ? '1px solid color-mix(in srgb, var(--border) 70%, transparent)' : '1px solid transparent',
                 color: getIconColor('list'),
-                transition: 'color 300ms cubic-bezier(0.42, 0, 0.58, 1), background-color 300ms cubic-bezier(0.42, 0, 0.58, 1), border-color 300ms cubic-bezier(0.42, 0, 0.58, 1)',
+                transition: 'color var(--duration-default) var(--ease-standard), background-color var(--duration-default) var(--ease-standard), border-color var(--duration-default) var(--ease-standard)',
               }}
               onMouseEnter={() => setHoveredToggle('list')}
               onMouseLeave={() => setHoveredToggle(null)}
             >
-              <List size={18} strokeWidth={2} />
+              <List size={20} strokeWidth={2} />
             </button>
 
             {/* Grid View Button */}
             <button
               onClick={() => onViewModeChange?.('grid')}
-              className="flex items-center justify-center size-[36px] rounded-[8px] p-[9px]"
+              className="flex items-center justify-center size-[32px] rounded-[8px] p-[6px]"
               style={{
                 backgroundColor: viewMode === 'grid' ? 'var(--bg-row-selected)' : 'transparent',
-                border: viewMode === 'grid' ? '1px solid color-mix(in srgb, var(--border-interactive) 70%, transparent)' : '1px solid transparent',
+                border: viewMode === 'grid' ? '1px solid color-mix(in srgb, var(--border) 70%, transparent)' : '1px solid transparent',
                 color: getIconColor('grid'),
-                transition: 'color 300ms cubic-bezier(0.42, 0, 0.58, 1), background-color 300ms cubic-bezier(0.42, 0, 0.58, 1), border-color 300ms cubic-bezier(0.42, 0, 0.58, 1)',
+                transition: 'color var(--duration-default) var(--ease-standard), background-color var(--duration-default) var(--ease-standard), border-color var(--duration-default) var(--ease-standard)',
               }}
               onMouseEnter={() => setHoveredToggle('grid')}
               onMouseLeave={() => setHoveredToggle(null)}
             >
-              <LayoutGrid size={18} strokeWidth={2} />
+              <LayoutGrid size={20} strokeWidth={2} />
             </button>
           </div>
 
           {/* New… button — right of view toggle */}
           <button
             onClick={onAddClick}
-            className="flex items-center gap-[8px] h-[48px] rounded-[12px] transition-colors"
-            style={{ border: 'none', paddingLeft: '15px', paddingRight: '17px', backgroundColor: 'var(--btn-primary-bg)', cursor: 'pointer' }}
-            onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'var(--btn-primary-hover)'; }}
-            onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'var(--btn-primary-bg)'; }}
+            className="flex items-center gap-[8px] h-[40px] rounded-[12px]"
+            style={{
+              border: 'none',
+              paddingLeft: '15px',
+              paddingRight: '17px',
+              cursor: 'pointer',
+              backgroundColor: isNewHovered ? 'var(--btn-primary-hover)' : 'var(--btn-primary-bg)',
+              transition: 'background-color var(--duration-default) var(--ease-standard)',
+            }}
+            onMouseEnter={() => setIsNewHovered(true)}
+            onMouseLeave={() => setIsNewHovered(false)}
           >
             <Plus className="size-[18px] shrink-0" style={{ color: 'var(--btn-primary-text)' }} strokeWidth={2.5} />
-            <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: '15px', letterSpacing: '0.32px', color: 'var(--btn-primary-text)', whiteSpace: 'nowrap' }}>New…</span>
+            <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-15)', letterSpacing: 'var(--letter-spacing-button)', color: 'var(--btn-primary-text)', whiteSpace: 'nowrap' }}>New…</span>
           </button>
         </div>
       </div>

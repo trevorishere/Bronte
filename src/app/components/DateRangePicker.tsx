@@ -137,7 +137,7 @@ export function DateRangePicker({
       style={{
         width: '640px',
         backgroundColor: 'var(--background)',
-        border: '1px solid var(--border-interactive)',
+        border: '1px solid var(--border)',
         borderRadius: 'var(--radius-12)',
         padding: '32px',
         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
@@ -151,7 +151,7 @@ export function DateRangePicker({
             variant="text"
             onClick={() => applyPreset(preset)}
             style={{
-              backgroundColor: selectedPreset === preset ? 'var(--accent)' : undefined,
+              backgroundColor: selectedPreset === preset ? 'var(--bg-row-selected)' : undefined,
               color: selectedPreset === preset ? 'var(--primary)' : undefined,
             }}
           >
@@ -411,7 +411,7 @@ function CalendarView({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRadius: '50%',
+                borderRadius: 'var(--radius-round)',
                 backgroundColor: isSelected ? '#0d99ff' : inRange ? 'rgba(13, 153, 255, 0.12)' : 'transparent',
                 border: '2px solid transparent',
                 fontFamily: 'var(--font-family)',

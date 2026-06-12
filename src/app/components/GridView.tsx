@@ -1,4 +1,4 @@
-import { Star, MoreHorizontal, List, ShieldCheck, Code2, PenLine } from 'lucide-react';
+import { Star, MoreHorizontal, List, ShieldCheck, Code2, Paintbrush } from 'lucide-react';
 import { IconButton } from './IconButton';
 import { useState, useRef, useEffect } from 'react';
 import { WorkspaceIcon } from './WorkspaceIcon';
@@ -113,7 +113,7 @@ export function GridView({
   const roleIconMap: Record<Role, React.ReactNode> = {
     Admin:     <ShieldCheck className="size-[10px] shrink-0" strokeWidth={2} />,
     Developer: <Code2       className="size-[10px] shrink-0" strokeWidth={2} />,
-    Creator:   <PenLine     className="size-[10px] shrink-0" strokeWidth={2} />,
+    Creator:   <Paintbrush  className="size-[10px] shrink-0" strokeWidth={2} />,
   };
 
   // fontSize deliberately excluded — applied via Tailwind className for responsive sizing
@@ -147,7 +147,7 @@ export function GridView({
             <span className="text-[11px] md:text-[12px]" style={{
               fontFamily: 'var(--font-family)',
               fontWeight: 'var(--font-weight-medium)',
-              letterSpacing: '0.2px',
+              letterSpacing: 'var(--letter-spacing-tight)',
               color: 'var(--role-pill-text)',
               whiteSpace: 'nowrap',
               lineHeight: 'normal',
@@ -225,13 +225,11 @@ export function GridView({
                 backgroundColor: isSelected
                   ? 'transparent'
                   : isHovered
-                  ? 'var(--muted)'
+                  ? 'var(--bg-rollover)'
                   : 'color-mix(in srgb, var(--background) 96%, white)',
-                border: '1px solid var(--sidebar-border)',
+                border: '1px solid var(--border)',
                 padding: '16px',
-                boxShadow: isHovered
-                  ? '0px 0px 6px 0px rgba(0,0,0,0.025), 0px 1px 5px 0px rgba(0,0,0,0.04), 0px 6px 15px 0px rgba(50,50,93,0.075)'
-                  : '0px 0px 6px 0px rgba(0,0,0,0.025), 0px 1px 5px 0px rgba(0,0,0,0.04), 0px 4px 9px 0px rgba(50,50,93,0.055)',
+                boxShadow: isHovered ? 'var(--shadow-card-hover)' : 'var(--shadow-card)',
                 transition: `background-color var(--transition-duration) var(--transition-timing)`,
               }}
               onClick={() => {
@@ -279,7 +277,8 @@ export function GridView({
                     className="size-[32px] flex items-center justify-center rounded-full shrink-0"
                     style={{
                       backgroundColor: hoveredFavorite === `${item.id}-favorite` ? 'var(--bg-icon-hover)' : 'transparent',
-                      transition: `background-color var(--transition-duration) var(--transition-timing)`,
+                      color: hoveredFavorite === `${item.id}-favorite` ? 'var(--primary)' : 'var(--foreground)',
+                      transition: `background-color var(--transition-duration) var(--transition-timing), color var(--transition-duration) var(--transition-timing)`,
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -291,7 +290,6 @@ export function GridView({
                     <Star
                       className="size-[16px]"
                       fill={isStarred ? 'currentColor' : 'none'}
-                      style={{ color: 'var(--text-foreground)' }}
                       strokeWidth={1.5}
                     />
                   </button>
@@ -300,14 +298,15 @@ export function GridView({
                     className="size-[32px] flex items-center justify-center rounded-full shrink-0"
                     style={{
                       backgroundColor: hoveredFavorite === `${item.id}-more` || openMenuId === item.id ? 'var(--bg-icon-hover)' : 'transparent',
-                      transition: `background-color var(--transition-duration) var(--transition-timing)`,
+                      color: hoveredFavorite === `${item.id}-more` || openMenuId === item.id ? 'var(--primary)' : 'var(--foreground)',
+                      transition: `background-color var(--transition-duration) var(--transition-timing), color var(--transition-duration) var(--transition-timing)`,
                     }}
                     onClick={(e) => { e.stopPropagation(); if (openMenuId !== item.id) setDrawerItem(item); setOpenMenuId(openMenuId === item.id ? null : item.id); }}
                     onMouseEnter={() => setHoveredFavorite(`${item.id}-more`)}
                     onMouseLeave={() => setHoveredFavorite(null)}
                     title="More options"
                   >
-                    <MoreHorizontal className="size-[16px]" style={{ color: 'var(--text-foreground)' }} />
+                    <MoreHorizontal className="size-[16px]" />
                   </button>
                 </div>
               </div>

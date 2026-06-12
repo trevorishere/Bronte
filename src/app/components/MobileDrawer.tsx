@@ -67,7 +67,7 @@ export function MobileDrawer({ items, isOpen, onClose, entityName, entityIcon }:
                 style={{
                   fontFamily: 'var(--font-family)',
                   fontWeight: 'var(--font-weight-semibold)',
-                  fontSize: '16px',
+                  fontSize: 'var(--font-size-16)',
                   lineHeight: '22px',
                   color: 'var(--primary)',
                   letterSpacing: 'var(--letter-spacing-md)',
@@ -97,11 +97,11 @@ export function MobileDrawer({ items, isOpen, onClose, entityName, entityIcon }:
                     color: item.variant === 'danger' ? 'var(--destructive)' : 'var(--foreground)',
                     backgroundColor: 'transparent',
                   }}
-                  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--muted)')}
+                  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-rollover)')}
                   onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                 >
                   <div
-                    className="size-[18px] flex items-center justify-center shrink-0"
+                    className="size-[20px] flex items-center justify-center shrink-0"
                     style={{ color: item.variant === 'danger' ? 'var(--destructive)' : 'var(--icon)' }}
                   >
                     {item.icon}

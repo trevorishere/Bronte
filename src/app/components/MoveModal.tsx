@@ -49,7 +49,7 @@ function WorkspaceIcon({ size = 16 }: { size?: number }) {
   return (
     <div
       className="flex items-center justify-center rounded-[4px] shrink-0"
-      style={{ width: size, height: size, backgroundColor: 'var(--muted)', border: '1px solid var(--border-interactive)' }}
+      style={{ width: size, height: size, backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }}
     >
       <FolderOpen style={{ width: size * 0.6, height: size * 0.6, color: 'var(--secondary-foreground)' }} />
     </div>
@@ -87,10 +87,10 @@ function TreeNodeRow({ node, depth, isExpanded, isSelected, isCurrentLocation, o
         height: '40px',
         paddingLeft: `${16 + depth * 20}px`,
         paddingRight: '12px',
-        backgroundColor: isSelected ? 'var(--accent)' : 'transparent',
+        backgroundColor: isSelected ? 'var(--bg-selected)' : 'transparent',
       }}
       onClick={() => onSelect(node.id)}
-      onMouseOver={e => { if (!isSelected) e.currentTarget.style.backgroundColor = 'var(--muted)'; }}
+      onMouseOver={e => { if (!isSelected) e.currentTarget.style.backgroundColor = 'var(--bg-rollover)'; }}
       onMouseOut={e => { if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent'; }}
     >
       {/* Expand / collapse chevron */}
@@ -131,7 +131,7 @@ function TreeNodeRow({ node, depth, isExpanded, isSelected, isCurrentLocation, o
           className="shrink-0"
           style={{
             fontFamily: 'var(--font-family)',
-            fontSize: '12px',
+            fontSize: 'var(--font-size-12)',
             color: 'var(--muted-foreground)',
             fontStyle: 'italic',
           }}

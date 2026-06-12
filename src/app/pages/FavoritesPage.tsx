@@ -23,9 +23,9 @@ interface OutletContext {
 
 const tableColumns: Column[] = [
   { key: 'name', label: 'Project Name', sortable: true, width: 'w-[400px]' },
-  { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
   { key: 'lastModified', label: 'Last Modified', sortable: true, width: 'w-[200px]' },
   { key: 'accountCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
+  { key: 'progress', label: 'Progress', sortable: true, width: 'w-[200px]' },
 ];
 
 export function FavoritesPage() {
@@ -48,25 +48,22 @@ export function FavoritesPage() {
     .map(project => ({
       id: project.id,
       name: project.name,
-      owner: project.owner,
+      progress: project.progress,
       lastModified: project.lastModified,
       workspace: project.workspace,
       iconType: 'project' as const,
       accountCount: countMembers('project', project.id, project.owner),
     }));
 
-  // Get unique owners for filter options
-  const uniqueOwners = Array.from(new Set(tableData.map(p => p.owner))).sort();
-
   // Apply filters to table data
   const filteredData = tableData.filter(row => {
-    // Filter by Owner
-    if (selectedFilters['Owner'] && selectedFilters['Owner'].length > 0) {
-      if (!selectedFilters['Owner'].includes(row.owner)) {
-        return false;
-      }
+
+    // Filter by Progress
+    if (selectedFilters['Progress'] && selectedFilters['Progress'].length > 0) {
+      const normalizedProgress = (row.progress as string || '').replace(/\s*\(\d+%\)$/, '');
+      if (!selectedFilters['Progress'].includes(normalizedProgress)) return false;
     }
-    
+
     // Filter by Last Modified date range
     if (dateFilters['Last Modified']) {
       const { start, end } = dateFilters['Last Modified'];
@@ -76,7 +73,7 @@ export function FavoritesPage() {
         if (end && rowDate > end) return false;
       }
     }
-    
+
     return true;
   });
 
@@ -141,7 +138,7 @@ export function FavoritesPage() {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         filters={[
-          { label: 'Owner', options: uniqueOwners },
+          { label: 'Progress', options: ['Not Started', 'In Progress', 'In Review', 'Done'] },
           { label: 'Last Modified', type: 'date' as const }
         ]}
         selectedFilters={selectedFilters}

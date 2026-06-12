@@ -19,7 +19,7 @@ function MetadataItem({ icon, label }: MetadataItemProps) {
         style={{
           fontFamily: 'var(--font-family)',
           fontWeight: 'var(--font-weight-regular)',
-          fontSize: '14px',
+          fontSize: 'var(--font-size-14)',
           color: 'var(--muted-foreground)',
           letterSpacing: 'var(--letter-spacing-md)',
           lineHeight: 'normal',
@@ -82,7 +82,7 @@ export function DetailPageHeader({ title, badge, icon, metadata, onShareClick, o
 
   const mobileActionHover = {
     onMouseOver: (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.currentTarget.style.backgroundColor = 'var(--muted)';
+      e.currentTarget.style.backgroundColor = 'var(--bg-rollover)';
     },
     onMouseOut: (e: React.MouseEvent<HTMLButtonElement>) => {
       e.currentTarget.style.backgroundColor = 'transparent';
@@ -96,15 +96,17 @@ export function DetailPageHeader({ title, badge, icon, metadata, onShareClick, o
       {/* MOBILE LAYOUT — action buttons only, left aligned              */}
       {/* ================================================================ */}
       <div className="md:hidden flex items-center gap-[8px] px-4 pt-3 pb-3">
-        <button
-          className="flex items-center justify-center size-[34px] rounded-xl transition-colors"
-          style={actionBtnStyle}
-          title="Share"
-          onClick={onShareClick}
-          {...mobileActionHover}
-        >
-          <UserRoundPlus className="size-[15px]" strokeWidth={2} />
-        </button>
+        {onShareClick && (
+          <button
+            className="flex items-center justify-center size-[34px] rounded-xl transition-colors"
+            style={actionBtnStyle}
+            title="Share"
+            onClick={onShareClick}
+            {...mobileActionHover}
+          >
+            <UserRoundPlus className="size-[15px]" strokeWidth={2} />
+          </button>
+        )}
         <button
           className="flex items-center justify-center size-[34px] rounded-xl transition-colors"
           style={actionBtnStyle}
@@ -145,7 +147,7 @@ export function DetailPageHeader({ title, badge, icon, metadata, onShareClick, o
                   className="font-medium"
                   style={{
                     fontFamily: 'var(--font-family)',
-                    fontSize: '24px',
+                    fontSize: 'var(--font-size-24)',
                     color: 'var(--primary)',
                     letterSpacing: 'var(--letter-spacing-md)',
                     lineHeight: 'normal',
@@ -171,31 +173,33 @@ export function DetailPageHeader({ title, badge, icon, metadata, onShareClick, o
 
           {/* Right: action buttons */}
           <div className="shrink-0 flex items-center gap-[8px]">
+            {onShareClick && (
+              <button
+                className="flex items-center gap-[6px] h-[32px] px-[12px] rounded-lg transition-colors"
+                style={actionBtnStyle}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-rollover)'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                title="Share"
+                onClick={onShareClick}
+              >
+                <UserRoundPlus className="size-[14px]" strokeWidth={2} />
+                <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-14)', letterSpacing: 'var(--letter-spacing-md)', color: 'var(--foreground)' }}>Share</span>
+              </button>
+            )}
             <button
               className="flex items-center gap-[6px] h-[32px] px-[12px] rounded-lg transition-colors"
               style={actionBtnStyle}
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
-              onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-              title="Share"
-              onClick={onShareClick}
-            >
-              <UserRoundPlus className="size-[14px]" strokeWidth={2} />
-              <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)', fontSize: '14px', letterSpacing: 'var(--letter-spacing-md)', color: 'var(--foreground)' }}>Share</span>
-            </button>
-            <button
-              className="flex items-center gap-[6px] h-[32px] px-[12px] rounded-lg transition-colors"
-              style={actionBtnStyle}
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-rollover)'}
               onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               title="New"
             >
               <Plus className="size-[14px]" strokeWidth={2.5} style={{ color: 'white' }} />
-              <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)', fontSize: '14px', letterSpacing: 'var(--letter-spacing-md)', color: 'var(--foreground)' }}>New</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-14)', letterSpacing: 'var(--letter-spacing-md)', color: 'var(--foreground)' }}>New</span>
             </button>
             <button
               className="flex items-center justify-center size-[32px] rounded-lg transition-colors"
               style={actionBtnStyle}
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-rollover)'}
               onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               title="More options"
             >

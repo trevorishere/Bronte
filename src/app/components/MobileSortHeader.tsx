@@ -74,7 +74,7 @@ export function MobileSortHeader({
             style={{
               fontFamily: 'var(--font-family)',
               fontWeight: 'var(--font-weight-semibold)',
-              fontSize: '12px',
+              fontSize: 'var(--font-size-12)',
               color: 'var(--primary)',
               letterSpacing: 'var(--letter-spacing-lg)',
               textTransform: 'uppercase',
@@ -135,7 +135,7 @@ export function MobileSortHeader({
                 onClick={() => handleSortOptionClick(option.key)}
                 className="w-full flex items-center justify-between px-[12px] py-[10px] transition-colors rounded-xl"
                 style={{
-                  backgroundColor: sortColumn === option.key ? 'var(--muted)' : 'transparent',
+                  backgroundColor: sortColumn === option.key ? 'var(--bg-rollover)' : 'transparent',
                   fontFamily: 'var(--font-family)',
                   fontWeight: 'var(--font-weight-regular)',
                   fontSize: 'var(--font-size-14)',
@@ -144,7 +144,7 @@ export function MobileSortHeader({
                 }}
                 onMouseOver={(e) => {
                   if (sortColumn !== option.key) {
-                    e.currentTarget.style.backgroundColor = 'var(--muted)';
+                    e.currentTarget.style.backgroundColor = 'var(--bg-rollover)';
                     e.currentTarget.style.color = 'var(--primary)';
                   }
                 }}

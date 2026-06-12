@@ -1,58 +1,134 @@
 import React from 'react';
 
-export const textStyles = {
+/**
+ * Typography presets — shared font bundles for inline styles.
+ *
+ * Usage:  style={{ ...ts.body, color: 'var(--foreground)' }}
+ *
+ * Naming:  <semantic>     — medium weight (default)
+ *          <semantic>Lt   — regular / light weight
+ *          <semantic>Sb   — semibold weight
+ */
+
+const base = {
+  fontFamily: 'var(--font-family)',
+} as React.CSSProperties;
+
+export const ts = {
+  // ── 15px — primary body text ─────────────────────────────────────────────
   body: {
-    fontFamily: 'var(--font-family)',
-    fontSize: 'var(--font-size-14)',
-    fontWeight: 'var(--font-weight-regular)',
-    letterSpacing: 'var(--letter-spacing-md)',
-    lineHeight: 'var(--line-height-20)',
-  } as React.CSSProperties,
-
-  bodyMedium: {
-    fontFamily: 'var(--font-family)',
-    fontSize: 'var(--font-size-14)',
+    ...base,
     fontWeight: 'var(--font-weight-medium)',
-    letterSpacing: 'var(--letter-spacing-md)',
-    lineHeight: 'var(--line-height-20)',
+    fontSize: 'var(--font-size-15)',
+    letterSpacing: 'var(--letter-spacing-body)',
   } as React.CSSProperties,
 
-  bodySemibold: {
-    fontFamily: 'var(--font-family)',
-    fontSize: 'var(--font-size-14)',
+  bodyLt: {
+    ...base,
+    fontWeight: 'var(--font-weight-regular)',
+    fontSize: 'var(--font-size-15)',
+    letterSpacing: 'var(--letter-spacing-body)',
+  } as React.CSSProperties,
+
+  bodySb: {
+    ...base,
     fontWeight: 'var(--font-weight-semibold)',
-    letterSpacing: 'var(--letter-spacing-md)',
-    lineHeight: 'var(--line-height-20)',
+    fontSize: 'var(--font-size-15)',
+    letterSpacing: 'var(--letter-spacing-body)',
   } as React.CSSProperties,
 
+  // ── 14px — dense / secondary body ────────────────────────────────────────
+  label: {
+    ...base,
+    fontWeight: 'var(--font-weight-medium)',
+    fontSize: 'var(--font-size-14)',
+    letterSpacing: 'var(--letter-spacing-body)',
+  } as React.CSSProperties,
+
+  labelLt: {
+    ...base,
+    fontWeight: 'var(--font-weight-regular)',
+    fontSize: 'var(--font-size-14)',
+    letterSpacing: 'var(--letter-spacing-body)',
+  } as React.CSSProperties,
+
+  labelSb: {
+    ...base,
+    fontWeight: 'var(--font-weight-semibold)',
+    fontSize: 'var(--font-size-14)',
+    letterSpacing: 'var(--letter-spacing-body)',
+  } as React.CSSProperties,
+
+  // ── 13px — small / metadata ───────────────────────────────────────────────
   small: {
-    fontFamily: 'var(--font-family)',
-    fontSize: '13px',
+    ...base,
     fontWeight: 'var(--font-weight-medium)',
-    letterSpacing: 'var(--letter-spacing-md)',
+    fontSize: 'var(--font-size-13)',
+    letterSpacing: 'var(--letter-spacing-body)',
   } as React.CSSProperties,
 
-  caption: {
-    fontFamily: 'var(--font-family)',
-    fontSize: '11px',
+  smallLt: {
+    ...base,
     fontWeight: 'var(--font-weight-regular)',
-    letterSpacing: 'var(--letter-spacing-md)',
+    fontSize: 'var(--font-size-13)',
+    letterSpacing: 'var(--letter-spacing-body)',
   } as React.CSSProperties,
 
-  caps: {
-    fontFamily: 'var(--font-family)',
-    fontSize: '11px',
+  // ── 12px — caption ────────────────────────────────────────────────────────
+  caption: {
+    ...base,
+    fontWeight: 'var(--font-weight-medium)',
+    fontSize: 'var(--font-size-12)',
+    letterSpacing: 'var(--letter-spacing-body)',
+  } as React.CSSProperties,
+
+  captionLt: {
+    ...base,
+    fontWeight: 'var(--font-weight-regular)',
+    fontSize: 'var(--font-size-12)',
+    letterSpacing: 'var(--letter-spacing-body)',
+  } as React.CSSProperties,
+
+  captionSb: {
+    ...base,
     fontWeight: 'var(--font-weight-semibold)',
-    letterSpacing: '0.07em',
+    fontSize: 'var(--font-size-12)',
+    letterSpacing: 'var(--letter-spacing-body)',
+  } as React.CSSProperties,
+
+  // ── 11px — micro / badge ──────────────────────────────────────────────────
+  micro: {
+    ...base,
+    fontWeight: 'var(--font-weight-medium)',
+    fontSize: 'var(--font-size-11)',
+    letterSpacing: 'var(--letter-spacing-body)',
+  } as React.CSSProperties,
+
+  microSb: {
+    ...base,
+    fontWeight: 'var(--font-weight-semibold)',
+    fontSize: 'var(--font-size-11)',
+    letterSpacing: 'var(--letter-spacing-body)',
+  } as React.CSSProperties,
+
+  // ── Uppercase section headers ─────────────────────────────────────────────
+  caps: {
+    ...base,
+    fontWeight: 'var(--font-weight-semibold)',
+    fontSize: 'var(--font-size-11)',
+    letterSpacing: 'var(--letter-spacing-caps)',
     textTransform: 'uppercase' as const,
+  } as React.CSSProperties,
+
+  // ── Button labels ─────────────────────────────────────────────────────────
+  btn: {
+    ...base,
+    fontWeight: 'var(--font-weight-semibold)',
+    fontSize: 'var(--font-size-15)',
+    letterSpacing: 'var(--letter-spacing-button)',
     whiteSpace: 'nowrap' as const,
   } as React.CSSProperties,
-
-  label: {
-    fontFamily: 'var(--font-family)',
-    fontSize: 'var(--font-size-11)',
-    fontWeight: 'var(--font-weight-semibold)',
-    letterSpacing: 'var(--letter-spacing-lg)',
-    textTransform: 'uppercase' as const,
-  } as React.CSSProperties,
 } as const;
+
+/** Verbose alias for readability in larger components */
+export const textStyles = ts;

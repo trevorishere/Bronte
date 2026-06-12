@@ -23,21 +23,23 @@ interface OutletContext {
 const tableColumns: Column[] = [
   { key: 'name', label: 'Project Name', sortable: true, width: 'w-[400px]' },
   { key: 'sharedBy', label: 'Shared By', sortable: true, width: 'w-[200px]' },
-  { key: 'lastModified', label: 'Last Modified', sortable: true, width: 'w-[200px]' },
   { key: 'accountCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
+  { key: 'progress', label: 'Progress', sortable: true, width: 'w-[200px]' },
 ];
 
-const tableData: RowData[] = sharedProjects.map(project => ({
-  id: project.id,
-  name: project.name,
-  owner: project.owner,
-  sharedBy: project.sharedBy,
-  dateShared: project.dateShared,
-  lastModified: project.lastModified,
-  workspace: project.workspace,
-  iconType: 'project' as const,
-  accountCount: countMembers('project', project.id, project.owner),
-}));
+const tableData: RowData[] = sharedProjects
+  .filter(project => project.progress !== 'Done')
+  .map(project => ({
+    id: project.id,
+    name: project.name,
+    progress: project.progress,
+    sharedBy: project.sharedBy,
+    dateShared: project.dateShared,
+    lastModified: project.lastModified,
+    workspace: project.workspace,
+    iconType: 'project' as const,
+    accountCount: countMembers('project', project.id, project.owner),
+  }));
 
 export function SharedPage() {
   const { isDarkMode, onThemeToggle } = useOutletContext<OutletContext>();
@@ -53,18 +55,15 @@ export function SharedPage() {
   const { favorites, addFavorite, removeFavorite } = useFavorites();
   const [extraRows, setExtraRows] = useState<RowData[]>([]);
 
-  // Get unique shared by users for filter options
-  const uniqueSharedBy = Array.from(new Set(tableData.map(p => p.sharedBy))).sort();
-
   // Apply filters to table data
   const filteredData = tableData.filter(row => {
-    // Filter by Shared By
-    if (selectedFilters['Shared By'] && selectedFilters['Shared By'].length > 0) {
-      if (!selectedFilters['Shared By'].includes(row.sharedBy)) {
-        return false;
-      }
+
+    // Filter by Progress
+    if (selectedFilters['Progress'] && selectedFilters['Progress'].length > 0) {
+      const normalizedProgress = (row.progress as string || '').replace(/\s*\(\d+%\)$/, '');
+      if (!selectedFilters['Progress'].includes(normalizedProgress)) return false;
     }
-    
+
     // Filter by Last Modified date range
     if (dateFilters['Last Modified']) {
       const { start, end } = dateFilters['Last Modified'];
@@ -74,7 +73,7 @@ export function SharedPage() {
         if (end && rowDate > end) return false;
       }
     }
-    
+
     return true;
   });
 
@@ -135,10 +134,7 @@ export function SharedPage() {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         filters={[
-          {
-            label: 'Shared By',
-            options: uniqueSharedBy,
-          },
+          { label: 'Progress', options: ['Not Started', 'In Progress', 'In Review'] },
           {
             label: 'Last Modified',
             type: 'date' as const,

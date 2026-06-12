@@ -1,12 +1,7 @@
 import { useOutletContext, useNavigate } from 'react-router';
 import { Mail, ShieldUser, HelpCircle, ChevronRight, LogOut, BookOpen, MessageSquare, Moon, Sun } from 'lucide-react';
 import { TopBar } from '../components/TopBar';
-
-const roleColors: Record<string, { bg: string; text: string; badge: string }> = {
-  Admin:     { bg: '#934790', text: '#934790', badge: 'rgba(147,71,144,0.3)' },
-  Developer: { bg: '#ce5b29', text: '#ce5b29', badge: 'rgba(206,91,41,0.3)' },
-  Creator:   { bg: '#068aaf', text: '#068aaf', badge: 'rgba(6,138,175,0.3)' },
-};
+import { roleColors } from '../components/Avatar';
 
 interface OutletContext {
   isDarkMode: boolean;
@@ -35,7 +30,7 @@ function SectionRow({ icon, label, description, onClick, destructive = false }: 
       onClick={onClick}
       className="w-full flex items-center gap-4 px-5 py-4 transition-colors text-left"
       style={{ backgroundColor: 'transparent' }}
-      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
+      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-rollover)'}
       onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
     >
       <div
@@ -51,7 +46,7 @@ function SectionRow({ icon, label, description, onClick, destructive = false }: 
           style={{
             fontFamily: 'var(--font-family)',
             fontWeight: 'var(--font-weight-medium)',
-            fontSize: '15px',
+            fontSize: 'var(--font-size-15)',
             color: destructive ? 'var(--destructive)' : 'var(--primary)',
             letterSpacing: 'var(--letter-spacing-md)',
           }}
@@ -63,7 +58,7 @@ function SectionRow({ icon, label, description, onClick, destructive = false }: 
             style={{
               fontFamily: 'var(--font-family)',
               fontWeight: 'var(--font-weight-regular)',
-              fontSize: '13px',
+              fontSize: 'var(--font-size-13)',
               color: 'var(--muted-foreground)',
               letterSpacing: 'var(--letter-spacing-md)',
               marginTop: '2px',
@@ -94,7 +89,7 @@ function SectionToggleRow({ icon, label, description, checked, onToggle }: Secti
       onClick={onToggle}
       className="w-full flex items-center gap-4 px-5 py-4 transition-colors text-left"
       style={{ backgroundColor: 'transparent' }}
-      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
+      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-rollover)'}
       onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
     >
       <div
@@ -108,7 +103,7 @@ function SectionToggleRow({ icon, label, description, checked, onToggle }: Secti
           style={{
             fontFamily: 'var(--font-family)',
             fontWeight: 'var(--font-weight-medium)',
-            fontSize: '15px',
+            fontSize: 'var(--font-size-15)',
             color: 'var(--primary)',
             letterSpacing: 'var(--letter-spacing-md)',
           }}
@@ -120,7 +115,7 @@ function SectionToggleRow({ icon, label, description, checked, onToggle }: Secti
             style={{
               fontFamily: 'var(--font-family)',
               fontWeight: 'var(--font-weight-regular)',
-              fontSize: '13px',
+              fontSize: 'var(--font-size-13)',
               color: 'var(--muted-foreground)',
               letterSpacing: 'var(--letter-spacing-md)',
               marginTop: '2px',
@@ -138,7 +133,7 @@ function SectionToggleRow({ icon, label, description, checked, onToggle }: Secti
           height: '26px',
           borderRadius: '13px',
           backgroundColor: checked ? 'var(--primary)' : 'var(--switch-background)',
-          transition: 'background-color 200ms ease',
+          transition: 'background-color var(--duration-fast) ease',
         }}
       >
         <div
@@ -148,9 +143,9 @@ function SectionToggleRow({ icon, label, description, checked, onToggle }: Secti
             left: checked ? '21px' : '3px',
             width: '20px',
             height: '20px',
-            borderRadius: '50%',
+            borderRadius: 'var(--radius-round)',
             backgroundColor: 'white',
-            transition: 'left 200ms ease',
+            transition: 'left var(--duration-fast) ease',
             boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
           }}
         />
@@ -175,7 +170,7 @@ function HelpCard({ icon, label, description, onClick }: HelpCardProps) {
         backgroundColor: 'var(--card)',
         border: '1px solid var(--border-interactive)',
       }}
-      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
+      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-rollover)'}
       onMouseOut={(e) => {
         e.currentTarget.style.backgroundColor = 'var(--card)';
       }}
@@ -191,7 +186,7 @@ function HelpCard({ icon, label, description, onClick }: HelpCardProps) {
           style={{
             fontFamily: 'var(--font-family)',
             fontWeight: 'var(--font-weight-medium)',
-            fontSize: '14px',
+            fontSize: 'var(--font-size-14)',
             color: 'var(--primary)',
             letterSpacing: 'var(--letter-spacing-md)',
           }}
@@ -203,7 +198,7 @@ function HelpCard({ icon, label, description, onClick }: HelpCardProps) {
             style={{
               fontFamily: 'var(--font-family)',
               fontWeight: 'var(--font-weight-regular)',
-              fontSize: '12px',
+              fontSize: 'var(--font-size-12)',
               color: 'var(--muted-foreground)',
               letterSpacing: 'var(--letter-spacing-md)',
               marginTop: '2px',
@@ -224,9 +219,9 @@ function SectionLabel({ title }: { title: string }) {
       style={{
         fontFamily: 'var(--font-family)',
         fontWeight: 'var(--font-weight-medium)',
-        fontSize: '11px',
+        fontSize: 'var(--font-size-11)',
         textTransform: 'uppercase',
-        letterSpacing: '0.8px',
+        letterSpacing: 'var(--letter-spacing-caps)',
         color: 'var(--muted-foreground)',
       }}
     >
@@ -267,11 +262,11 @@ export function AccountPage() {
               className="shrink-0 size-[64px] rounded-full flex items-center justify-center"
               style={{
                 backgroundColor: roleColors[currentUser.role]?.bg ?? 'var(--primary)',
-                fontSize: '22px',
+                fontSize: 'var(--font-size-22)',
                 fontFamily: 'var(--font-family)',
                 fontWeight: 'var(--font-weight-semibold)',
                 color: '#ffffff',
-                letterSpacing: '0.5px',
+                letterSpacing: 'var(--letter-spacing-icon)',
               }}
             >
               {currentUser.initials}
@@ -283,7 +278,7 @@ export function AccountPage() {
                 style={{
                   fontFamily: 'var(--font-family)',
                   fontWeight: 'var(--font-weight-bold)',
-                  fontSize: '20px',
+                  fontSize: 'var(--font-size-20)',
                   color: 'var(--primary)',
                   letterSpacing: 'var(--letter-spacing-md)',
                   lineHeight: 'normal',
@@ -298,7 +293,7 @@ export function AccountPage() {
                   style={{
                     fontFamily: 'var(--font-family)',
                     fontWeight: 'var(--font-weight-regular)',
-                    fontSize: '13px',
+                    fontSize: 'var(--font-size-13)',
                     color: 'var(--muted-foreground)',
                     letterSpacing: 'var(--letter-spacing-md)',
                   }}
@@ -313,9 +308,9 @@ export function AccountPage() {
                     backgroundColor: roleColors[currentUser.role]?.badge ?? 'var(--accent)',
                     fontFamily: 'var(--font-family)',
                     fontWeight: 'var(--font-weight-medium)',
-                    fontSize: '11px',
-                    color: roleColors[currentUser.role]?.text ?? 'var(--primary)',
-                    letterSpacing: '0.3px',
+                    fontSize: 'var(--font-size-11)',
+                    color: roleColors[currentUser.role]?.bg ?? 'var(--primary)',
+                    letterSpacing: 'var(--letter-spacing-body)',
                   }}
                 >
                   {currentUser.role}
@@ -332,7 +327,7 @@ export function AccountPage() {
                 color: 'var(--destructive)',
                 cursor: 'pointer',
               }}
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-rollover)'}
               onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             >
               <LogOut className="size-[16px]" strokeWidth={2} />
@@ -340,7 +335,7 @@ export function AccountPage() {
                 style={{
                   fontFamily: 'var(--font-family)',
                   fontWeight: 'var(--font-weight-medium)',
-                  fontSize: '13px',
+                  fontSize: 'var(--font-size-13)',
                   letterSpacing: 'var(--letter-spacing-md)',
                 }}
               >

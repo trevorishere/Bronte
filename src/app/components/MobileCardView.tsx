@@ -1,7 +1,8 @@
-import { Star, ShieldCheck, Code2, PenLine } from 'lucide-react';
+import { Star, ShieldCheck, Code2, Paintbrush } from 'lucide-react';
 import { getMetadataString } from '../utils/getMetadataString';
 import { useState } from 'react';
 import { Avatar, roleColors, Role } from './Avatar';
+import { progressPillColors } from '../constants/progressColors';
 import { TeamIcon } from './TeamIcon';
 import { WorkspaceIcon } from './WorkspaceIcon';
 import { ProjectIcon } from './ProjectIcon';
@@ -102,7 +103,7 @@ export function MobileCardView({
         {
           id: 'favorite',
           label: isStarred ? 'Remove from Favorites' : 'Add to Favorites',
-          icon: <Star className="size-4" fill={isStarred ? 'currentColor' : 'none'} />,
+          icon: <Star className="size-[20px]" fill={isStarred ? 'currentColor' : 'none'} />,
           onClick: () => { onStarClick?.(row, !isStarred); },
         },
         ...filtered,
@@ -133,8 +134,8 @@ export function MobileCardView({
                 className="flex flex-col gap-[8px] p-[16px] rounded-[16px] cursor-pointer"
                 style={{
                   backgroundColor: 'color-mix(in srgb, var(--background) 96%, white)',
-                  border: '1px solid var(--sidebar-border)',
-                  boxShadow: '0px 0px 6px 0px rgba(0,0,0,0.02), 0px 1px 5px 0px rgba(0,0,0,0.04), 0px 4px 9px 0px rgba(50,50,93,0.05)',
+                  border: '1px solid var(--border)',
+                  boxShadow: 'var(--shadow-card)',
                 }}
               >
                 {/* Icon area — fixed height, centered */}
@@ -152,13 +153,13 @@ export function MobileCardView({
                       style={{
                         fontFamily: 'var(--font-family)',
                         fontWeight: 'var(--font-weight-medium)',
-                        fontSize: '16px',
+                        fontSize: 'var(--font-size-16)',
                         lineHeight: '22px',
                         height: `${titleHeight}px`,
                         overflow: 'hidden',
                         display: '-webkit-box',
                         WebkitBoxOrient: 'vertical',
-                        letterSpacing: '0.3px',
+                        letterSpacing: 'var(--letter-spacing-body)',
                         color: 'var(--foreground)',
                       }}
                     >
@@ -175,7 +176,7 @@ export function MobileCardView({
                           const roleIconMap: Record<Role, React.ReactNode> = {
                             Admin:     <ShieldCheck className="size-[10px] shrink-0" strokeWidth={2} />,
                             Developer: <Code2       className="size-[10px] shrink-0" strokeWidth={2} />,
-                            Creator:   <PenLine     className="size-[10px] shrink-0" strokeWidth={2} />,
+                            Creator:   <Paintbrush  className="size-[10px] shrink-0" strokeWidth={2} />,
                           };
                           return (
                             <div
@@ -191,8 +192,8 @@ export function MobileCardView({
                               <span style={{
                                 fontFamily: 'var(--font-family)',
                                 fontWeight: 'var(--font-weight-medium)',
-                                fontSize: '11px',
-                                letterSpacing: '0.2px',
+                                fontSize: 'var(--font-size-11)',
+                                letterSpacing: 'var(--letter-spacing-tight)',
                                 color: 'var(--role-pill-text)',
                                 whiteSpace: 'nowrap',
                                 lineHeight: 'normal',
@@ -207,7 +208,7 @@ export function MobileCardView({
                           <p style={{
                             fontFamily: 'var(--font-family)',
                             fontWeight: 'var(--font-weight-regular)',
-                            fontSize: '12px',
+                            fontSize: 'var(--font-size-12)',
                             lineHeight: '18px',
                             letterSpacing: 'var(--letter-spacing-sm)',
                             color: 'var(--muted-foreground)',
@@ -222,7 +223,7 @@ export function MobileCardView({
                           <p style={{
                             fontFamily: 'var(--font-family)',
                             fontWeight: 'var(--font-weight-regular)',
-                            fontSize: '12px',
+                            fontSize: 'var(--font-size-12)',
                             lineHeight: '18px',
                             letterSpacing: 'var(--letter-spacing-sm)',
                             color: 'var(--muted-foreground)',
@@ -234,7 +235,7 @@ export function MobileCardView({
                           <p style={{
                             fontFamily: 'var(--font-family)',
                             fontWeight: 'var(--font-weight-regular)',
-                            fontSize: '12px',
+                            fontSize: 'var(--font-size-12)',
                             lineHeight: '18px',
                             letterSpacing: 'var(--letter-spacing-sm)',
                             color: 'var(--muted-foreground)',
@@ -246,23 +247,38 @@ export function MobileCardView({
                     ) : (
                       // project (default)
                       <div className="flex flex-col gap-[2px]">
-                        {row.owner && (
-                          <p style={{
-                            fontFamily: 'var(--font-family)',
-                            fontWeight: 'var(--font-weight-semibold)',
-                            fontSize: '12px',
-                            lineHeight: '20px',
-                            letterSpacing: 'var(--letter-spacing-sm)',
-                            color: 'var(--muted-foreground)',
-                          }}>
-                            {row.owner}
-                          </p>
-                        )}
+                        {row.progress != null && (() => {
+                          const progressVal = row.progress as string;
+                          const isNotStarted = !progressVal || progressVal === 'Not Started';
+                          const cat = progressVal.startsWith('In Progress') ? 'In Progress'
+                            : progressVal === 'In Review' ? 'In Review'
+                            : progressVal === 'Done' ? 'Done' : null;
+                          const bg = isNotStarted ? 'var(--bg-icon-hover)' : progressPillColors[cat!];
+                          const label = (progressVal || 'Not Started').replace(/\s*\(\d+%\)$/, '');
+                          return (
+                            <div
+                              className="inline-flex items-center justify-center self-start rounded-[6px]"
+                              style={{ paddingLeft: '7px', paddingRight: '7px', paddingTop: '2px', paddingBottom: '2px', backgroundColor: bg }}
+                            >
+                              <span style={{
+                                fontFamily: 'var(--font-family)',
+                                fontWeight: 'var(--font-weight-medium)',
+                                fontSize: 'var(--font-size-11)',
+                                letterSpacing: 'var(--letter-spacing-tight)',
+                                color: isNotStarted ? 'var(--muted-foreground)' : 'var(--role-pill-text)',
+                                whiteSpace: 'nowrap',
+                                lineHeight: 'normal',
+                              }}>
+                                {label}
+                              </span>
+                            </div>
+                          );
+                        })()}
                         {row.accountCount != null && (
                           <p style={{
                             fontFamily: 'var(--font-family)',
                             fontWeight: 'var(--font-weight-regular)',
-                            fontSize: '12px',
+                            fontSize: 'var(--font-size-12)',
                             lineHeight: '20px',
                             letterSpacing: 'var(--letter-spacing-sm)',
                             color: 'var(--muted-foreground)',
@@ -280,7 +296,7 @@ export function MobileCardView({
                       className="flex items-center justify-center size-[32px] rounded-full transition-colors"
                       style={{ backgroundColor: 'transparent', color: 'var(--icon)' }}
                       onClick={(e) => { e.stopPropagation(); onStarClick?.(row, !isStarred); }}
-                      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--muted)')}
+                      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-rollover)')}
                       onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                       title={isStarred ? 'Remove from favorites' : 'Add to favorites'}
                     >
@@ -290,7 +306,7 @@ export function MobileCardView({
                       className="flex items-center justify-center size-[32px] rounded-full transition-colors"
                       style={{ backgroundColor: 'transparent', color: 'var(--icon)' }}
                       onClick={(e) => { e.stopPropagation(); openMenu(row); }}
-                      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--muted)')}
+                      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-rollover)')}
                       onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                       title="More options"
                     >
@@ -363,7 +379,7 @@ export function MobileCardView({
                   style={{
                     fontFamily: 'var(--font-family)',
                     fontWeight: 'var(--font-weight-medium)',
-                    fontSize: '15px',
+                    fontSize: 'var(--font-size-15)',
                     lineHeight: '21px',
                     letterSpacing: 'var(--letter-spacing-sm)',
                     color: 'var(--primary)',
@@ -377,7 +393,7 @@ export function MobileCardView({
                     style={{
                       fontFamily: 'var(--font-family)',
                       fontWeight: 'var(--font-weight-regular)',
-                      fontSize: '11px',
+                      fontSize: 'var(--font-size-11)',
                       letterSpacing: 'var(--letter-spacing-sm)',
                       lineHeight: 'normal',
                       color: 'var(--muted-foreground)',
