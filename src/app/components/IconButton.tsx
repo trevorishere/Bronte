@@ -31,10 +31,24 @@ export function IconButton({
       title={title}
       aria-label={ariaLabel}
       disabled={disabled}
-      className={`flex items-center justify-center transition-colors shrink-0 ${radiusClass} ${className}`}
-      style={{ width: size, height: size, backgroundColor: 'transparent', border: 'none', cursor: disabled ? 'not-allowed' : 'pointer', padding: 0 }}
-      onMouseOver={(e) => { if (!disabled && !noHover) e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'; }}
-      onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+      className={`flex items-center justify-center shrink-0 ${radiusClass} ${className}`}
+      style={{
+        width: size, height: size,
+        backgroundColor: 'transparent',
+        color: 'var(--foreground)',
+        border: 'none',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        padding: 0,
+        transition: `background-color var(--transition-duration) var(--transition-timing), color var(--transition-duration) var(--transition-timing)`,
+      }}
+      onMouseOver={(e) => {
+        if (!disabled && !noHover) e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)';
+        if (!disabled) e.currentTarget.style.color = 'var(--primary)';
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.backgroundColor = 'transparent';
+        e.currentTarget.style.color = 'var(--foreground)';
+      }}
     >
       {icon}
     </button>

@@ -7,6 +7,7 @@ import type { Role } from './Avatar';
 import { useSharedMembers } from '../contexts/SharedMembersContext';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useRestoreFocus } from '../hooks/useRestoreFocus';
+import { ts } from '../utils/textStyles';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -37,8 +38,8 @@ interface SelectedAccount {
 type MiniAvatarSize = 'small' | 'medium' | 'large';
 const miniAvatarSizes: Record<MiniAvatarSize, { px: number; fontSize: string }> = {
   small:  { px: 16, fontSize: '7px' },
-  medium: { px: 20, fontSize: '12px' },
-  large:  { px: 24, fontSize: '10px' },
+  medium: { px: 20, fontSize: 'var(--font-size-12)' },
+  large:  { px: 24, fontSize: 'var(--font-size-10)' },
 };
 
 function MiniAvatar({ name, role, size = 'medium' }: { name: string; role: Role; size?: MiniAvatarSize }) {
@@ -49,7 +50,7 @@ function MiniAvatar({ name, role, size = 'medium' }: { name: string; role: Role;
   return (
     <div
       className="shrink-0 flex items-center justify-center rounded-full"
-      style={{ width: px, height: px, backgroundColor: bg, fontSize, lineHeight: fontSize, fontWeight: 600, color: '#fff' }}
+      style={{ width: px, height: px, backgroundColor: bg, fontSize, lineHeight: 1, fontWeight: 600, color: '#fff' }}
     >
       {initials}
     </div>
@@ -64,8 +65,8 @@ function Chip({ account, onRemove }: { account: SelectedAccount; onRemove: () =>
       className="flex items-center gap-[8px] pl-[6px] pr-[8px] shrink-0"
       style={{
         backgroundColor: 'var(--muted)',
-        border: '1px solid var(--border-interactive)',
-        borderRadius: '8px',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius-8)',
         height: '28px',
         maxWidth: '220px',
       }}
@@ -119,7 +120,7 @@ function AccountListRow({
       onMouseLeave={() => setHovered(false)}
       className="group w-full flex items-center gap-[12px] px-[12px] h-[48px] rounded-xl transition-colors text-left"
       style={{
-        backgroundColor: isSelected ? 'var(--accent)' : hovered ? 'var(--muted)' : 'transparent',
+        backgroundColor: isSelected ? 'var(--bg-selected)' : hovered ? 'var(--bg-rollover)' : 'transparent',
         border: 'none',
         cursor: disabled ? 'default' : 'pointer',
         opacity: isMember ? 0.45 : 1,
@@ -133,7 +134,7 @@ function AccountListRow({
           fontSize: 'var(--font-size-15)',
           lineHeight: '16px',
           color: hovered ? 'var(--primary)' : 'var(--foreground)',
-          letterSpacing: '0.3px',
+          letterSpacing: 'var(--letter-spacing-body)',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -143,10 +144,10 @@ function AccountListRow({
         <p style={{
           fontFamily: 'var(--font-family)',
           fontWeight: 'var(--font-weight-regular)',
-          fontSize: '12px',
+          fontSize: 'var(--font-size-12)',
           lineHeight: '12px',
           color: 'var(--muted-foreground)',
-          letterSpacing: '0.3px',
+          letterSpacing: 'var(--letter-spacing-body)',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -191,7 +192,7 @@ function AccessRow({ member, onRemove, isPending = false, entityName }: { member
       type="button"
       className="group w-full flex items-center gap-[12px] px-[12px] h-[40px] rounded-xl transition-colors cursor-pointer"
       style={{
-        backgroundColor: hovered ? 'var(--muted)' : 'transparent',
+        backgroundColor: hovered ? 'var(--bg-rollover)' : 'transparent',
         border: 'none',
         padding: '0 12px',
         textAlign: 'left',
@@ -208,7 +209,7 @@ function AccessRow({ member, onRemove, isPending = false, entityName }: { member
         fontSize: 'var(--font-size-15)',
         lineHeight: 'var(--line-height-20)',
         color: hovered ? 'var(--primary)' : 'var(--foreground)',
-        letterSpacing: '0.3px',
+        letterSpacing: 'var(--letter-spacing-body)',
         fontStyle: isPending ? 'italic' : 'normal',
       }}>
         {member.name}
@@ -217,10 +218,7 @@ function AccessRow({ member, onRemove, isPending = false, entityName }: { member
         <span
           className="shrink-0 transition-colors"
           style={{
-            fontFamily: 'var(--font-family)',
-            fontWeight: 'var(--font-weight-regular)',
-            fontSize: '12px',
-            letterSpacing: '0.3px',
+            ...ts.captionLt,
             color: hovered ? 'var(--primary)' : 'var(--muted-foreground)',
             whiteSpace: 'nowrap',
           }}
@@ -250,9 +248,9 @@ function SectionLabel({ text }: { text: string }) {
     <p style={{
       fontFamily: 'var(--font-family)',
       fontWeight: 'var(--font-weight-semibold)',
-      fontSize: '11px',
+      fontSize: 'var(--font-size-11)',
       textTransform: 'uppercase' as const,
-      letterSpacing: '0.8px',
+      letterSpacing: 'var(--letter-spacing-caps)',
       color: 'var(--muted-foreground)',
       padding: '4px 12px 8px',
     }}>
@@ -463,7 +461,7 @@ export function ShareModal({
                   fontFamily: 'var(--font-family)',
                   fontSize: 'var(--font-size-14)',
                   color: 'var(--muted-foreground)',
-                  letterSpacing: '0.3px',
+                  letterSpacing: 'var(--letter-spacing-body)',
                 }}>
                   No accounts match "{query}"
                 </p>

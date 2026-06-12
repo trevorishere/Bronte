@@ -14,7 +14,7 @@
 :root {
   /* Base */
   --font-size: 16px;
-  --background: #faf7f4; /* Content area - warm off-white */
+  --background: #f4f0ec; /* Content area */
   --foreground: #665e56; /* Default text color - warm medium brown-gray */
 
   /** Card **/
@@ -48,7 +48,7 @@
   --destructive-hover: #b8142f;
 
   /* Borders */
-  --border: #e0d8d0; /* Table borders - warm */
+  --border: #D1CDC8;
   --input: transparent;
   --input-background: #f0ebe5;
   --switch-background: #c8c0b8;
@@ -65,22 +65,23 @@
   --radius: 0.5rem;
 
   /* Sidebar */
-  --sidebar: #f4f0ec; /* Sidebar background - warm, slightly deeper than page */
+  --sidebar: #faf7f4; /* Sidebar background */
   --sidebar-foreground: #665e56;
   --sidebar-primary: #2b2520;
   --sidebar-primary-foreground: #f4f0ec;
   --sidebar-accent: #e4ddd6;
   --sidebar-accent-foreground: #2b2520;
-  --sidebar-border: #d0c8c0;
   --sidebar-ring: #9a8f86;
 
   /* Template-specific custom properties (truly unique values) */
-  --bg-nav-hover: rgba(224, 216, 208, 0.5);
+  --bg-rollover: rgba(0, 0, 0, 0.04);
+  --bg-selected: rgba(0, 0, 0, 0.08);
+  --bg-nav-hover: var(--bg-rollover);
   --bg-row-selected: #e8e0d8;
-  --border-interactive: #d0c8c0;
-  --border-interactive-hover: #b8b0a8;
-  --bg-icon-container: #d58c6f;
-  --bg-icon-hover: rgba(0, 0, 0, 0.06);
+  --border-interactive: #928D88;
+  --border-interactive-hover: #75716D;
+  --bg-icon-container: #CE886C;
+  --bg-icon-hover: var(--bg-rollover);
   --icon-nav-hover: #7a7068;
   --bg-grid-card: #fdfaf8; /* Grid card background - warm white */
 
@@ -99,12 +100,15 @@
   --font-size-8: 8px;
   --font-size-10: 10px;
   --font-size-11: 11px;
+  --font-size-12: 12px;
   --font-size-13: 13px;
   --font-size-14: 14px;
   --font-size-15: 15px;
   --font-size-16: 16px;
   --font-size-18: 18px;
+  --font-size-22: 22px;
   --font-size-24: 24px;
+  --font-size-28: 28px;
 
   /* Line heights */
   --line-height-normal: normal;
@@ -112,10 +116,17 @@
   --line-height-20: 20px;
   --line-height-22: 22px;
 
-  /* Letter spacing */
+  /* Letter spacing — % scale (relative to font-size, used by legacy components) */
   --letter-spacing-sm: 0.5%;
   --letter-spacing-md: 1%;
   --letter-spacing-lg: 5%;
+
+  /* Letter spacing — px scale (absolute, used by inline styles throughout UI) */
+  --letter-spacing-body:   0.3px;   /* body text, labels, nav items — most common */
+  --letter-spacing-tight:  0.2px;   /* secondary / caption text */
+  --letter-spacing-button: 0.32px;  /* button labels */
+  --letter-spacing-icon:   0.5px;   /* icon badges, logo mark */
+  --letter-spacing-caps:   0.8px;   /* uppercase section headers */
 
   /* Border radius */
   --radius-4: 4px;
@@ -126,9 +137,21 @@
   --radius-24: 24px;
   --radius-round: 50%;
 
-  /* Transition */
-  --transition-duration: 150ms;
-  --transition-timing: ease-in-out;
+  /* Shadows */
+  --shadow-tray:       0 8px 24px rgba(0,0,0,0.3);                                                                                                           /* info/roles tray overlay */
+  --shadow-card:       0px 0px 6px 0px rgba(0,0,0,0.025), 0px 1px 5px 0px rgba(0,0,0,0.04), 0px 4px 9px 0px rgba(50,50,93,0.055);  /* grid/mobile card resting */
+  --shadow-card-hover: 0px 0px 6px 0px rgba(0,0,0,0.025), 0px 1px 5px 0px rgba(0,0,0,0.04), 0px 6px 15px 0px rgba(50,50,93,0.075); /* grid/mobile card hovered */
+
+  /* Animation system */
+  --duration-micro:      120ms;   /* sidebar collapse fade, quick opacity */
+  --duration-fast:       200ms;   /* exits, chevron rotation */
+  --duration-default:    300ms;   /* hover ↔ default for all interactive elements */
+  --duration-expressive: 500ms;   /* label float, chip enter, layout resize */
+  --ease-standard:       cubic-bezier(0.2, 0, 0.5, 1);
+
+  /* Legacy aliases — consumed by DataTable, GridView, Button */
+  --transition-duration: var(--duration-default);
+  --transition-timing:   var(--ease-standard);
 
   /* Additional icon/UI colors */
   --icon: #5a5048;
@@ -159,7 +182,7 @@
 }
 
 .dark {
-  --background: #211F1D; /* Warm very dark brown */
+  --background: #1c1a19; /* Warm very dark brown */
   --foreground: #BFB8B1; /* Warm light */
   --card: #221e1a; /* Warm dark card */
   --card-foreground: #BFB8B1;
@@ -177,27 +200,28 @@
   --destructive: #d4183d;
   --destructive-foreground: #ffffff;
   --destructive-hover: #b8142f;
-  --border: #3c3630; /* Warm border */
+  --border: #3E3B38;
   --input: transparent;
   --input-background: #2c2822;
   --switch-background: #4a4440;
   --ring: #6a6460;
-  --sidebar: #1c1a19; /* Warm dark sidebar, slightly deeper */
+  --sidebar: #211F1D; /* Warm dark sidebar */
   --sidebar-foreground: #b8b0a6;
   --sidebar-primary: #ede8e2;
   --sidebar-primary-foreground: #1c1a19;
   --sidebar-accent: #342e28;
   --sidebar-accent-foreground: #ede8e2;
-  --sidebar-border: #3c3630;
   --sidebar-ring: #6a6460;
 
   /* Dark mode specific custom properties */
-  --bg-nav-hover: rgba(44, 40, 34, 0.5);
+  --bg-rollover: rgba(255, 255, 255, 0.04);
+  --bg-selected: rgba(255, 255, 255, 0.08);
+  --bg-nav-hover: var(--bg-rollover);
   --bg-row-selected: #2E2B29;
-  --border-interactive: #4a4440;
-  --border-interactive-hover: #6a6460;
-  --bg-icon-container: #d58c6f;
-  --bg-icon-hover: rgba(255, 255, 255, 0.06);
+  --border-interactive: #7E7A78;
+  --border-interactive-hover: #989593;
+  --bg-icon-container: #CE886C;
+  --bg-icon-hover: var(--bg-rollover);
   --icon-nav-hover: #b0a898;
   --icon: #a09890;
   --icon-toggle-inactive: #4a4440;
@@ -276,8 +300,54 @@
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-sidebar-accent: var(--sidebar-accent);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-border: var(--border);
   --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* Column sort arrow loop animations
+   Timing: slow first 48% (ease-in exit), instant jump, fast 49-80% (ease-out entry), slow settle 80-100% */
+@keyframes arrowLoopUp {
+  0% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.8, 0.2); /* slow start, accelerates toward exit */
+  }
+  48% {
+    transform: translateY(-160%);
+    animation-timing-function: steps(1, end);                    /* instant jump to opposite side */
+  }
+  49% {
+    transform: translateY(160%);
+    animation-timing-function: cubic-bezier(0.1, 0.7, 0.4, 1);  /* fast entry, decelerating */
+  }
+  80% {
+    transform: translateY(-5%);                                   /* slight overshoot */
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);    /* ease settle */
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes arrowLoopDown {
+  0% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.8, 0.2);
+  }
+  48% {
+    transform: translateY(160%);
+    animation-timing-function: steps(1, end);
+  }
+  49% {
+    transform: translateY(-160%);
+    animation-timing-function: cubic-bezier(0.1, 0.7, 0.4, 1);
+  }
+  80% {
+    transform: translateY(5%);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 /* Skeleton shimmer animation */
@@ -395,6 +465,14 @@
 
   /* Remove default outline since we handle it with :focus-visible */
   :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Inputs rely on their container border for focus feedback — no ring needed */
+  input:focus,
+  input:focus-visible,
+  textarea:focus,
+  textarea:focus-visible {
     outline: none;
   }
 

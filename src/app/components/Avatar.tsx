@@ -1,5 +1,6 @@
-import { ShieldCheck, Code2, PenLine } from 'lucide-react';
+import { ShieldCheck, Code2, Paintbrush } from 'lucide-react';
 import { BaseIcon, IconText, IconSize } from './BaseIcon';
+import { ts } from '../utils/textStyles';
 
 export type Role = 'Admin' | 'Developer' | 'Creator';
 
@@ -10,16 +11,16 @@ interface AvatarProps {
 }
 
 // Role color mapping — 3 canonical roles
-export const roleColors: Record<Role, { bg: string; border: string; rgba: string }> = {
-  Admin:     { bg: '#934790', border: '#934790', rgba: 'rgba(147,71,144,0.3)' },
-  Developer: { bg: '#ce5b29', border: '#ce5b29', rgba: 'rgba(206,91,41,0.3)' },
-  Creator:   { bg: '#068aaf', border: '#068aaf', rgba: 'rgba(6,138,175,0.3)' },
+export const roleColors: Record<Role, { bg: string; border: string; rgba: string; badge: string }> = {
+  Admin:     { bg: '#934790', border: '#934790', rgba: 'rgba(147,71,144,0.15)', badge: 'rgba(147,71,144,0.3)' },
+  Developer: { bg: '#ce5b29', border: '#ce5b29', rgba: 'rgba(206,91,41,0.15)', badge: 'rgba(206,91,41,0.3)'  },
+  Creator:   { bg: '#068aaf', border: '#068aaf', rgba: 'rgba(6,138,175,0.15)',  badge: 'rgba(6,138,175,0.3)'  },
 };
 
 const roleIcons: Record<Role, React.ReactNode> = {
   Admin:     <ShieldCheck className="size-[14px] shrink-0" strokeWidth={2} />,
   Developer: <Code2      className="size-[14px] shrink-0" strokeWidth={2} />,
-  Creator:   <PenLine    className="size-[14px] shrink-0" strokeWidth={2} />,
+  Creator:   <Paintbrush className="size-[14px] shrink-0" strokeWidth={2} />,
 };
 
 export function Avatar({ name, role = 'Creator', size = 'medium' }: AvatarProps) {
@@ -69,10 +70,7 @@ export function RoleBadge({ role, iconOnly = false }: RoleBadgeProps) {
       {!iconOnly && (
         <span
           style={{
-            fontFamily: 'var(--font-family)',
-            fontWeight: 'var(--font-weight-medium)',
-            fontSize: '14px',
-            letterSpacing: '0.3px',
+            ...ts.label,
             color: 'var(--role-pill-text)',
             whiteSpace: 'nowrap',
             lineHeight: 'normal',

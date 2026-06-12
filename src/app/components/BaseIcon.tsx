@@ -15,26 +15,26 @@ export interface BaseIconProps {
 export const iconSizeConfig = {
   small: {
     containerSize: 'size-[24px]',
-    fontSize: '10px',
-    letterSpacing: '0.5px',
+    fontSize: 'var(--font-size-10)',
+    letterSpacing: 'var(--letter-spacing-icon)',
     iconSize: 12,
   },
   medium: {
     containerSize: 'size-[32px]',
-    fontSize: '12px',
-    letterSpacing: '0.5px',
+    fontSize: 'var(--font-size-12)',
+    letterSpacing: 'var(--letter-spacing-icon)',
     iconSize: 16,
   },
   large: {
     containerSize: 'size-[48px]',
-    fontSize: '20px',
-    letterSpacing: '0.5px',
+    fontSize: 'var(--font-size-20)',
+    letterSpacing: 'var(--letter-spacing-icon)',
     iconSize: 24,
   },
   'x-large': {
     containerSize: 'size-[64px]',
-    fontSize: '28px',
-    letterSpacing: '0.5px',
+    fontSize: 'var(--font-size-28)',
+    letterSpacing: 'var(--letter-spacing-icon)',
     iconSize: 32,
   },
 };

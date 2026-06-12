@@ -33,14 +33,14 @@ interface SelectedAccount {
 // ─── Mini avatar ──────────────────────────────────────────────────────────────
 
 function MiniAvatar({ name, role, size = 'medium' }: { name: string; role: Role; size?: 'small' | 'medium' | 'large' }) {
-  const sizes = { small: { px: 16, fontSize: '7px' }, medium: { px: 20, fontSize: '12px' }, large: { px: 24, fontSize: '10px' } };
+  const sizes = { small: { px: 16, fontSize: '7px' }, medium: { px: 20, fontSize: 'var(--font-size-12)' }, large: { px: 24, fontSize: 'var(--font-size-10)' } };
   const { px, fontSize } = sizes[size];
   const initials = name.trim().split(' ').filter(Boolean).map(p => p[0]).slice(0, 2).join('').toUpperCase();
   const bg = roleColors[role]?.bg ?? '#665e56';
   return (
     <div
       className="shrink-0 flex items-center justify-center rounded-full"
-      style={{ width: px, height: px, backgroundColor: bg, fontSize, lineHeight: fontSize, fontWeight: 600, color: '#fff' }}
+      style={{ width: px, height: px, backgroundColor: bg, fontSize, lineHeight: 1, fontWeight: 600, color: '#fff' }}
     >
       {initials}
     </div>
@@ -55,8 +55,8 @@ function Chip({ account, onRemove }: { account: SelectedAccount; onRemove: () =>
       className="flex items-center gap-[8px] pl-[6px] pr-[8px] shrink-0"
       style={{
         backgroundColor: 'var(--muted)',
-        border: '1px solid var(--border-interactive)',
-        borderRadius: '8px',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius-8)',
         height: '28px',
         maxWidth: '220px',
       }}
@@ -104,7 +104,7 @@ function AccountListRow({
       onMouseLeave={() => setHovered(false)}
       className="w-full flex items-center gap-[12px] px-[12px] h-[48px] rounded-xl transition-colors text-left"
       style={{
-        backgroundColor: isSelected ? 'var(--accent)' : hovered ? 'var(--muted)' : 'transparent',
+        backgroundColor: isSelected ? 'var(--bg-selected)' : hovered ? 'var(--bg-rollover)' : 'transparent',
         border: 'none',
         cursor: disabled ? 'default' : 'pointer',
         opacity: isMember ? 0.45 : 1,
@@ -116,12 +116,12 @@ function AccountListRow({
           fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)',
           fontSize: 'var(--font-size-15)', lineHeight: '16px',
           color: hovered ? 'var(--primary)' : 'var(--foreground)',
-          letterSpacing: '0.3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+          letterSpacing: 'var(--letter-spacing-body)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>{name}</p>
         <p style={{
           fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-regular)',
-          fontSize: '12px', lineHeight: '12px',
-          color: 'var(--muted-foreground)', letterSpacing: '0.3px',
+          fontSize: 'var(--font-size-12)', lineHeight: '12px',
+          color: 'var(--muted-foreground)', letterSpacing: 'var(--letter-spacing-body)',
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>{email}</p>
       </div>
@@ -140,7 +140,7 @@ function AccessRow({ member, onRemove, isPending = false, entityName }: { member
       type="button"
       className="w-full flex items-center gap-[12px] px-[12px] h-[40px] rounded-xl transition-colors cursor-pointer"
       style={{
-        backgroundColor: hovered ? 'var(--muted)' : 'transparent',
+        backgroundColor: hovered ? 'var(--bg-rollover)' : 'transparent',
         border: 'none',
         padding: '0 12px',
         textAlign: 'left',
@@ -155,14 +155,14 @@ function AccessRow({ member, onRemove, isPending = false, entityName }: { member
         fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-regular)',
         fontSize: 'var(--font-size-15)', lineHeight: 'var(--line-height-20)',
         color: hovered ? 'var(--primary)' : 'var(--foreground)',
-        letterSpacing: '0.3px', fontStyle: isPending ? 'italic' : 'normal',
+        letterSpacing: 'var(--letter-spacing-body)', fontStyle: isPending ? 'italic' : 'normal',
       }}>
         {member.name}
       </span>
       {isPending ? (
         <span style={{
           fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-regular)',
-          fontSize: '12px', letterSpacing: '0.3px',
+          fontSize: 'var(--font-size-12)', letterSpacing: 'var(--letter-spacing-body)',
           color: hovered ? 'var(--primary)' : 'var(--muted-foreground)', whiteSpace: 'nowrap',
         }}>Revoke</span>
       ) : (
@@ -178,7 +178,7 @@ function SectionLabel({ text }: { text: string }) {
   return (
     <p style={{
       fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)',
-      fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.8px',
+      fontSize: 'var(--font-size-11)', textTransform: 'uppercase', letterSpacing: 'var(--letter-spacing-caps)',
       color: 'var(--muted-foreground)', padding: '4px 12px 8px',
       position: 'sticky', top: 0,
       backgroundColor: 'var(--background)', zIndex: 1,
@@ -282,7 +282,7 @@ export function ShareDrawer({ isOpen, onClose, entityName, entityId, onShare, cu
                 id="share-drawer-title"
                 style={{
                   fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)',
-                  fontSize: '22px', lineHeight: 'normal', color: 'var(--primary)',
+                  fontSize: 'var(--font-size-22)', lineHeight: 'normal', color: 'var(--primary)',
                 }}
               >Share</h2>
               <p className="truncate" style={{
@@ -322,7 +322,7 @@ export function ShareDrawer({ isOpen, onClose, entityName, entityId, onShare, cu
                       className="w-full bg-transparent"
                       style={{
                         fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-regular)',
-                        fontSize: '16px', lineHeight: 'var(--line-height-20)',
+                        fontSize: 'var(--font-size-16)', lineHeight: 'var(--line-height-20)',
                         color: 'var(--foreground)',
                       }}
                     />
@@ -356,7 +356,7 @@ export function ShareDrawer({ isOpen, onClose, entityName, entityId, onShare, cu
                   <div className="flex items-center justify-center py-[24px]">
                     <p style={{
                       fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-14)',
-                      color: 'var(--muted-foreground)', letterSpacing: '0.3px',
+                      color: 'var(--muted-foreground)', letterSpacing: 'var(--letter-spacing-body)',
                     }}>
                       {query ? `No accounts match "${query}"` : 'All accounts already have access'}
                     </p>

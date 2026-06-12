@@ -27,14 +27,14 @@ function TableSkeleton({ rowCount = 8 }: { rowCount?: number }) {
       </div>
 
       {/* Rows */}
-      <div className="overflow-hidden rounded-2xl" style={{ border: '1px solid var(--border-interactive)' }}>
+      <div className="overflow-hidden rounded-2xl" style={{ border: '1px solid var(--border)' }}>
         {Array.from({ length: rowCount }).map((_, i) => (
           <div
             key={i}
             className="flex items-center gap-[16px] px-[20px]"
             style={{
               height: '56px',
-              borderBottom: i < rowCount - 1 ? '1px solid var(--border-interactive)' : 'none',
+              borderBottom: i < rowCount - 1 ? '1px solid var(--border)' : 'none',
             }}
           >
             <SkeletonBox width="32px" height="32px" borderRadius="50%" />
@@ -83,7 +83,7 @@ export function GridSkeleton({ itemCount = 8 }: { itemCount?: number }) {
             className="flex flex-col gap-[8px] rounded-[16px]"
             style={{
               backgroundColor: 'var(--bg-grid-card)',
-              border: '1px solid var(--sidebar-border)',
+              border: '1px solid var(--border)',
               padding: '16px',
               paddingBottom: '20px',
             }}

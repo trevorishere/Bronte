@@ -3,6 +3,7 @@ import { Star, MoreHorizontal, ArrowUp, ArrowDown, File } from 'lucide-react';
 import { toast } from 'sonner';
 import { DropdownMenu, createDefaultMenuItems } from './DropdownMenu';
 import { Avatar, RoleBadge } from './Avatar';
+import { progressPillColors } from '../constants/progressColors';
 import { TeamIcon } from './TeamIcon';
 import { WorkspaceIcon } from './WorkspaceIcon';
 import { ProjectIcon } from './ProjectIcon';
@@ -16,6 +17,7 @@ import { OwnerModal } from './OwnerModal';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { accounts } from '../data/accounts';
 import type { Account } from '../data/accounts';
+import { ts } from '../utils/textStyles';
 
 // ========================================
 // TYPE DEFINITIONS
@@ -60,6 +62,36 @@ type SortConfig = {
 } | null;
 
 const MEMBER_COUNT_KEYS = new Set(['accountCount', 'membersCount', 'memberCount']);
+
+// ========================================
+// PROGRESS PILL
+// ========================================
+
+function ProgressPill({ value }: { value: string }) {
+  const displayValue = value || 'Not Started';
+  const isNotStarted = displayValue === 'Not Started';
+  const category = !isNotStarted
+    ? (value.startsWith('In Progress') ? 'In Progress' : value === 'In Review' ? 'In Review' : 'Done')
+    : null;
+  const bg = isNotStarted ? 'var(--bg-icon-hover)' : progressPillColors[category!];
+  // Strip any trailing "(N%)" from the label — percentage lives in data only
+  const label = displayValue.replace(/\s*\(\d+%\)$/, '');
+  return (
+    <div
+      className="inline-flex items-center justify-center h-[32px] rounded-[8px] shrink-0"
+      style={{ paddingLeft: '12px', paddingRight: '12px', backgroundColor: bg }}
+    >
+      <span style={{
+        ...ts.body,
+        color: isNotStarted ? 'var(--muted-foreground)' : 'var(--role-pill-text)',
+        whiteSpace: 'nowrap',
+        lineHeight: 'normal',
+      }}>
+        {label}
+      </span>
+    </div>
+  );
+}
 
 export function DataTable({
   columns,
@@ -284,7 +316,7 @@ export function DataTable({
 
   const getRowBackgroundColor = (rowId: string) => {
     if (selectedRow === rowId) {
-      return 'var(--bg-row-selected)';
+      return 'var(--bg-selected)';
     }
     return 'var(--background)';
   };
@@ -294,7 +326,7 @@ export function DataTable({
     const iconColWidth = 116;
     const nameColMin = 200;
     const middleColMin = 140;
-    const lastNumericW = 112;
+    const lastNumericW = 140;
     const lastTextW = 140;
     const lastIsNumeric = columns[columns.length - 1]?.align === 'right';
     const lastW = lastIsNumeric ? lastNumericW : lastTextW;
@@ -364,9 +396,9 @@ export function DataTable({
       {/* ======================================== */}
       {/* TABLE (header + rows inside the same border) */}
       {/* ======================================== */}
-      <div role="grid" className="flex flex-col overflow-hidden rounded-2xl w-full flex-1 min-h-0" style={{ border: '1px solid var(--border-interactive)' }}>
+      <div role="grid" className="flex flex-col overflow-hidden rounded-2xl w-full flex-1 min-h-0" style={{ border: '1px solid var(--border)' }}>
       {/* TABLE HEADER SECTION */}
-      <div className="shrink-0 overflow-hidden w-full" style={{ borderBottom: '1px solid var(--border-interactive)' }}>
+      <div className="shrink-0 overflow-hidden w-full" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="w-full flex" role="row" style={{ minWidth: '100%' }}>
           {/* Header Columns */}
           <div className="flex flex-1 min-w-0" role="rowgroup">
@@ -386,11 +418,14 @@ export function DataTable({
               if (isLastColumn) {
                 // Numeric right-aligned (e.g. Members, Projects): tight fixed width
                 // Text last column (e.g. Created On): standard fixed width
-                const lastW = lastColIsNumeric ? 112 : 140;
+                const lastW = lastColIsNumeric ? 140 : 140;
                 flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
               } else if (index === 0) {
                 // Name column always gets 3x share so it survives narrowing
                 flexStyle = { flex: '3 1 0px', minWidth: '200px' };
+              } else if (column.align === 'right') {
+                // Right-aligned middle columns (e.g. Members when not last): compact fixed width
+                flexStyle = { flex: '0 0 140px', minWidth: '140px', maxWidth: '140px' };
               } else {
                 // Middle columns share equally
                 flexStyle = { flex: '1 1 0px', minWidth: '140px' };
@@ -405,7 +440,7 @@ export function DataTable({
                 fontFamily: 'var(--font-family)',
                 fontWeight: 'var(--font-weight-semibold)',
                 color: sortConfig?.key === column.key || hoveredHeader === column.key ? 'var(--primary)' : 'var(--muted-foreground)',
-                fontSize: '12px',
+                fontSize: 'var(--font-size-12)',
                 letterSpacing: 'var(--letter-spacing-lg)',
                 textTransform: 'uppercase',
                 textAlign: column.align || 'left',
@@ -415,6 +450,7 @@ export function DataTable({
                 boxSizing: 'border-box',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
+                transition: 'color var(--duration-default) var(--ease-standard)',
               };
 
               if (column.sortable) {
@@ -449,23 +485,25 @@ export function DataTable({
                     >
                       {column.align === 'right' ? (
                         <div className="flex items-center justify-end gap-[8px] w-full">
-                          <div className="flex flex-col w-[16px]">
-                            {(sortConfig?.key === column.key || hoveredHeader === column.key) && (
-                              <>
-                                {sortConfig?.key === column.key ? (
-                                  sortConfig.direction === 'asc' ? (
-                                    <ArrowUp className="size-[16px] text-primary" />
-                                  ) : (
-                                    <ArrowDown className="size-[16px] text-primary" />
-                                  )
-                                ) : (
-                                  isDateColumn(column.key) ? (
-                                    <ArrowDown className="size-[16px] text-muted-foreground" />
-                                  ) : (
-                                    <ArrowUp className="size-[16px] text-muted-foreground" />
-                                  )
-                                )}
-                              </>
+                          <div
+                            className="flex flex-col w-[16px] h-[16px] overflow-hidden shrink-0"
+                            style={{
+                              opacity: (sortConfig?.key === column.key || hoveredHeader === column.key) ? 1 : 0,
+                              transition: `opacity var(--duration-default) var(--ease-standard)`,
+                            }}
+                          >
+                            {sortConfig?.key === column.key ? (
+                              sortConfig.direction === 'asc' ? (
+                                <ArrowUp className="size-[16px]" style={{ color: 'var(--primary)', transition: 'color var(--duration-default) var(--ease-standard)' }} />
+                              ) : (
+                                <ArrowDown className="size-[16px]" style={{ color: 'var(--primary)', transition: 'color var(--duration-default) var(--ease-standard)' }} />
+                              )
+                            ) : (
+                              isDateColumn(column.key) ? (
+                                <ArrowDown className="size-[16px]" style={{ color: 'var(--muted-foreground)', transition: 'color var(--duration-default) var(--ease-standard)', animation: hoveredHeader === column.key ? 'arrowLoopDown 700ms forwards' : 'none' }} />
+                              ) : (
+                                <ArrowUp className="size-[16px]" style={{ color: 'var(--muted-foreground)', transition: 'color var(--duration-default) var(--ease-standard)', animation: hoveredHeader === column.key ? 'arrowLoopUp 700ms forwards' : 'none' }} />
+                              )
                             )}
                           </div>
                           <span>{column.label}</span>
@@ -473,23 +511,25 @@ export function DataTable({
                       ) : (
                         <div className="flex items-center gap-[8px] w-full">
                           <span>{column.label}</span>
-                          <div className="flex flex-col w-[16px]">
-                            {(sortConfig?.key === column.key || hoveredHeader === column.key) && (
-                              <>
-                                {sortConfig?.key === column.key ? (
-                                  sortConfig.direction === 'asc' ? (
-                                    <ArrowUp className="size-[16px] text-primary" />
-                                  ) : (
-                                    <ArrowDown className="size-[16px] text-primary" />
-                                  )
-                                ) : (
-                                  isDateColumn(column.key) ? (
-                                    <ArrowDown className="size-[16px] text-muted-foreground" />
-                                  ) : (
-                                    <ArrowUp className="size-[16px] text-muted-foreground" />
-                                  )
-                                )}
-                              </>
+                          <div
+                            className="flex flex-col w-[16px] h-[16px] overflow-hidden shrink-0"
+                            style={{
+                              opacity: (sortConfig?.key === column.key || hoveredHeader === column.key) ? 1 : 0,
+                              transition: `opacity var(--duration-default) var(--ease-standard)`,
+                            }}
+                          >
+                            {sortConfig?.key === column.key ? (
+                              sortConfig.direction === 'asc' ? (
+                                <ArrowUp className="size-[16px]" style={{ color: 'var(--primary)', transition: 'color var(--duration-default) var(--ease-standard)' }} />
+                              ) : (
+                                <ArrowDown className="size-[16px]" style={{ color: 'var(--primary)', transition: 'color var(--duration-default) var(--ease-standard)' }} />
+                              )
+                            ) : (
+                              isDateColumn(column.key) ? (
+                                <ArrowDown className="size-[16px]" style={{ color: 'var(--muted-foreground)', transition: 'color var(--duration-default) var(--ease-standard)', animation: hoveredHeader === column.key ? 'arrowLoopDown 700ms forwards' : 'none' }} />
+                              ) : (
+                                <ArrowUp className="size-[16px]" style={{ color: 'var(--muted-foreground)', transition: 'color var(--duration-default) var(--ease-standard)', animation: hoveredHeader === column.key ? 'arrowLoopUp 700ms forwards' : 'none' }} />
+                              )
                             )}
                           </div>
                         </div>
@@ -539,12 +579,13 @@ export function DataTable({
                   key={row.id}
                   role="row"
                   tabIndex={0}
-                  className="cursor-pointer transition-colors flex items-center w-full"
+                  className="cursor-pointer flex items-center w-full"
                   style={{
                     height: '64px',
-                    borderBottom: rowIndex === displayData.length - 1 ? 'none' : '1px solid var(--border-interactive)',
+                    borderBottom: rowIndex === displayData.length - 1 ? 'none' : '1px solid var(--border)',
                     backgroundColor: getRowBackgroundColor(row.id),
-                    minWidth: '100%'
+                    minWidth: '100%',
+                    transition: 'background-color var(--duration-default) var(--ease-standard)',
                   }}
                   onClick={() => handleRowClick(row)}
                   onDoubleClick={() => handleRowDoubleClick(row)}
@@ -554,7 +595,7 @@ export function DataTable({
                   onMouseOver={(e) => {
                     // HOVER STATE: Apply --muted background (var(--bg-row-hover) = #f5f5f5)
                     if (selectedRow !== row.id) {
-                      e.currentTarget.style.backgroundColor = 'var(--muted)';
+                      e.currentTarget.style.backgroundColor = 'var(--bg-rollover)';
                     }
                   }}
                   onMouseOut={(e) => {
@@ -571,10 +612,13 @@ export function DataTable({
                       const lastColIsNumeric = visibleColumns[visibleColumns.length - 1]?.align === 'right';
 
                       if (isLastColumn) {
-                        const lastW = lastColIsNumeric ? 112 : 140;
+                        const lastW = lastColIsNumeric ? 140 : 140;
                         flexStyle = { flex: `0 0 ${lastW}px`, minWidth: `${lastW}px`, maxWidth: `${lastW}px` };
                       } else if (index === 0) {
                         flexStyle = { flex: '3 1 0px', minWidth: '200px' };
+                      } else if (column.align === 'right') {
+                        // Right-aligned middle columns (e.g. Members when not last): compact fixed width
+                        flexStyle = { flex: '0 0 140px', minWidth: '140px', maxWidth: '140px' };
                       } else {
                         flexStyle = { flex: '1 1 0px', minWidth: '140px' };
                       }
@@ -639,7 +683,8 @@ export function DataTable({
                                   letterSpacing: 'var(--letter-spacing-sm)',
                                   whiteSpace: 'nowrap',
                                   overflow: 'hidden',
-                                  textOverflow: 'ellipsis'
+                                  textOverflow: 'ellipsis',
+                                  transition: 'color var(--duration-default) var(--ease-standard)',
                                 }}
                               >
                                 {row[column.key]}
@@ -649,6 +694,9 @@ export function DataTable({
                             // ========================================
                             // MIDDLE COLUMNS: Role badges or text
                             // ========================================
+                            column.key === 'progress' ? (
+                              <ProgressPill value={row[column.key]} />
+                            ) :
                             (column.key === 'owner' || column.key === 'sharedBy') ? (
                               (() => {
                                 const ownerAccount = accounts.find(a => a.name === row[column.key]);
@@ -656,9 +704,9 @@ export function DataTable({
                                   <div
                                     className="flex items-center gap-[8px] min-w-0 cursor-pointer"
                                     style={{
-                                      padding: '8px 12px',
-                                      marginLeft: '-12px',
-                                      borderRadius: '24px',
+                                      padding: '8px 12px 8px 8px',
+                                      marginLeft: '-8px',
+                                      borderRadius: 'var(--radius-24)',
                                       backgroundColor: 'transparent',
                                       transition: 'background-color var(--transition-duration) var(--transition-timing)',
                                     }}
@@ -678,6 +726,7 @@ export function DataTable({
                                         whiteSpace: 'nowrap',
                                         overflow: 'hidden',
                                         textOverflow: 'ellipsis',
+                                        transition: 'color var(--duration-default) var(--ease-standard)',
                                       }}
                                     >
                                       {row[column.key]}
@@ -701,6 +750,7 @@ export function DataTable({
                                 letterSpacing: 'var(--letter-spacing-sm)',
                                 color: (hoveredRow === row.id || selectedRow === row.id) ? 'var(--primary)' : 'var(--foreground)',
                                 whiteSpace: 'nowrap',
+                                transition: 'color var(--duration-default) var(--ease-standard)',
                               }}>
                                 {row[column.key]}
                               </span>
@@ -726,10 +776,10 @@ export function DataTable({
                                       height: '36px',
                                       minWidth: '36px',
                                       padding: '0 12px',
-                                      borderRadius: '24px',
+                                      borderRadius: 'var(--radius-24)',
                                       backgroundColor: 'transparent',
                                       textDecoration: 'none',
-                                      transition: 'background-color var(--transition-duration) var(--transition-timing)',
+                                      transition: 'background-color var(--duration-default) var(--ease-standard), color var(--duration-default) var(--ease-standard)',
                                     }}
                                     onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'; }}
                                     onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
@@ -746,7 +796,8 @@ export function DataTable({
                                       letterSpacing: 'var(--letter-spacing-sm)',
                                       whiteSpace: 'nowrap',
                                       overflow: 'hidden',
-                                      textOverflow: 'ellipsis'
+                                      textOverflow: 'ellipsis',
+                                      transition: 'color var(--duration-default) var(--ease-standard)',
                                     }}
                                   >
                                     {row[column.key]}
@@ -764,7 +815,8 @@ export function DataTable({
                                   letterSpacing: 'var(--letter-spacing-sm)',
                                   whiteSpace: 'nowrap',
                                   overflow: 'hidden',
-                                  textOverflow: 'ellipsis'
+                                  textOverflow: 'ellipsis',
+                                  transition: 'color var(--duration-default) var(--ease-standard)',
                                 }}
                               >
                                 {row[column.key]}
@@ -787,16 +839,16 @@ export function DataTable({
                         aria-label={starredItems?.has(row.id) ? `Remove ${row.name} from favorites` : `Add ${row.name} to favorites`}
                         style={{
                           backgroundColor: 'transparent',
-                          transition: `background-color var(--transition-duration) var(--transition-timing)`
+                          color: 'var(--foreground)',
+                          transition: `background-color var(--transition-duration) var(--transition-timing), color var(--transition-duration) var(--transition-timing)`,
                         }}
-                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'}
-                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                        onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'; e.currentTarget.style.color = 'var(--primary)'; }}
+                        onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--foreground)'; }}
                         onClick={(e) => handleStarClick(e, row)}
                       >
                         <Star
                           aria-hidden="true"
                           className="size-[16px]"
-                          style={{ color: 'var(--text-foreground)' }}
                           strokeWidth={1.5}
                           fill={starredItems?.has(row.id) ? 'currentColor' : 'none'}
                         />
@@ -811,21 +863,17 @@ export function DataTable({
                         aria-haspopup="menu"
                         style={{
                           backgroundColor: openMenuRowId === row.id ? 'var(--bg-icon-hover)' : 'transparent',
-                          transition: `background-color var(--transition-duration) var(--transition-timing)`
+                          color: 'var(--foreground)',
+                          transition: `background-color var(--transition-duration) var(--transition-timing), color var(--transition-duration) var(--transition-timing)`,
                         }}
-                        onMouseOver={(e) => {
-                          e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)';
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.backgroundColor = openMenuRowId === row.id ? 'var(--bg-icon-hover)' : 'transparent';
-                        }}
+                        onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)'; e.currentTarget.style.color = 'var(--primary)'; }}
+                        onMouseOut={(e) => { e.currentTarget.style.backgroundColor = openMenuRowId === row.id ? 'var(--bg-icon-hover)' : 'transparent'; e.currentTarget.style.color = 'var(--foreground)'; }}
                         onClick={(e) => handleMoreClick(e, row)}
                         ref={el => { if (el) moreButtonRefs.current.set(row.id, el); }}
                       >
                         <MoreHorizontal
                           aria-hidden="true"
                           className="size-[16px]"
-                          style={{ color: 'var(--text-foreground)' }}
                           />
                       </button>
                     </div>
@@ -847,7 +895,7 @@ export function DataTable({
       >
         <span style={{
           fontFamily: 'var(--font-family)',
-          fontSize: '12px',
+          fontSize: 'var(--font-size-12)',
           fontWeight: 'var(--font-weight-regular)',
           letterSpacing: 'var(--letter-spacing-sm)',
           color: 'var(--text-secondary)',

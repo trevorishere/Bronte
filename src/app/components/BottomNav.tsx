@@ -66,7 +66,7 @@ export function BottomNav({ activeItem = 'workspaces', onItemClick, userInitials
                       fontSize: 'var(--font-size-8)',
                       fontWeight: 'var(--font-weight-semibold)',
                       color: isActive ? 'var(--primary)' : 'var(--muted-foreground)',
-                      letterSpacing: '0.3px',
+                      letterSpacing: 'var(--letter-spacing-body)',
                       lineHeight: 1,
                     }}
                   >

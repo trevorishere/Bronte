@@ -23,7 +23,7 @@ export function Button({
     lineHeight: 'var(--line-height-20)',
     letterSpacing: 'var(--letter-spacing-md)',
     cursor: props.disabled ? 'not-allowed' : 'pointer',
-    transition: `background-color var(--transition-duration) var(--transition-timing), color var(--transition-duration) var(--transition-timing)`,
+    transition: `background-color var(--transition-duration) var(--transition-timing), color var(--transition-duration) var(--transition-timing), border-color var(--transition-duration) var(--transition-timing)`,
     border: 'none',
     ...style,
   };
@@ -32,9 +32,9 @@ export function Button({
     text: {
       padding: '8px 16px',
       borderRadius: 'var(--radius-8)',
-      border: '1px solid var(--border-interactive)',
-      backgroundColor: isHovered && !props.disabled ? 'var(--muted)' : 'transparent',
-      color: 'var(--foreground)',
+      border: `1px solid ${isHovered && !props.disabled ? 'var(--border-interactive-hover)' : 'var(--border)'}`,
+      backgroundColor: isHovered && !props.disabled ? 'var(--bg-rollover)' : 'transparent',
+      color: isHovered && !props.disabled ? 'var(--primary)' : 'var(--foreground)',
     },
     primary: {
       padding: '8px 16px',
@@ -45,9 +45,9 @@ export function Button({
     secondary: {
       padding: '8px 16px',
       borderRadius: 'var(--radius-8)',
-      border: '1px solid var(--border-interactive)',
-      backgroundColor: isHovered && !props.disabled ? 'var(--muted)' : 'var(--background)',
-      color: 'var(--foreground)',
+      border: `1px solid ${isHovered && !props.disabled ? 'var(--border-interactive-hover)' : 'var(--border)'}`,
+      backgroundColor: isHovered && !props.disabled ? 'var(--bg-rollover)' : 'var(--background)',
+      color: isHovered && !props.disabled ? 'var(--primary)' : 'var(--foreground)',
     },
     danger: {
       padding: '8px 16px',

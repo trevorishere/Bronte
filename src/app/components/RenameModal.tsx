@@ -114,7 +114,7 @@ export function RenameModal({
         style={{
           width: '560px',
           backgroundColor: 'var(--background)',
-          border: '1px solid var(--border)'
+          border: '1px solid var(--border-interactive)'
         }}
       >
         {/* Header */}

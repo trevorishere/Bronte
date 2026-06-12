@@ -100,7 +100,7 @@ export function InfoDrawer({ isOpen, onClose, content }: InfoTrayProps) {
             <DragHandle />
 
             {/* Header */}
-            <div className="shrink-0 flex items-center justify-between px-[24px] pt-[36px] pb-[16px]">
+            <div className="shrink-0 flex items-center justify-between px-[24px] pt-[44px] pb-[16px]">
               <span style={{
                 fontFamily:    'var(--font-family)',
                 fontSize:      '22px',
@@ -120,7 +120,7 @@ export function InfoDrawer({ isOpen, onClose, content }: InfoTrayProps) {
                 aria-label="Close"
                 className="shrink-0 flex items-center justify-center size-[32px] rounded-[8px] transition-colors"
                 style={{ backgroundColor: 'transparent', color: 'var(--muted-foreground)', border: 'none', cursor: 'pointer' }}
-                onMouseOver={e  => (e.currentTarget.style.backgroundColor = 'var(--muted)')}
+                onMouseOver={e  => (e.currentTarget.style.backgroundColor = 'var(--bg-rollover)')}
                 onMouseOut={e   => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 <X className="size-[18px]" strokeWidth={2} />
@@ -173,7 +173,7 @@ export function InfoTray({ isOpen, onClose, content }: InfoTrayProps) {
             opacity: { duration: 0.18, ease: 'easeInOut' },
           }}
           className="shrink-0 overflow-hidden hidden md:flex flex-col"
-          style={{ borderLeft: '1px solid var(--border)', backgroundColor: 'var(--muted)' }}
+          style={{ borderLeft: '1px solid var(--border)', backgroundColor: 'var(--background)' }}
         >
           <div className="flex flex-col h-full" style={{ minWidth: 380 }}>
 
@@ -197,7 +197,7 @@ export function InfoTray({ isOpen, onClose, content }: InfoTrayProps) {
                 aria-label="Close"
                 className="shrink-0 flex items-center justify-center size-[32px] rounded-[6px] transition-colors"
                 style={{ backgroundColor: 'transparent', color: 'var(--muted-foreground)', border: 'none', cursor: 'pointer' }}
-                onMouseOver={e  => (e.currentTarget.style.backgroundColor = 'var(--muted)')}
+                onMouseOver={e  => (e.currentTarget.style.backgroundColor = 'var(--bg-rollover)')}
                 onMouseOut={e   => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 <X className="size-[18px]" strokeWidth={2} />
@@ -267,7 +267,7 @@ function AccountPanel({ data }: { data: Record<string, unknown> }) {
     setPermissions(prev => ({ ...prev, [row]: level }));
   };
 
-  const borderColor = 'var(--border-interactive)';
+  const borderColor = 'var(--border)';
 
   return (
     <>
@@ -316,7 +316,7 @@ function AccountPanel({ data }: { data: Record<string, unknown> }) {
                     fontSize:      '14px',
                     fontWeight:    'var(--font-weight-medium)',
                     color:         'var(--foreground)',
-                    letterSpacing: '0.3px',
+                    letterSpacing: 'var(--letter-spacing-body)',
                     whiteSpace:    'nowrap',
                     paddingLeft:   '6px',
                   }}>
@@ -328,7 +328,7 @@ function AccountPanel({ data }: { data: Record<string, unknown> }) {
                     <TrayDropdownMenu>
                       {ACCESS_LEVELS.map(opt => (
                         <TrayDropdownItem key={opt} selected={accessLevel === opt} onClick={() => applyAccessLevel(opt)}>
-                          <span style={{ fontFamily: 'var(--font-family)', fontSize: '14px', fontWeight: 'var(--font-weight-medium)', color: 'var(--foreground)', letterSpacing: '0.3px' }}>
+                          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-14)', fontWeight: 'var(--font-weight-medium)', color: 'var(--foreground)', letterSpacing: 'var(--letter-spacing-body)' }}>
                             {opt}
                           </span>
                         </TrayDropdownItem>
@@ -342,13 +342,13 @@ function AccountPanel({ data }: { data: Record<string, unknown> }) {
             {/* Permissions matrix */}
             <div className="flex flex-col gap-[12px]">
               <div className="flex items-center h-[32px]">
-                <span className="flex-1" style={{ fontFamily: 'var(--font-family)', fontSize: '12px', fontWeight: 'var(--font-weight-semibold)', color: 'var(--foreground)', letterSpacing: '0.3px' }}>
+                <span className="flex-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-12)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--foreground)', letterSpacing: 'var(--letter-spacing-body)' }}>
                   Permissions
                 </span>
                 <div className="flex items-center gap-[8px]">
                   {PERM_COLS.map(col => (
                     <div key={col} className="flex items-center justify-center w-[64px]">
-                      <span style={{ fontFamily: 'var(--font-family)', fontSize: '12px', fontWeight: 'var(--font-weight-medium)', color: 'var(--foreground)', letterSpacing: '0.16px' }}>
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-12)', fontWeight: 'var(--font-weight-medium)', color: 'var(--foreground)', letterSpacing: '0.16px' }}>
                         {col}
                       </span>
                     </div>
@@ -358,7 +358,7 @@ function AccountPanel({ data }: { data: Record<string, unknown> }) {
 
               {PERM_ROWS.map(row => (
                 <div key={row.id} className="flex items-center h-[40px]">
-                  <span className="flex-1" style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-semibold)', color: 'var(--muted-foreground)', letterSpacing: '0.77px', textTransform: 'uppercase' }}>
+                  <span className="flex-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-11)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--muted-foreground)', letterSpacing: '0.77px', textTransform: 'uppercase' }}>
                     {row.label}
                   </span>
                   <div role="radiogroup" aria-label={row.label} className="flex items-center gap-[8px]">
@@ -397,8 +397,8 @@ function AccountPanel({ data }: { data: Record<string, unknown> }) {
             color:           'var(--foreground)',
             letterSpacing:   '0.3px',
           }}
-          onMouseOver={e => (e.currentTarget.style.backgroundColor = 'var(--muted)')}
-          onMouseOut={e  => (e.currentTarget.style.backgroundColor = 'transparent')}
+          onMouseOver={e => { e.currentTarget.style.backgroundColor = 'var(--bg-rollover)'; e.currentTarget.style.borderColor = 'var(--border-interactive-hover)'; }}
+          onMouseOut={e  => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.borderColor = 'var(--border)'; }}
           onClick={() => toast('Changes Applied')}
         >
           Apply
@@ -523,7 +523,7 @@ function ReadOnlyPanel({ content }: { content: InfoTrayContent }) {
       {hasMembersSection && (
         <>
           {/* Divider below member count */}
-          <div className="mx-[24px] shrink-0" style={{ height: 1, backgroundColor: 'var(--border-interactive)' }} />
+          <div className="mx-[24px] shrink-0" style={{ height: 1, backgroundColor: 'var(--border)' }} />
 
           {/* Member list */}
           <div className="flex flex-col pt-[8px] pb-[24px] px-[24px]">
@@ -556,7 +556,7 @@ function MemberRow({ member, isOwner = false }: { member: Account; isOwner?: boo
       style={{
         paddingLeft:     '8px',
         paddingRight:    '8px',
-        backgroundColor: hovered ? 'var(--muted)' : 'transparent',
+        backgroundColor: hovered ? 'var(--bg-rollover)' : 'transparent',
         border:          'none',
         cursor:          'pointer',
         textAlign:       'left',
@@ -575,7 +575,7 @@ function MemberRow({ member, isOwner = false }: { member: Account; isOwner?: boo
           fontSize:      '14px',
           fontWeight:    'var(--font-weight-regular)',
           color:         hovered ? 'var(--primary)' : 'var(--foreground)',
-          letterSpacing: '0.3px',
+          letterSpacing: 'var(--letter-spacing-body)',
           transition:    'color 150ms',
         }}
       >
@@ -594,7 +594,7 @@ function MemberRow({ member, isOwner = false }: { member: Account; isOwner?: boo
           fontSize:      '12px',
           fontWeight:    isOwner ? 'var(--font-weight-medium)' : 'var(--font-weight-regular)',
           color:         isOwner ? 'var(--foreground)' : 'var(--muted-foreground)',
-          letterSpacing: '0.3px',
+          letterSpacing: 'var(--letter-spacing-body)',
           whiteSpace:    'nowrap',
           width:         '76px',
           textAlign:     'right',
@@ -617,7 +617,7 @@ function EmptyPanel() {
         fontWeight:  'var(--font-weight-regular)',
         color:       'var(--muted-foreground)',
         textAlign:   'center',
-        letterSpacing: '0.3px',
+        letterSpacing: 'var(--letter-spacing-body)',
       }}>
         Select a row to view details
       </span>
@@ -632,7 +632,7 @@ const labelStyle: React.CSSProperties = {
   fontSize:      '15px',
   fontWeight:    'var(--font-weight-semibold)',
   color:         'var(--foreground)',
-  letterSpacing: '0.3px',
+  letterSpacing: 'var(--letter-spacing-body)',
   whiteSpace:    'nowrap',
 };
 
@@ -647,7 +647,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
         fontSize:      '15px',
         fontWeight:    'var(--font-weight-regular)',
         color:         'var(--foreground)',
-        letterSpacing: '0.3px',
+        letterSpacing: 'var(--letter-spacing-body)',
         maxWidth:      '200px',
         overflow:      'hidden',
         textOverflow:  'ellipsis',
@@ -672,7 +672,7 @@ function DropdownTrigger({ children, onClick, isOpen = false }: { children: Reac
       aria-haspopup="listbox"
       className="flex items-center justify-between w-full h-[40px] pl-[6px] pr-[12px] rounded-[12px] transition-colors"
       style={{
-        border:          `1px solid ${hovered ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}`,
+        border:          `1px solid ${hovered ? 'var(--border-interactive-hover)' : 'var(--border)'}`,
         backgroundColor: 'transparent',
         cursor:          'pointer',
       }}
@@ -690,10 +690,10 @@ function TrayDropdownMenu({ children }: { children: React.ReactNode }) {
     <motion.div
       className="absolute left-0 right-0 bg-background p-[8px] z-50"
       style={{
-        border:          '1px solid var(--border-interactive-hover)',
+        border:          '1px solid var(--border)',
         borderRadius:    'var(--radius-16)',
         top:             'calc(100% + 6px)',
-        boxShadow:       '0 8px 24px rgba(0,0,0,0.3)',
+        boxShadow:       'var(--shadow-tray)',
         transformOrigin: 'top center',
       }}
       initial={{ opacity: 0, scaleY: 0.9 }}
@@ -715,8 +715,8 @@ function TrayDropdownItem({ children, selected, onClick }: { children: React.Rea
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="w-full flex items-center justify-between px-[4px] h-[40px] rounded-lg transition-colors"
-      style={{ backgroundColor: hovered ? 'var(--muted)' : 'transparent', border: 'none', cursor: 'pointer' }}
+      className="w-full flex items-center justify-between px-[4px] h-[40px] shrink-0 rounded-lg transition-colors"
+      style={{ backgroundColor: hovered ? 'var(--bg-rollover)' : 'transparent', border: 'none', cursor: 'pointer' }}
     >
       {children}
       {selected && <Check className="size-[14px] shrink-0 ml-[8px]" style={{ color: 'var(--primary)' }} strokeWidth={2.5} />}

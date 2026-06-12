@@ -110,7 +110,7 @@ export function OwnerModal({ account, onClose }: OwnerModalProps) {
               className="relative flex flex-col pointer-events-auto overflow-hidden"
               style={{
                 backgroundColor: 'var(--background)',
-                border:          '1px solid var(--border-interactive)',
+                border:          '1px solid var(--border)',
                 borderRadius:    '16px',
                 width:           '376px',
                 maxHeight:       '80vh',
@@ -154,7 +154,7 @@ export function OwnerModal({ account, onClose }: OwnerModalProps) {
                 {/* Email · Timezone */}
                 <div
                   className="flex flex-col py-[16px] mx-[32px]"
-                  style={{ borderBottom: '1px solid var(--border-interactive)' }}
+                  style={{ borderBottom: '1px solid var(--border)' }}
                 >
                   <InfoRow label="Email"    value={account.email} />
                   <InfoRow label="Timezone" value="Los Angeles (PST)" />

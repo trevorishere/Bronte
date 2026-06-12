@@ -127,15 +127,15 @@ export function DropdownMenu({ items, isOpen, onClose, anchorRef }: DropdownMenu
               style={{
                 fontFamily: 'var(--font-family)',
                 fontWeight: 'var(--font-weight-medium)',
-                fontSize: 'var(--font-size-14)',
+                fontSize: 'var(--font-size-15)',
                 letterSpacing: 'var(--letter-spacing-md)',
                 lineHeight: 'var(--line-height-20)',
                 color: hoveredOption === item.id ? 'var(--primary)' : item.variant === 'danger' ? 'var(--destructive)' : 'var(--foreground)',
-                backgroundColor: hoveredOption === item.id ? 'var(--muted)' : 'transparent',
+                backgroundColor: hoveredOption === item.id ? 'var(--bg-rollover)' : 'transparent',
                 textAlign: 'left',
               }}
             >
-              <div className="size-4" style={{ color: item.variant === 'danger' ? 'var(--destructive)' : 'var(--foreground)' }}>
+              <div className="size-[20px]" style={{ color: item.variant === 'danger' ? 'var(--destructive)' : 'var(--foreground)' }}>
                 {item.icon}
               </div>
               <span>{item.label}</span>
@@ -158,31 +158,31 @@ export const createDefaultMenuItems = (
   {
     id: 'rename',
     label: 'Rename',
-    icon: <Edit3 className="size-4" />,
+    icon: <Edit3 className="size-[20px]" />,
     onClick: onRename,
   },
   {
     id: 'share',
     label: 'Share',
-    icon: <UserRoundPlus className="size-4" />,
+    icon: <UserRoundPlus className="size-[20px]" />,
     onClick: onShare,
   },
   {
     id: 'duplicate',
     label: 'Duplicate',
-    icon: <Copy className="size-4" />,
+    icon: <Copy className="size-[20px]" />,
     onClick: onDuplicate,
   },
   {
     id: 'move',
     label: 'Move',
-    icon: <FolderInput className="size-4" />,
+    icon: <FolderInput className="size-[20px]" />,
     onClick: onMove,
   },
   {
     id: 'delete',
     label: 'Delete',
-    icon: <Trash2 className="size-4" />,
+    icon: <Trash2 className="size-[20px]" />,
     onClick: onDelete,
     variant: 'danger',
   },

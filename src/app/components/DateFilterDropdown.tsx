@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { Calendar, X } from 'lucide-react';
-import { ListFilter } from 'lucide-react';
+import { X, ListFilter } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { DateRangePicker } from './DateRangePicker';
+import { labelVariants, labelBgVariants } from '../constants/animation';
+import { ts } from '../utils/textStyles';
 
 // ── Chevron ──────────────────────────────────────────────────────────────────
 
@@ -12,7 +13,7 @@ function ChevronIcon({ isOpen, isActive }: { isOpen: boolean; isActive: boolean 
       className="flex items-center justify-center shrink-0 size-[16px]"
       style={{
         transform: isActive ? 'translateX(4px)' : 'translateX(0px)',
-        transition: 'transform 300ms cubic-bezier(0.42, 0, 0.58, 1)',
+        transition: 'transform var(--duration-default) var(--ease-standard)',
       }}
     >
       <svg
@@ -23,7 +24,7 @@ function ChevronIcon({ isOpen, isActive }: { isOpen: boolean; isActive: boolean 
         style={{
           transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)',
           color: 'var(--foreground)',
-          transition: 'transform 0.2s ease',
+          transition: 'transform var(--duration-fast) ease',
         }}
       >
         <path
@@ -37,32 +38,6 @@ function ChevronIcon({ isOpen, isActive }: { isOpen: boolean; isActive: boolean 
     </div>
   );
 }
-
-// ── Variant definitions ──────────────────────────────────────────────────────
-
-const labelVariants = {
-  active: {
-    top: -4,
-    left: 12,
-    scale: 0.85,
-    paddingLeft: 4,
-    paddingRight: 4,
-    transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] as const, delay: 0 },
-  },
-  inactive: {
-    top: 24,
-    left: 44,
-    scale: 1,
-    paddingLeft: 0,
-    paddingRight: 0,
-    transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] as const, delay: 0.05 },
-  },
-};
-
-const labelBgVariants = {
-  active:   { opacity: 1, transition: { duration: 0.5, delay: 0    } },
-  inactive: { opacity: 0, transition: { duration: 0.5, delay: 0.05 } },
-};
 
 // ── Component ────────────────────────────────────────────────────────────────
 
@@ -86,6 +61,7 @@ export function DateFilterDropdown({
 }: DateFilterDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isChipXHovered, setIsChipXHovered] = useState(false);
   const [panelPos, setPanelPos] = useState({ top: 0, left: 0 });
   const triggerRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -132,7 +108,7 @@ export function DateFilterDropdown({
   const handleToggle = () => {
     if (!isOpen && triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
-      setPanelPos({ top: rect.bottom + 4, left: rect.left });
+      setPanelPos({ top: rect.bottom + 8, left: rect.left });
     }
     setIsOpen(prev => !prev);
   };
@@ -147,20 +123,18 @@ export function DateFilterDropdown({
       {/* ── TRIGGER BUTTON ───────────────────────────────────────────────── */}
       <motion.button
         layout
-        className="relative flex h-[48px] items-center bg-background group overflow-visible"
+        className="relative flex h-[40px] items-center bg-background group overflow-visible"
         aria-expanded={isOpen}
         aria-haspopup="dialog"
         style={{
-          borderWidth: '1px',
-          borderStyle: 'solid',
-          borderColor: (isHovered || isOpen)
-            ? 'var(--border-interactive-hover)'
-            : 'var(--border-interactive)',
           borderRadius: 'var(--radius-12)',
           minWidth: 'fit-content',
+          boxShadow: (isHovered || isOpen)
+            ? '0 0 0 1px var(--border-interactive-hover)'
+            : '0 0 0 1px var(--border)',
           transition: isActive
-            ? 'border-color 300ms cubic-bezier(0.42, 0, 0.58, 1) 200ms'
-            : 'border-color 300ms cubic-bezier(0.42, 0, 0.58, 1)',
+            ? `box-shadow var(--duration-default) var(--ease-standard) var(--duration-fast)`
+            : `box-shadow var(--duration-default) var(--ease-standard)`,
         }}
         transition={{
           layout: { type: 'spring', bounce: 0, duration: 0.5 },
@@ -172,18 +146,9 @@ export function DateFilterDropdown({
         {/* ── BUTTON CONTENT ───────────────────────────────────────────── */}
         <div
           className="flex items-center h-full"
-          style={{ paddingLeft: '16px', paddingRight: '16px', gap: '12px' }}
+          style={{ paddingLeft: isActive ? '8px' : '14px', paddingRight: '12px', gap: '12px' }}
         >
-          {/* Icon — layout wrapper cancels parent scaleX; always 16px from left */}
-          <motion.div layout className="shrink-0 flex items-center justify-center size-[18px]">
-            <ListFilter
-              className="size-[18px]"
-              style={{ color: 'var(--muted-foreground)' }}
-              strokeWidth={2}
-            />
-          </motion.div>
-
-          {/* Middle slot: chip (active) or hidden spacer (inactive) */}
+          {/* Middle slot: chip (active) or icon+label spacer (inactive) */}
           <AnimatePresence mode="wait" onExitComplete={onAnimationComplete}>
             {isActive ? (
               <motion.div
@@ -198,26 +163,21 @@ export function DateFilterDropdown({
                 <div
                   className="flex items-center shrink-0"
                   style={{
-                    height: '32px',
-                    backgroundColor: 'var(--bg-row-selected)',
-                    border: '1px solid color-mix(in srgb, var(--border-interactive) 70%, transparent)',
-                    borderRadius: '8px',
+                    height: '28px',
+                    backgroundColor: 'var(--bg-selected)',
+                    border: '1px solid color-mix(in srgb, var(--border) 70%, transparent)',
+                    borderRadius: 'var(--radius-8)',
                     paddingLeft: '12px',
-                    paddingRight: '8px',
-                    gap: '8px',
+                    paddingRight: '4px',
+                    gap: '12px',
                   }}
                 >
-                  <Calendar
-                    className="size-[14px] shrink-0"
-                    style={{ color: 'var(--foreground)' }}
-                    strokeWidth={2}
-                  />
                   <span
                     className="truncate"
                     style={{
                       fontFamily: 'var(--font-family)',
                       fontWeight: 'var(--font-weight-medium)',
-                      fontSize: 'var(--font-size-15)',
+                      fontSize: 'var(--font-size-14)',
                       color: 'var(--foreground)',
                       whiteSpace: 'nowrap',
                       maxWidth: '200px',
@@ -227,8 +187,15 @@ export function DateFilterDropdown({
                   </span>
                   <div
                     onClick={clearSelection}
-                    className="flex items-center justify-center size-[16px] rounded cursor-pointer opacity-70 hover:opacity-100 transition-opacity shrink-0"
-                    style={{ pointerEvents: 'auto' }}
+                    onMouseEnter={() => setIsChipXHovered(true)}
+                    onMouseLeave={() => setIsChipXHovered(false)}
+                    className="flex items-center justify-center p-[4px] rounded-[4px] cursor-pointer shrink-0"
+                    style={{
+                      pointerEvents: 'auto',
+                      opacity: isChipXHovered ? 1 : 0.7,
+                      backgroundColor: isChipXHovered ? 'var(--bg-icon-hover)' : 'transparent',
+                      transition: 'opacity var(--duration-default) var(--ease-standard), background-color var(--duration-default) var(--ease-standard)',
+                    }}
                   >
                     <X className="size-[12px]" style={{ color: 'var(--foreground)' }} strokeWidth={2.5} />
                   </div>
@@ -244,20 +211,28 @@ export function DateFilterDropdown({
                 className="shrink-0"
                 exit={{ opacity: 0, transition: { duration: 0.2 } }}
               >
-                <span
+                {/* Invisible spacer — reserves same width as floating icon+label */}
+                <div
                   aria-hidden="true"
                   style={{
                     visibility: 'hidden',
-                    fontFamily: 'var(--font-family)',
-                    fontWeight: 'var(--font-weight-regular)',
-                    fontSize: 'var(--font-size-15)',
-                    letterSpacing: 'var(--letter-spacing-md)',
-                    whiteSpace: 'nowrap',
-                    display: 'block',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
                   }}
                 >
-                  {label}
-                </span>
+                  <span style={{ display: 'block', width: '20px', height: '20px', flexShrink: 0 }} />
+                  <span
+                    style={{
+                      ...ts.body,
+                      fontSize: 'var(--font-size-15)',
+                      whiteSpace: 'nowrap',
+                      display: 'block',
+                    }}
+                  >
+                    {label}
+                  </span>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -284,6 +259,8 @@ export function DateFilterDropdown({
           transformOrigin: 'left center',
           pointerEvents: 'none',
           zIndex: 10,
+          display: 'flex',
+          alignItems: 'center',
         }}
       >
         {/* Background — fades in to create the border-cut effect */}
@@ -299,21 +276,35 @@ export function DateFilterDropdown({
             zIndex: -1,
           }}
         />
+        {/* Filter icon — animates up with the label as a nav-item-style unit */}
+        <ListFilter
+          className="shrink-0"
+          style={{
+            width: isActive ? '15px' : '20px',
+            height: isActive ? '15px' : '20px',
+            marginRight: isActive ? '6px' : '12px',
+            color: isActive ? 'var(--border-interactive-hover)' : (isHovered || isOpen) ? 'var(--primary)' : 'var(--foreground)',
+            transition: isActive
+              ? `color var(--duration-default) var(--ease-standard), width var(--duration-default) var(--ease-standard), height var(--duration-default) var(--ease-standard), margin-right var(--duration-default) var(--ease-standard)`
+              : `color var(--duration-default) var(--ease-standard) 50ms, width var(--duration-default) var(--ease-standard) 50ms, height var(--duration-default) var(--ease-standard) 50ms, margin-right var(--duration-default) var(--ease-standard) 50ms`,
+          }}
+          strokeWidth={2}
+        />
         {/* Label text */}
         <span
           style={{
             position: 'relative',
             fontFamily: 'var(--font-family)',
-            fontWeight: 'var(--font-weight-regular)',
-            fontSize: 'var(--font-size-15)',
-            letterSpacing: 'var(--letter-spacing-md)',
+            fontWeight: isActive ? 'var(--font-weight-regular)' : 'var(--font-weight-medium)',
+            fontSize: isActive ? '14px' : 'var(--font-size-15)',
+            letterSpacing: 'var(--letter-spacing-body)',
             lineHeight: 'var(--line-height-20)',
             whiteSpace: 'nowrap',
             display: 'block',
-            color: isActive ? 'var(--border-interactive)' : 'var(--foreground)',
+            color: isActive ? 'var(--border-interactive-hover)' : (isHovered || isOpen) ? 'var(--primary)' : 'var(--foreground)',
             transition: isActive
-              ? 'color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms'
-              : 'color 300ms cubic-bezier(0.4, 0, 0.2, 1) 50ms',
+              ? `color var(--duration-default) var(--ease-standard), font-size var(--duration-default) var(--ease-standard), font-weight var(--duration-default) var(--ease-standard)`
+              : `color var(--duration-default) var(--ease-standard) 50ms, font-size var(--duration-default) var(--ease-standard) 50ms, font-weight var(--duration-default) var(--ease-standard) 50ms`,
           }}
         >
           {label}
@@ -325,12 +316,15 @@ export function DateFilterDropdown({
         {isOpen && (
           <motion.div
             ref={panelRef}
+            className="pb-[8px]"
             style={{
               position: 'fixed',
               top: panelPos.top,
               left: panelPos.left,
               zIndex: 9999,
               transformOrigin: 'top center',
+              border: `1px solid var(--border)`,
+              borderRadius: 'var(--radius-16)',
             }}
             initial={{ opacity: 0, scaleY: 0 }}
             animate={{ opacity: 1, scaleY: 1 }}

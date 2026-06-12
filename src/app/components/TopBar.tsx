@@ -3,6 +3,7 @@ import { ReactNode, useRef, useState, useEffect, cloneElement, isValidElement } 
 import { useNavigate } from 'react-router';
 import { ActionButtons } from './ActionButtons';
 import { IconButton } from './IconButton';
+import type { IconSize } from './BaseIcon';
 import type { BreadcrumbEntry } from '../contexts/NavigationContext';
 
 // ============================================================
@@ -12,9 +13,11 @@ import type { BreadcrumbEntry } from '../contexts/NavigationContext';
 //   Line 1 — ancestor trail (chevrons between, none after last)
 //   Line 2 — current page title
 // ============================================================
-function BreadcrumbNav({ entries, titleSuffix, ancMaxLen = 14, badgeIconOnly = false, isMobile = false }: {
+function BreadcrumbNav({ entries, titleSuffix, titleIcon, ancMaxLen = 14, badgeIconOnly = false, isMobile = false }: {
   entries: BreadcrumbEntry[];
   titleSuffix?: ReactNode;
+  /** Icon rendered to the left of the page title. Receives 'large' on desktop, 'medium' on mobile. */
+  titleIcon?: (size: IconSize) => ReactNode;
   ancMaxLen?: number;
   badgeIconOnly?: boolean;
   isMobile?: boolean;
@@ -94,22 +97,27 @@ function BreadcrumbNav({ entries, titleSuffix, ancMaxLen = 14, badgeIconOnly = f
           })}
         </div>
       )}
-      {/* Row 2: current page title */}
-      <div className="flex items-center gap-[8px] min-w-0 overflow-hidden">
-        <h1
-          className="font-medium truncate min-w-0"
-          style={{ fontFamily: 'var(--font-family)', fontSize: '24px', color: 'var(--primary)', letterSpacing: 'var(--letter-spacing-md)', lineHeight: 'normal' }}
-          title={current.label}
-        >
-          {current.label}
-        </h1>
-        {titleSuffix && (
-          <span className="shrink-0">
-            {isValidElement(titleSuffix)
-              ? cloneElement(titleSuffix as React.ReactElement<{ iconOnly?: boolean }>, { iconOnly: badgeIconOnly })
-              : titleSuffix}
-          </span>
+      {/* Row 2: icon + current page title + suffix */}
+      <div className="flex items-center min-w-0 overflow-hidden" style={{ gap: '16px' }}>
+        {titleIcon && (
+          <div className="shrink-0">{titleIcon('medium')}</div>
         )}
+        <div className="flex items-center gap-[8px] min-w-0 overflow-hidden">
+          <h1
+            className="font-medium truncate min-w-0"
+            style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-24)', color: 'var(--primary)', letterSpacing: 'var(--letter-spacing-md)', lineHeight: 'normal' }}
+            title={current.label}
+          >
+            {current.label}
+          </h1>
+          {titleSuffix && (
+            <span className="shrink-0">
+              {isValidElement(titleSuffix)
+                ? cloneElement(titleSuffix as React.ReactElement<{ iconOnly?: boolean }>, { iconOnly: badgeIconOnly })
+                : titleSuffix}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -130,6 +138,8 @@ interface TopBarProps {
   mobileActions?: ReactNode;
   /** Node rendered after the current page label in the breadcrumb (e.g. a role pill) */
   titleSuffix?: ReactNode;
+  /** Icon rendered to the left of the page title. Receives 'large' on desktop, 'medium' on mobile. */
+  titleIcon?: (size: IconSize) => ReactNode;
   /** Full breadcrumb trail including current page as last item. When provided, replaces the back button. */
   breadcrumbs?: BreadcrumbEntry[];
   /** Called when the Info button is clicked */
@@ -155,6 +165,7 @@ export function TopBar({
   onViewModeChange,
   mobileActions,
   titleSuffix,
+  titleIcon,
   breadcrumbs,
   onInfoClick,
   onShareClick,
@@ -178,7 +189,7 @@ export function TopBar({
         style={{
           fontFamily: 'var(--font-family)',
           fontWeight: 'var(--font-weight-regular)',
-          fontSize: '14px',
+          fontSize: 'var(--font-size-14)',
           color: 'var(--muted-foreground)',
           letterSpacing: 'var(--letter-spacing-md)',
           lineHeight: 'normal',
@@ -196,6 +207,8 @@ export function TopBar({
   const leftRef = useRef<HTMLDivElement>(null);
   const [ancMaxLen, setAncMaxLen] = useState(14);
   const [badgeIconOnly, setBadgeIconOnly] = useState(false);
+  const [isShareHovered, setIsShareHovered] = useState(false);
+  const [isInfoHovered, setIsInfoHovered] = useState(false);
 
   useEffect(() => {
     if (!leftRef.current) return;
@@ -227,30 +240,33 @@ export function TopBar({
       className="shrink-0 w-full"
       style={{
         backgroundColor: 'var(--background)',
-        borderBottom: /*showBorder ? '1px solid var(--border)' :*/ 'none',
+        borderBottom: /*showBorder ? '1px solid var(--border-interactive)' :*/ 'none',
       }}
     >
       {/* ================================================================ */}
       {/* MOBILE LAYOUT                                                    */}
       {/* ================================================================ */}
-      <div className="md:hidden flex items-center gap-1 pt-[20px] pb-[24px] px-[16px] w-full">
+      <div className="md:hidden flex items-center gap-1 pt-[28px] pb-[24px] px-[16px] w-full">
         <div className="flex items-center flex-1 min-w-0 gap-[10px] overflow-hidden">
           {hasBreadcrumbs ? (
-            <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} ancMaxLen={ancMaxLen} badgeIconOnly={badgeIconOnly} isMobile={true} />
+            <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} titleIcon={titleIcon} ancMaxLen={ancMaxLen} badgeIconOnly={badgeIconOnly} isMobile={true} />
           ) : showBackButton ? (
             backBtn()
           ) : title ? (
-            <h1
-              className="truncate text-[24px] font-medium"
-              style={{
-                fontFamily: 'var(--font-family)',
-                lineHeight: 'normal',
-                color: 'var(--primary)',
-                letterSpacing: 'var(--letter-spacing-md)',
-              }}
-            >
-              {title}
-            </h1>
+            <div className="flex items-center min-w-0 overflow-hidden" style={{ gap: '16px' }}>
+              {titleIcon && <div className="shrink-0">{titleIcon('medium')}</div>}
+              <h1
+                className="truncate text-[24px] font-medium"
+                style={{
+                  fontFamily: 'var(--font-family)',
+                  lineHeight: 'normal',
+                  color: 'var(--primary)',
+                  letterSpacing: 'var(--letter-spacing-md)',
+                }}
+              >
+                {title}
+              </h1>
+            </div>
           ) : null}
         </div>
 
@@ -264,24 +280,27 @@ export function TopBar({
       {/* ================================================================ */}
       {/* DESKTOP LAYOUT                                                   */}
       {/* ================================================================ */}
-      <div className="hidden md:flex items-start gap-[24px] pt-[20px] pb-[16px] pl-[24px] pr-[24px] w-full">
+      <div className="hidden md:flex items-start gap-[24px] pt-[28px] pb-[8px] pl-[24px] pr-[24px] w-full">
         <div ref={leftRef} className="flex items-center flex-1 min-w-0 gap-[16px] overflow-hidden">
           {hasBreadcrumbs ? (
-            <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} ancMaxLen={ancMaxLen} badgeIconOnly={badgeIconOnly} />
+            <BreadcrumbNav entries={breadcrumbs} titleSuffix={titleSuffix} titleIcon={titleIcon} ancMaxLen={ancMaxLen} badgeIconOnly={badgeIconOnly} />
           ) : showBackButton ? (
             backBtn()
           ) : title ? (
-            <h1
-              className="truncate text-[24px] font-medium"
-              style={{
-                fontFamily: 'var(--font-family)',
-                lineHeight: 'normal',
-                color: 'var(--primary)',
-                letterSpacing: 'var(--letter-spacing-md)',
-              }}
-            >
-              {title}
-            </h1>
+            <div className="flex items-center min-w-0 overflow-hidden" style={{ gap: '16px' }}>
+              {titleIcon && <div className="shrink-0">{titleIcon('medium')}</div>}
+              <h1
+                className="truncate text-[24px] font-medium"
+                style={{
+                  fontFamily: 'var(--font-family)',
+                  lineHeight: 'normal',
+                  color: 'var(--primary)',
+                  letterSpacing: 'var(--letter-spacing-md)',
+                }}
+              >
+                {title}
+              </h1>
+            </div>
           ) : null}
         </div>
 
@@ -289,15 +308,15 @@ export function TopBar({
         <div className="flex items-center gap-[8px] shrink-0 mt-[-2px]">
           {!hideShare && (
           <button
-            className="flex items-center gap-[8px] h-[40px] rounded-[12px] transition-colors"
-            style={{ border: '1px solid var(--border-interactive)', paddingLeft: '12px', paddingRight: '12px', paddingTop: '1px', paddingBottom: '1px', backgroundColor: 'transparent', cursor: 'pointer' }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            className="flex items-center gap-[8px] h-[40px] rounded-[12px]"
+            style={{ border: `1px solid ${isShareHovered ? 'var(--border-interactive-hover)' : 'var(--border)'}`, paddingLeft: '12px', paddingRight: '12px', paddingTop: '1px', paddingBottom: '1px', backgroundColor: isShareHovered ? 'var(--bg-rollover)' : 'transparent', color: isShareHovered ? 'var(--primary)' : 'var(--foreground)', cursor: 'pointer', transition: `background-color var(--transition-duration) var(--transition-timing), color var(--transition-duration) var(--transition-timing), border-color var(--transition-duration) var(--transition-timing)` }}
+            onMouseEnter={() => setIsShareHovered(true)}
+            onMouseLeave={() => setIsShareHovered(false)}
             title="Share"
             onClick={onShareClick}
           >
-            <UserRoundPlus className="size-[18px] shrink-0" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2} />
-            <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: '15px', letterSpacing: '0.32px', color: 'var(--secondary-foreground)', whiteSpace: 'nowrap' }}>Share</span>
+            <UserRoundPlus className="size-[18px] shrink-0" style={{ color: isShareHovered ? 'var(--icon-nav-hover)' : 'var(--muted-foreground)', transition: `color var(--transition-duration) var(--transition-timing)` }} strokeWidth={2} />
+            <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-15)', letterSpacing: 'var(--letter-spacing-button)', whiteSpace: 'nowrap' }}>Share</span>
             {shareCount > 0 && (
               <div style={{
                 width: 24,
@@ -309,7 +328,7 @@ export function TopBar({
                 justifyContent: 'center',
                 fontFamily: 'var(--font-family)',
                 fontWeight: 600,
-                fontSize: '13px',
+                fontSize: 'var(--font-size-13)',
                 lineHeight: '20px',
                 color: 'var(--foreground)',
                 flexShrink: 0,
@@ -321,14 +340,14 @@ export function TopBar({
           )}
           {!hideInfo && (
           <button
-            className="flex items-center justify-center size-[40px] rounded-[12px] transition-colors"
-            style={{ border: '1px solid var(--border-interactive)', paddingLeft: '13px', paddingRight: '13px', paddingTop: '1px', paddingBottom: '1px', backgroundColor: 'transparent', cursor: 'pointer' }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            className="flex items-center justify-center size-[40px] rounded-[12px]"
+            style={{ border: `1px solid ${isInfoHovered ? 'var(--border-interactive-hover)' : 'var(--border)'}`, paddingLeft: '13px', paddingRight: '13px', paddingTop: '1px', paddingBottom: '1px', backgroundColor: isInfoHovered ? 'var(--bg-rollover)' : 'transparent', color: isInfoHovered ? 'var(--primary)' : 'var(--foreground)', cursor: 'pointer', transition: `background-color var(--transition-duration) var(--transition-timing), color var(--transition-duration) var(--transition-timing), border-color var(--transition-duration) var(--transition-timing)` }}
+            onMouseEnter={() => setIsInfoHovered(true)}
+            onMouseLeave={() => setIsInfoHovered(false)}
             title="Info"
             onClick={onInfoClick}
           >
-            <Info className="size-[18px] shrink-0" style={{ color: 'var(--secondary-foreground)' }} strokeWidth={2} />
+            <Info className="size-[18px] shrink-0" strokeWidth={2} />
           </button>
           )}
         </div>

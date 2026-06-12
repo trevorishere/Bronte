@@ -1,8 +1,10 @@
-import { Star, Clock, UserRoundPlus, ShieldUser, Search, PanelLeftClose, X } from 'lucide-react';
+import { Star, Clock, UserRoundPlus, ShieldUser, PanelLeftClose, X } from 'lucide-react';
 import { IconButton } from './IconButton';
 import { getWorkspaceInitials } from './WorkspaceIcon';
+import { SearchInput } from './SearchInput';
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
+import { ts } from '../utils/textStyles';
 
 interface WorkspaceItem {
   id: string;
@@ -70,17 +72,17 @@ export function Sidebar({
     activeItem === id || hoveredItem === id ? 'var(--primary)' : 'var(--foreground)';
 
   const navBg = (id: string) =>
-    activeItem === id ? 'var(--accent)'
+    activeItem === id ? 'var(--bg-selected)'
     : hoveredItem === id ? 'var(--bg-nav-hover)'
     : 'transparent';
 
   const textFade: React.CSSProperties = {
     opacity: isDesktopOpen ? 1 : 0,
-    transition: 'opacity 0.12s ease, color 300ms cubic-bezier(0.42, 0, 0.58, 1)',
+    transition: 'opacity var(--duration-micro) ease, color var(--duration-default) var(--ease-standard)',
   };
 
-  const navTransition = 'background-color 300ms cubic-bezier(0.42, 0, 0.58, 1)';
-  const colorTransition = 'color 300ms cubic-bezier(0.42, 0, 0.58, 1)';
+  const navTransition = 'background-color var(--duration-default) var(--ease-standard)';
+  const colorTransition = 'color var(--duration-default) var(--ease-standard)';
 
   const sidebarBody = (
     <nav aria-label="Sidebar navigation" className="flex flex-col h-full pt-[20px] pb-[24px]">
@@ -91,7 +93,7 @@ export function Sidebar({
         {!isDesktopOpen && (
           <div className="hidden md:flex h-[40px] items-center mb-[12px] mt-[-4px]">
             <IconButton
-              icon={<PanelLeftClose className="size-[20px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
+              icon={<PanelLeftClose className="size-[20px]" style={{ color: 'var(--border-interactive)' }} strokeWidth={2} />}
               onClick={onDesktopToggle}
               size={40}
               rounded="full"
@@ -105,7 +107,7 @@ export function Sidebar({
         <div className={`flex items-center justify-between pb-[24px] pl-[12px] ${!isDesktopOpen ? 'flex md:hidden' : 'flex'}`}>
           <div
             className="h-[40px] flex items-center"
-            style={{ fontFamily: 'Aleo, serif', fontWeight: 700, fontSize: '22px', letterSpacing: '0.3px', color: 'var(--primary)', whiteSpace: 'nowrap' }}
+            style={{ fontFamily: 'Aleo, serif', fontWeight: 700, fontSize: 'var(--font-size-22)', letterSpacing: 'var(--letter-spacing-body)', color: 'var(--primary)', whiteSpace: 'nowrap' }}
           >
             Bronte
           </div>
@@ -120,7 +122,7 @@ export function Sidebar({
           {/* Desktop collapse */}
           <div className="hidden md:flex items-center justify-center w-[52px] h-[40px] mt-[-4px]">
             <IconButton
-              icon={<PanelLeftClose className="size-[20px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
+              icon={<PanelLeftClose className="size-[20px]" style={{ color: 'var(--border-interactive)' }} strokeWidth={2} />}
               onClick={onDesktopToggle}
               size={40}
               rounded="full"
@@ -131,31 +133,13 @@ export function Sidebar({
         </div>
 
         {/* Search — decorative placeholder, no function yet */}
-        <div className="pr-[16px] pt-[16px]" style={textFade} aria-hidden="true">
-          <div
-            className="flex items-center gap-[12px] px-[12px] py-[10px] rounded-[12px] transition-colors duration-150"
-            style={{
-              border: '1px solid var(--border-interactive)',
-              cursor: 'default',
-              backgroundColor: hoveredItem === 'search' ? 'var(--bg-nav-hover)' : 'transparent',
-            }}
-            onMouseEnter={() => setHoveredItem('search')}
-            onMouseLeave={() => setHoveredItem(null)}
-          >
-            <Search className="size-[20px] shrink-0" style={{ color: hoveredItem === 'search' ? 'var(--icon-nav-hover)' : 'var(--muted-foreground)' }} strokeWidth={2} />
-            <span style={{
-              fontFamily: 'var(--font-family)',
-              fontWeight: 'var(--font-weight-medium)',
-              fontSize: 'var(--font-size-15)',
-              letterSpacing: '0.3px',
-              color: hoveredItem === 'search' ? 'var(--primary)' : 'var(--muted-foreground)',
-              whiteSpace: 'nowrap',
-              lineHeight: '20px',
-              transition: 'color 150ms ease',
-            }}>
-              Search
-            </span>
-          </div>
+        <div className="pr-[16px] pt-[12px]" style={textFade} aria-hidden="true">
+          <SearchInput
+            readOnly
+            placeholder="Search"
+            tabIndex={-1}
+            containerClassName="cursor-default"
+          />
         </div>
       </div>
 
@@ -184,10 +168,7 @@ export function Sidebar({
                   {item.icon === 'UserRoundPlus' && <UserRoundPlus className="size-full" style={{ color: iconColor(item.id), transition: colorTransition }} />}
                 </div>
                 <p style={{
-                  fontFamily: 'var(--font-family)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  fontSize: 'var(--font-size-15)',
-                  letterSpacing: '0.3px',
+                  ...ts.body,
                   lineHeight: '20px',
                   color: textColor(item.id),
                   whiteSpace: 'nowrap',
@@ -254,7 +235,7 @@ export function Sidebar({
                         fontFamily: 'var(--font-family)',
                         fontWeight: 'var(--font-weight-semibold)',
                         fontSize: 'var(--font-size-8)',
-                        letterSpacing: '0.3px',
+                        letterSpacing: 'var(--letter-spacing-body)',
                         color: iconColor(workspace.id),
                         whiteSpace: 'nowrap',
                         transition: colorTransition,
@@ -265,10 +246,7 @@ export function Sidebar({
                   </div>
                   <div className="flex-1 min-w-0" style={textFade}>
                     <p style={{
-                      fontFamily: 'var(--font-family)',
-                      fontWeight: 'var(--font-weight-medium)',
-                      fontSize: 'var(--font-size-15)',
-                      letterSpacing: '0.3px',
+                      ...ts.body,
                       lineHeight: '20px',
                       color: textColor(workspace.id),
                       whiteSpace: 'nowrap',
@@ -309,10 +287,7 @@ export function Sidebar({
                 <ShieldUser className="size-full" style={{ color: iconColor('admin'), transition: colorTransition }} />
               </div>
               <p style={{
-                fontFamily: 'var(--font-family)',
-                fontWeight: 'var(--font-weight-medium)',
-                fontSize: 'var(--font-size-15)',
-                letterSpacing: '0.3px',
+                ...ts.body,
                 lineHeight: '20px',
                 color: textColor('admin'),
                 whiteSpace: 'nowrap',
@@ -344,14 +319,11 @@ export function Sidebar({
                 className="shrink-0 size-[24px] rounded-full flex items-center justify-center"
                 style={{ backgroundColor: 'var(--bg-account-avatar)' }}
               >
-                <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'bold', fontSize: 'var(--font-size-10)', lineHeight: 1, color: 'white', letterSpacing: '0.5px' }}>LD</span>
+                <span style={{ fontFamily: 'var(--font-family)', fontWeight: 'bold', fontSize: 'var(--font-size-10)', lineHeight: 1, color: 'white', letterSpacing: 'var(--letter-spacing-icon)' }}>LD</span>
               </div>
               <div className="flex-1 min-w-0" style={textFade}>
                 <p className="truncate" style={{
-                  fontFamily: 'var(--font-family)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  fontSize: 'var(--font-size-15)',
-                  letterSpacing: '0.3px',
+                  ...ts.body,
                   lineHeight: '18px',
                   color: textColor('account'),
                   textAlign: 'left',
@@ -381,7 +353,7 @@ export function Sidebar({
         animate={{ width: isDesktopOpen ? EXPANDED_WIDTH : COLLAPSED_WIDTH }}
         initial={false}
         transition={{ type: 'spring', stiffness: 320, damping: 32 }}
-        style={{ borderRight: '1px solid var(--border-interactive)' }}
+        style={{ borderRight: '1px solid var(--border)' }}
       >
         <div style={{ width: EXPANDED_WIDTH, height: '100%' }}>
           {sidebarBody}
@@ -396,7 +368,7 @@ export function Sidebar({
           transform transition-transform duration-300 ease-in-out
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
-        style={{ borderRight: '1px solid var(--border-interactive)' }}
+        style={{ borderRight: '1px solid var(--border)' }}
       >
         {sidebarBody}
       </div>

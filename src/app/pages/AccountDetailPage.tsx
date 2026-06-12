@@ -93,14 +93,14 @@ export function AccountDetailPage() {
         return {
           columns: [
             { key: 'name', label: 'Project Name', sortable: true, width: 'w-[400px]' },
-            { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
             { key: 'lastModified', label: 'Last Modified', sortable: true, width: 'w-[200px]' },
             { key: 'accountCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
+            { key: 'progress', label: 'Progress', sortable: true, width: 'w-[200px]' },
           ] as Column[],
           data: accountProjects.map(project => ({
             id: project.id,
             name: project.name,
-            owner: project.owner,
+            progress: project.progress,
             lastModified: project.lastModified,
             workspace: project.workspace,
             iconType: 'project' as const,
@@ -165,10 +165,7 @@ export function AccountDetailPage() {
     switch (activeTab) {
       case 'Projects':
         return [
-          {
-            label: 'Owner',
-            options: Array.from(new Set(data.map(d => d.owner as string))).sort()
-          },
+          { label: 'Progress', options: ['Not Started', 'In Progress', 'In Review', 'Done'] },
           {
             label: 'Last Modified',
             type: 'date' as const
@@ -209,11 +206,10 @@ export function AccountDetailPage() {
 
   // Apply filters to data
   const filteredData = data.filter(row => {
-    // Apply owner filter for projects
-    if (activeTab === 'Projects' && selectedFilters['Owner'] && selectedFilters['Owner'].length > 0) {
-      if (!selectedFilters['Owner'].includes(row.owner as string)) {
-        return false;
-      }
+    // Apply Progress filter for Projects
+    if (activeTab === 'Projects' && selectedFilters['Progress'] && selectedFilters['Progress'].length > 0) {
+      const normalizedProgress = (row.progress as string || '').replace(/\s*\(\d+%\)$/, '');
+      if (!selectedFilters['Progress'].includes(normalizedProgress)) return false;
     }
 
     // Apply Last Modified date filter for Projects
@@ -279,11 +275,11 @@ export function AccountDetailPage() {
           isDarkMode={isDarkMode}
           breadcrumbs={[...ancestors, { label: account.name, path: `/admin/account/${accountId}` }]}
           titleSuffix={<RoleBadge role={account.role} />}
+          titleIcon={(size) => <Avatar size={size} name={account.name} role={account.role} />}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           onInfoClick={() => setIsTrayOpen(prev => !prev)}
-          onShareClick={() => setIsShareOpen(true)}
-          shareCount={getExtraCount(account.id)}
+          hideShare
         />
 
       {/* Account header */}
@@ -295,7 +291,6 @@ export function AccountDetailPage() {
           { icon: 'email', label: account.email },
           { icon: 'calendar', label: `Joined ${account.created}` }
         ]}
-        onShareClick={() => setIsShareOpen(true)}
         onInfoClick={() => setIsTrayOpen(prev => !prev)}
       />
 

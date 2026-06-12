@@ -90,7 +90,7 @@ function DrawerChrome({ isOpen, onClose, title, subtitle, titleId, maxHeight, ch
                 id={titleId}
                 style={{
                   fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-semibold)',
-                  fontSize: '22px', lineHeight: 'normal', color: 'var(--primary)',
+                  fontSize: 'var(--font-size-22)', lineHeight: 'normal', color: 'var(--primary)',
                 }}
               >
                 {title}
@@ -173,7 +173,7 @@ export function RenameActionDrawer({ isOpen, row, onClose, onConfirm }: RenameAc
         <div className="flex flex-col gap-[8px]">
           <label style={{
             fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)',
-            fontSize: '11px', color: 'var(--muted-foreground)',
+            fontSize: 'var(--font-size-11)', color: 'var(--muted-foreground)',
           }}>
             New Name
           </label>
@@ -201,7 +201,7 @@ export function RenameActionDrawer({ isOpen, row, onClose, onConfirm }: RenameAc
                 onClick={() => { setValue(''); inputRef.current?.focus(); }}
                 className="absolute right-[10px] flex items-center justify-center size-[20px] rounded-full"
                 style={{ backgroundColor: 'transparent' }}
-                onMouseOver={e => (e.currentTarget.style.backgroundColor = 'var(--muted)')}
+                onMouseOver={e => (e.currentTarget.style.backgroundColor = 'var(--bg-rollover)')}
                 onMouseOut={e => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 <X className="size-[12px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2.5} />
@@ -265,7 +265,7 @@ interface MoveActionDrawerProps {
 function SmallWorkspaceIcon() {
   return (
     <div className="flex items-center justify-center rounded-[4px] shrink-0"
-      style={{ width: 18, height: 18, backgroundColor: 'var(--muted)', border: '1px solid var(--border-interactive)' }}>
+      style={{ width: 18, height: 18, backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }}>
       <FolderOpen style={{ width: 11, height: 11, color: 'var(--secondary-foreground)' }} />
     </div>
   );
@@ -343,10 +343,10 @@ export function MoveActionDrawer({ isOpen, row, onClose, onConfirm }: MoveAction
             height: '40px',
             paddingLeft: `${12 + depth * 20}px`,
             paddingRight: '12px',
-            backgroundColor: isSelected ? 'var(--accent)' : 'transparent',
+            backgroundColor: isSelected ? 'var(--bg-selected)' : 'transparent',
           }}
           onClick={() => setSelectedId(node.id)}
-          onMouseOver={e => { if (!isSelected) e.currentTarget.style.backgroundColor = 'var(--muted)'; }}
+          onMouseOver={e => { if (!isSelected) e.currentTarget.style.backgroundColor = 'var(--bg-rollover)'; }}
           onMouseOut={e => { if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent'; }}
         >
           <div
@@ -370,7 +370,7 @@ export function MoveActionDrawer({ isOpen, row, onClose, onConfirm }: MoveAction
             {node.label}
           </span>
           {isCurrentLocation && (
-            <span style={{ fontFamily: 'var(--font-family)', fontSize: '12px', color: 'var(--muted-foreground)', fontStyle: 'italic', flexShrink: 0 }}>
+            <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-12)', color: 'var(--muted-foreground)', fontStyle: 'italic', flexShrink: 0 }}>
               current
             </span>
           )}
@@ -418,7 +418,7 @@ export function MoveActionDrawer({ isOpen, row, onClose, onConfirm }: MoveAction
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             className="flex-1 min-w-0 bg-transparent"
-            style={{ fontFamily: 'var(--font-family)', fontSize: '16px', color: 'var(--foreground)' }}
+            style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-16)', color: 'var(--foreground)' }}
           />
           {searchQuery && (
             <button onClick={() => setSearchQuery('')} style={{ color: 'var(--muted-foreground)' }}>

@@ -26,7 +26,7 @@ export function EmptyState({
           aria-hidden="true"
         >
           {/* Shadow ellipse */}
-          <ellipse cx="90" cy="148" rx="52" ry="8" fill="currentColor" style={{ color: 'var(--border)', opacity: 0.5 }} />
+          <ellipse cx="90" cy="148" rx="52" ry="8" fill="currentColor" style={{ color: 'var(--border-interactive)', opacity: 0.5 }} />
 
           {/* Back document */}
           <rect x="54" y="28" width="84" height="104" rx="10" fill="currentColor" style={{ color: 'var(--border-interactive)' }} />
@@ -72,7 +72,7 @@ export function EmptyState({
             style={{
               fontFamily: 'var(--font-family)',
               fontWeight: 'var(--font-weight-semibold)',
-              fontSize: '18px',
+              fontSize: 'var(--font-size-18)',
               lineHeight: '26px',
               color: 'var(--primary)',
             }}

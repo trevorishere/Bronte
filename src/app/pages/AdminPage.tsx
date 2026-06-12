@@ -34,9 +34,9 @@ const tabs: Tab[] = [
 
 const projectColumns: Column[] = [
   { key: 'name', label: 'Project Name', sortable: true, width: 'w-[400px]' },
-  { key: 'owner', label: 'Owner', sortable: true, width: 'w-[200px]' },
   { key: 'lastModified', label: 'Last Modified', sortable: true, width: 'w-[200px]' },
   { key: 'accountCount', label: 'Members', sortable: true, width: 'w-[120px]', align: 'right' as const },
+  { key: 'progress', label: 'Progress', sortable: true, width: 'w-[200px]' },
 ];
 
 const accountColumns: Column[] = [
@@ -84,20 +84,19 @@ export function AdminPage() {
   const getTableData = (): { columns: Column[], data: RowData[], filters: any[] } => {
     switch (activeTab) {
       case 'projects': {
-        const uniqueOwners = Array.from(new Set(projects.map(p => p.owner).filter(Boolean))).sort();
         return {
           columns: projectColumns,
           data: projects.map(project => ({
             id: project.id,
             name: project.name,
-            owner: project.owner,
+            progress: project.progress,
             lastModified: project.lastModified,
             workspace: project.workspace,
             iconType: 'project' as const,
             accountCount: countMembers('project', project.id, project.owner),
           })),
           filters: [
-            { label: 'Owner', options: uniqueOwners },
+            { label: 'Progress', options: ['Not Started', 'In Progress', 'In Review', 'Done'] },
             { label: 'Last Modified', type: 'date' as const }
           ]
         };
@@ -182,8 +181,13 @@ export function AdminPage() {
     for (const [filterLabel, values] of Object.entries(selectedFilters)) {
       if (values.length > 0) {
         const columnKey = columns.find(col => col.label === filterLabel)?.key;
-        if (columnKey && !values.includes(row[columnKey])) {
-          return false;
+        if (columnKey) {
+          if (columnKey === 'progress') {
+            const normalizedProgress = (row[columnKey] as string || '').replace(/\s*\(\d+%\)$/, '');
+            if (!values.includes(normalizedProgress)) return false;
+          } else if (!values.includes(row[columnKey])) {
+            return false;
+          }
         }
       }
     }
