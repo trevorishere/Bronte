@@ -14,19 +14,19 @@
 :root {
   /* Base */
   --font-size: 16px;
-  --background: #f4f0ec; /* Content area */
-  --foreground: #665e56; /* Default text color - warm medium brown-gray */
+  --background: #FBF8F5; /* Content area */
+  --foreground: #6D6965; /* Default text color - warm medium brown-gray */
 
   /** Card **/
   --card: #faf7f4;
-  --card-foreground: #665e56;
+  --card-foreground: var(--foreground);
 
   /* Popover */
   --popover: #faf7f4;
-  --popover-foreground: #665e56;
+  --popover-foreground: var(--foreground);
 
   /* Primary (hover/selected text) */
-  --primary: #2b2520;
+  --primary: #4A4541;
   --primary-foreground: #faf7f4;
 
   /* Secondary */
@@ -35,7 +35,7 @@
 
   /* Muted (light backgrounds and icons) */
   --muted: #f0ebe5; /* Row hover background - warm light */
-  --muted-foreground: #9a8f86; /* Icon muted color - warm gray */
+  --muted-foreground: #b1a9a2; /* Icon muted color - warm gray */
 
   /* Accent (navigation selected) */
   --accent: #e4ddd6; /* Nav selected background - warm medium */
@@ -48,7 +48,7 @@
   --destructive-hover: #b8142f;
 
   /* Borders */
-  --border: #D1CDC8;
+  --border: #DCD9D6;
   --input: transparent;
   --input-background: #f0ebe5;
   --switch-background: #c8c0b8;
@@ -65,8 +65,8 @@
   --radius: 0.5rem;
 
   /* Sidebar */
-  --sidebar: #faf7f4; /* Sidebar background */
-  --sidebar-foreground: #665e56;
+  --sidebar: #FBFAF9; /* Sidebar background */
+  --sidebar-foreground: var(--foreground);
   --sidebar-primary: #2b2520;
   --sidebar-primary-foreground: #f4f0ec;
   --sidebar-accent: #e4ddd6;
@@ -74,10 +74,12 @@
   --sidebar-ring: #9a8f86;
 
   /* Template-specific custom properties (truly unique values) */
-  --bg-rollover: rgba(0, 0, 0, 0.04);
-  --bg-selected: rgba(0, 0, 0, 0.08);
+  --bg-search: rgba(255, 255, 255, 0.08);
+  --bg-rollover: rgba(84, 70, 58, 0.04);
+  --bg-selected: rgba(84, 70, 58, 0.08);
   --bg-nav-hover: var(--bg-rollover);
   --bg-row-selected: #e8e0d8;
+  --bg-table-row: #e5e1dd;       /* Default row bg — 6% darker than --background */
   --border-interactive: #928D88;
   --border-interactive-hover: #75716D;
   --bg-icon-container: #CE886C;
@@ -163,7 +165,7 @@
   --icon-workspace-bg: #6BA0D2;
 
   /* Primary button */
-  --btn-primary-bg: #0d99ff;
+  --btn-primary-bg: #50b6ff;
   --btn-primary-hover: #0a85e0;
   --btn-primary-text: #ffffff;
 
@@ -185,15 +187,15 @@
   --background: #1c1a19; /* Warm very dark brown */
   --foreground: #BFB8B1; /* Warm light */
   --card: #221e1a; /* Warm dark card */
-  --card-foreground: #BFB8B1;
+  --card-foreground: var(--foreground);
   --popover: #201c18;
-  --popover-foreground: #BFB8B1;
+  --popover-foreground: var(--foreground);
   --primary: #ede8e2; /* Warm off-white */
   --primary-foreground: #1C1A19;
   --secondary: rgba(255, 255, 255, 0.05);
   --secondary-foreground: #a09890;
   --muted: #262422; /* Warm dark muted */
-  --muted-foreground: #9a9088;
+  --muted-foreground: #81776e;
   --accent: #342e28; /* Warm medium dark */
   --accent-foreground: #ede8e2;
   --accent-hover: #403a34;
@@ -214,10 +216,12 @@
   --sidebar-ring: #6a6460;
 
   /* Dark mode specific custom properties */
+  --bg-search: rgba(0, 0, 0, 0.08);
   --bg-rollover: rgba(255, 255, 255, 0.04);
   --bg-selected: rgba(255, 255, 255, 0.08);
   --bg-nav-hover: var(--bg-rollover);
   --bg-row-selected: #2E2B29;
+  --bg-table-row: #1a1817;       /* Default row bg — 6% darker than --background */
   --border-interactive: #7E7A78;
   --border-interactive-hover: #989593;
   --bg-icon-container: #CE886C;
@@ -233,7 +237,7 @@
   --icon-workspace-bg: #2166A6;
 
   /* Primary button */
-  --btn-primary-bg: #0d99ff;
+  --btn-primary-bg: #0075c9;
   --btn-primary-hover: #3db3ff;
   --btn-primary-text: #ffffff;
 

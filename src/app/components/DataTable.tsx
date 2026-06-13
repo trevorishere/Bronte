@@ -318,7 +318,7 @@ export function DataTable({
     if (selectedRow === rowId) {
       return 'var(--bg-selected)';
     }
-    return 'var(--background)';
+    return 'transparent';
   };
 
   // Determine which columns to show based on container width
@@ -439,7 +439,7 @@ export function DataTable({
                 ...flexStyle,
                 fontFamily: 'var(--font-family)',
                 fontWeight: 'var(--font-weight-semibold)',
-                color: sortConfig?.key === column.key || hoveredHeader === column.key ? 'var(--primary)' : 'var(--muted-foreground)',
+                color: sortConfig?.key === column.key || hoveredHeader === column.key ? 'var(--primary)' : 'var(--foreground)',
                 fontSize: 'var(--font-size-12)',
                 letterSpacing: 'var(--letter-spacing-lg)',
                 textTransform: 'uppercase',

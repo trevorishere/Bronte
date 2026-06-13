@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Search, Check, CircleCheck } from 'lucide-react';
+import { Modal } from './Modal';
 import { Button } from './Button';
 import { accounts } from '../data/accounts';
 import { roleColors } from './Avatar';
 import type { Role } from './Avatar';
+import { avatarMap } from '../data/avatarMap';
 import { useSharedMembers } from '../contexts/SharedMembersContext';
-import { useFocusTrap } from '../hooks/useFocusTrap';
-import { useRestoreFocus } from '../hooks/useRestoreFocus';
 import { ts } from '../utils/textStyles';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -42,17 +42,15 @@ const miniAvatarSizes: Record<MiniAvatarSize, { px: number; fontSize: string }> 
   large:  { px: 24, fontSize: 'var(--font-size-10)' },
 };
 
-function MiniAvatar({ name, role, size = 'medium' }: { name: string; role: Role; size?: MiniAvatarSize }) {
-  const { px, fontSize } = miniAvatarSizes[size];
-  const initials = name.trim().split(' ').filter(Boolean)
-    .map(p => p[0]).slice(0, 2).join('').toUpperCase();
-  const bg = roleColors[role]?.bg ?? '#665e56';
+function MiniAvatar({ name, size = 'medium' }: { name: string; role?: Role; size?: MiniAvatarSize }) {
+  const { px } = miniAvatarSizes[size];
+  const src = avatarMap[name];
   return (
     <div
-      className="shrink-0 flex items-center justify-center rounded-full"
-      style={{ width: px, height: px, backgroundColor: bg, fontSize, lineHeight: 1, fontWeight: 600, color: '#fff' }}
+      className="shrink-0 overflow-hidden rounded-full"
+      style={{ width: px, height: px }}
     >
-      {initials}
+      <img src={src} alt={name} style={{ width: px, height: px, objectFit: 'cover', display: 'block' }} />
     </div>
   );
 }
@@ -60,6 +58,7 @@ function MiniAvatar({ name, role, size = 'medium' }: { name: string; role: Role;
 // ─── Selected chip ────────────────────────────────────────────────────────────
 
 function Chip({ account, onRemove }: { account: SelectedAccount; onRemove: () => void }) {
+  const [isXHovered, setIsXHovered] = useState(false);
   return (
     <div
       className="flex items-center gap-[8px] pl-[6px] pr-[8px] shrink-0"
@@ -81,15 +80,20 @@ function Chip({ account, onRemove }: { account: SelectedAccount; onRemove: () =>
       }}>
         {account.name}
       </span>
-      <button
-        type="button"
+      <div
         onClick={onRemove}
+        onMouseEnter={() => setIsXHovered(true)}
+        onMouseLeave={() => setIsXHovered(false)}
         aria-label={`Remove ${account.name}`}
-        className="shrink-0 flex items-center justify-center size-[12px] rounded-full transition-opacity hover:opacity-70 cursor-pointer"
-        style={{ background: 'none', border: 'none', padding: 0 }}
+        className="flex items-center justify-center p-[4px] rounded-[4px] cursor-pointer shrink-0"
+        style={{
+          opacity: isXHovered ? 1 : 0.7,
+          backgroundColor: isXHovered ? 'var(--bg-icon-hover)' : 'transparent',
+          transition: 'opacity var(--duration-default) var(--ease-standard), background-color var(--duration-default) var(--ease-standard)',
+        }}
       >
-        <X className="size-[10px]" style={{ color: 'var(--foreground)' }} strokeWidth={2.5} />
-      </button>
+        <X className="size-[12px]" style={{ color: isXHovered ? 'var(--primary)' : 'var(--foreground)' }} strokeWidth={2.5} />
+      </div>
     </div>
   );
 }
@@ -110,7 +114,6 @@ function AccountListRow({
   const [hovered, setHovered] = useState(false);
   const [hoveredX, setHoveredX] = useState(false);
   const disabled = isMember;
-
   const handleClick = disabled ? undefined : isSelected ? onDeselect : onSelect;
 
   return (
@@ -168,7 +171,7 @@ function AccountListRow({
           {/* X: hidden on mobile + desktop default, visible on desktop hover */}
           <div
             role="button"
-            onClick={(e) => { e.stopPropagation(); onDeselect(); }}
+            onClick={e => { e.stopPropagation(); onDeselect(); }}
             onMouseEnter={() => setHoveredX(true)}
             onMouseLeave={() => setHoveredX(false)}
             className="absolute inset-0 flex items-center justify-center size-[22px] rounded-full cursor-pointer transition-opacity opacity-0 pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto"
@@ -217,11 +220,7 @@ function AccessRow({ member, onRemove, isPending = false, entityName }: { member
       {isPending ? (
         <span
           className="shrink-0 transition-colors"
-          style={{
-            ...ts.captionLt,
-            color: hovered ? 'var(--primary)' : 'var(--muted-foreground)',
-            whiteSpace: 'nowrap',
-          }}
+          style={{ ...ts.captionLt, color: hovered ? 'var(--primary)' : 'var(--muted-foreground)', whiteSpace: 'nowrap' }}
         >
           Revoke Invitation
         </span>
@@ -265,19 +264,15 @@ export function ShareModal({
   isOpen, onClose, entityName, entityId, onShare, currentMembers = [],
 }: ShareModalProps) {
   const { pendingInvitations, revokeInvitation } = useSharedMembers();
-  const panelRef = useRef<HTMLDivElement>(null);
-  useFocusTrap(panelRef, isOpen);
-  useRestoreFocus(isOpen);
-
   const currentMemberIds = new Set(currentMembers.map(m => m.id));
   const pendingIds = new Set(pendingInvitations[entityId] ?? []);
-  // Exclude confirmed members and pending invitations from the all-accounts list
   const allExistingIds = new Set([...currentMemberIds, ...pendingIds]);
 
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<SelectedAccount[]>([]);
   const [removedMemberIds, setRemovedMemberIds] = useState<Set<string>>(new Set());
   const [inputFocused, setInputFocused] = useState(false);
+  const [isSearchHovered, setIsSearchHovered] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Reset on open/close
@@ -291,17 +286,8 @@ export function ShareModal({
     }
   }, [isOpen]);
 
-  // Escape to close
-  useEffect(() => {
-    if (!isOpen) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, [isOpen, onClose]);
-
   const selectedIds = new Set(selected.map(a => a.id));
 
-  // Full alphabetized list — existing members excluded, current session selections stay
   const filteredList = accounts
     .filter(a => !allExistingIds.has(a.id))
     .filter(a => {
@@ -311,10 +297,8 @@ export function ShareModal({
     })
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  // Confirmed members minus any removed this session
   const accessList = currentMembers.filter(m => !removedMemberIds.has(m.id));
 
-  // Pending invitations: accounts shared in a previous session awaiting acceptance
   const pendingList: CurrentMember[] = [...pendingIds]
     .map(id => accounts.find(a => a.id === id))
     .filter((a): a is NonNullable<typeof a> => a != null)
@@ -327,7 +311,6 @@ export function ShareModal({
   };
 
   const removeChip = (id: string) => setSelected(prev => prev.filter(a => a.id !== id));
-
   const removeAccess = (id: string) => setRemovedMemberIds(prev => new Set([...prev, id]));
 
   const handleShare = () => {
@@ -335,198 +318,132 @@ export function ShareModal({
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: 'var(--backdrop-color-modal)' }}
-      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div
-        ref={panelRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="share-title"
-        className="relative flex flex-col rounded-2xl shadow-lg overflow-hidden"
-        style={{
-          width: '560px',
-          maxHeight: '80vh',
-          backgroundColor: 'var(--background)',
-          border: '1px solid var(--border)',
-        }}
-      >
-        {/* ── Header ──────────────────────────────────────────────────── */}
+    <Modal isOpen={isOpen} onClose={onClose} title="Share" subtitle={entityName} labelledById="share-title" maxHeight="80vh">
+      {/* ── Search input + chips ─────────────────────────────────────── */}
+      <div className="shrink-0 px-[32px] pt-[8px] pb-[32px]">
         <div
-          className="shrink-0 flex items-start justify-between px-[32px] py-[28px]"
+          className={`flex gap-[12px] min-h-[40px] px-[12px] py-[6px] rounded-[12px] cursor-text ${selected.length > 0 ? 'items-start' : 'items-center'}`}
+          style={{
+            border: `1px solid ${inputFocused || isSearchHovered ? 'var(--border-interactive-hover)' : 'var(--border)'}`,
+            backgroundColor: 'var(--background)',
+            transition: 'border-color var(--duration-fast) var(--ease-standard)',
+          }}
+          onClick={() => inputRef.current?.focus()}
+          onMouseEnter={() => setIsSearchHovered(true)}
+          onMouseLeave={() => setIsSearchHovered(false)}
         >
-          <div className="flex flex-col gap-[4px] min-w-0 pr-[8px]">
-            <h2
-              id="share-title"
-              style={{
-                fontFamily: 'var(--font-family)',
-                fontWeight: 'var(--font-weight-semibold)',
-                fontSize: 'var(--font-size-24)',
-                lineHeight: 'var(--line-height-normal)',
-                color: 'var(--primary)',
-              }}
-            >
-              Share
-            </h2>
-            <p className="truncate" style={{
-              fontFamily: 'var(--font-family)',
-              fontSize: 'var(--font-size-15)',
-              color: 'var(--muted-foreground)',
-              lineHeight: '1.3',
-            }}>
-              {entityName}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            className="flex items-center justify-center size-[32px] rounded-full transition-colors ml-[16px] shrink-0"
-            style={{ backgroundColor: 'transparent' }}
-            onMouseOver={e => (e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)')}
-            onMouseOut={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-          >
-            <X className="size-[20px]" style={{ color: 'var(--icon)' }} />
-          </button>
-        </div>
-
-        {/* ── Search input + chips ─────────────────────────────────────── */}
-        <div className="shrink-0 px-[32px] pt-[8px] pb-[32px]">
-          <div
-            className={`flex gap-[8px] min-h-[40px] px-[10px] py-[6px] rounded-[12px] cursor-text ${selected.length > 0 ? 'items-start' : 'items-center'}`}
-            style={{
-              border: `1px solid ${inputFocused ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}`,
-              backgroundColor: 'var(--background)',
-              transition: 'border-color 150ms ease',
-            }}
-            onClick={() => inputRef.current?.focus()}
-          >
-            <Search className={`size-[16px] shrink-0 pointer-events-none ${selected.length > 0 ? 'mt-[6px]' : ''}`} style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
-            <div className="flex flex-wrap items-center gap-[6px] flex-1 min-w-0">
-              {selected.map(acc => (
-                <Chip key={acc.id} account={acc} onRemove={() => removeChip(acc.id)} />
-              ))}
-              <div className={selected.length > 0 ? 'basis-full min-w-0' : 'flex-1 min-w-0'}>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={query}
-                  onChange={e => setQuery(e.target.value)}
-                  onFocus={() => setInputFocused(true)}
-                  onBlur={() => setInputFocused(false)}
-                  placeholder={selected.length === 0 ? 'Search by name or email…' : ''}
-                  className="w-full bg-transparent"
-                  style={{
-                    fontFamily: 'var(--font-family)',
-                    fontWeight: 'var(--font-weight-regular)',
-                    fontSize: 'var(--font-size-15)',
-                    lineHeight: 'var(--line-height-20)',
-                    color: 'var(--foreground)',
-                  }}
-                />
-              </div>
+          <Search className={`size-[16px] shrink-0 pointer-events-none ${selected.length > 0 ? 'mt-[6px]' : ''}`} style={{ color: inputFocused ? 'var(--foreground)' : isSearchHovered ? 'var(--icon-nav-hover)' : 'var(--muted-foreground)', transition: 'color 300ms cubic-bezier(0.2,0,0.5,1)' }} strokeWidth={2} />
+          <div className="flex flex-wrap items-center gap-[6px] flex-1 min-w-0">
+            {selected.map(acc => (
+              <Chip key={acc.id} account={acc} onRemove={() => removeChip(acc.id)} />
+            ))}
+            <div className={selected.length > 0 ? 'basis-full min-w-0' : 'flex-1 min-w-0'}>
+              <input
+                ref={inputRef}
+                type="text"
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                onFocus={() => setInputFocused(true)}
+                onBlur={() => setInputFocused(false)}
+                placeholder={selected.length === 0 ? 'Search by name or email…' : ''}
+                className="w-full bg-transparent placeholder:text-[var(--muted-foreground)]"
+                style={{
+                  fontFamily: 'var(--font-family)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontSize: 'var(--font-size-15)',
+                  letterSpacing: 'var(--letter-spacing-body)',
+                  lineHeight: 'var(--line-height-20)',
+                  color: 'var(--foreground)',
+                  outline: 'none',
+                }}
+              />
             </div>
           </div>
         </div>
+      </div>
 
-        {/* ── Scrollable body ───────────────────────────────────────────── */}
-        <div className="flex flex-col px-[24px] pb-[24px]" style={{ minHeight: 0, overflowY: 'auto' }}>
+      {/* ── Scrollable body ───────────────────────────────────────────── */}
+      <div className="flex flex-col px-[24px] pb-[24px]" style={{ minHeight: 0, overflowY: 'auto' }}>
+        {/* ── All accounts ─────────────────────────────────────────────── */}
+        <SectionLabel text={`All Accounts (${filteredList.length})`} />
+        <div style={{ maxHeight: '302px', overflowY: 'auto' }}>
+          {filteredList.length > 0 ? (
+            <div className="flex flex-col gap-[1px]">
+              {filteredList.map(acc => (
+                <AccountListRow
+                  key={acc.id}
+                  name={acc.name}
+                  email={acc.email}
+                  role={acc.role}
+                  isMember={false}
+                  isSelected={selectedIds.has(acc.id)}
+                  onSelect={() => selectAccount(acc)}
+                  onDeselect={() => removeChip(acc.id)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center py-[24px]">
+              <p style={{
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--font-size-14)',
+                color: 'var(--muted-foreground)',
+                letterSpacing: 'var(--letter-spacing-body)',
+              }}>
+                No accounts match "{query}"
+              </p>
+            </div>
+          )}
+        </div>
 
-          {/* ── All accounts ─────────────────────────────────────────────── */}
-          <SectionLabel text={`All Accounts (${filteredList.length})`} />
-
-          <div style={{ maxHeight: '302px', overflowY: 'auto' }}>
-            {filteredList.length > 0 ? (
+        {/* ── Accounts with access ─────────────────────────────────────── */}
+        {(accessList.length > 0 || pendingList.length > 0) && (
+          <>
+            <div style={{ height: 32 }} />
+            {(() => {
+              const total = accessList.length + pendingList.length;
+              return <SectionLabel text={`Accounts with Access (${total})`} />;
+            })()}
+            <div style={{ maxHeight: '198px', overflowY: 'auto' }}>
               <div className="flex flex-col gap-[1px]">
-                {filteredList.map(acc => (
-                  <AccountListRow
-                    key={acc.id}
-                    name={acc.name}
-                    email={acc.email}
-                    role={acc.role}
-                    isMember={false}
-                    isSelected={selectedIds.has(acc.id)}
-                    onSelect={() => selectAccount(acc)}
-                    onDeselect={() => removeChip(acc.id)}
-                  />
+                {accessList.map(m => (
+                  <AccessRow key={m.id} member={m} onRemove={() => removeAccess(m.id)} entityName={entityName} />
+                ))}
+                {pendingList.map(m => (
+                  <AccessRow key={m.id} member={m} onRemove={() => revokeInvitation(entityId, m.id)} isPending entityName={entityName} />
                 ))}
               </div>
-            ) : (
-              <div className="flex items-center justify-center py-[24px]">
-                <p style={{
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--font-size-14)',
-                  color: 'var(--muted-foreground)',
-                  letterSpacing: 'var(--letter-spacing-body)',
-                }}>
-                  No accounts match "{query}"
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* ── Accounts with access ─────────────────────────────────────── */}
-          {(accessList.length > 0 || pendingList.length > 0) && (
-            <>
-              <div style={{ height: 32 }} />
-              {(() => {
-                const total = accessList.length + pendingList.length;
-                return <SectionLabel text={`Accounts with Access (${total})`} />;
-              })()}
-              <div style={{ maxHeight: '198px', overflowY: 'auto' }}>
-                <div className="flex flex-col gap-[1px]">
-                  {accessList.map(m => (
-                    <AccessRow key={m.id} member={m} onRemove={() => removeAccess(m.id)} entityName={entityName} />
-                  ))}
-                  {pendingList.map(m => (
-                    <AccessRow key={m.id} member={m} onRemove={() => revokeInvitation(entityId, m.id)} isPending entityName={entityName} />
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-
-        </div>
-
-        {/* ── Footer ───────────────────────────────────────────────────── */}
-        <div
-          className="shrink-0 flex items-center justify-end gap-[12px] px-[32px] py-[28px]"
-        >
-          <Button variant="secondary" onClick={onClose} type="button">
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleShare}
-            disabled={selected.length === 0}
-            type="button"
-          >
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-              Share
-              {selected.length > 0 && (
-                <span style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: 22,
-                  height: 22,
-                  borderRadius: 6,
-                  backgroundColor: 'rgba(0,0,0,0.12)',
-                  fontFamily: 'var(--font-family)',
-                  fontWeight: 'var(--font-weight-semibold)',
-                  fontSize: 'var(--font-size-13)',
-                }}>
-                  {selected.length}
-                </span>
-              )}
-            </span>
-          </Button>
-        </div>
+            </div>
+          </>
+        )}
       </div>
-    </div>
+
+      {/* ── Footer ───────────────────────────────────────────────────── */}
+      <div className="shrink-0 flex items-center justify-end gap-[12px] px-[32px] py-[28px]">
+        <Button variant="secondary" onClick={onClose} type="button">Cancel</Button>
+        <Button variant="primary" onClick={handleShare} disabled={selected.length === 0} type="button">
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            Share
+            {selected.length > 0 && (
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 22,
+                height: 22,
+                borderRadius: 6,
+                backgroundColor: 'rgba(0,0,0,0.12)',
+                fontFamily: 'var(--font-family)',
+                fontWeight: 'var(--font-weight-semibold)',
+                fontSize: 'var(--font-size-13)',
+              }}>
+                {selected.length}
+              </span>
+            )}
+          </span>
+        </Button>
+      </div>
+    </Modal>
   );
 }
