@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { accounts } from '../data/accounts';
 import { roleColors } from './Avatar';
 import type { Role } from './Avatar';
+import { avatarMap } from '../data/avatarMap';
 import { useSharedMembers } from '../contexts/SharedMembersContext';
 import { Button } from './Button';
 import type { CurrentMember } from './ShareModal';
@@ -32,17 +33,13 @@ interface SelectedAccount {
 
 // ─── Mini avatar ──────────────────────────────────────────────────────────────
 
-function MiniAvatar({ name, role, size = 'medium' }: { name: string; role: Role; size?: 'small' | 'medium' | 'large' }) {
-  const sizes = { small: { px: 16, fontSize: '7px' }, medium: { px: 20, fontSize: 'var(--font-size-12)' }, large: { px: 24, fontSize: 'var(--font-size-10)' } };
-  const { px, fontSize } = sizes[size];
-  const initials = name.trim().split(' ').filter(Boolean).map(p => p[0]).slice(0, 2).join('').toUpperCase();
-  const bg = roleColors[role]?.bg ?? '#665e56';
+function MiniAvatar({ name, size = 'medium' }: { name: string; role?: Role; size?: 'small' | 'medium' | 'large' }) {
+  const sizes = { small: { px: 16 }, medium: { px: 20 }, large: { px: 24 } };
+  const { px } = sizes[size];
+  const src = avatarMap[name];
   return (
-    <div
-      className="shrink-0 flex items-center justify-center rounded-full"
-      style={{ width: px, height: px, backgroundColor: bg, fontSize, lineHeight: 1, fontWeight: 600, color: '#fff' }}
-    >
-      {initials}
+    <div className="shrink-0 overflow-hidden rounded-full" style={{ width: px, height: px }}>
+      <img src={src} alt={name} style={{ width: px, height: px, objectFit: 'cover', display: 'block' }} />
     </div>
   );
 }
@@ -50,6 +47,7 @@ function MiniAvatar({ name, role, size = 'medium' }: { name: string; role: Role;
 // ─── Selected chip ────────────────────────────────────────────────────────────
 
 function Chip({ account, onRemove }: { account: SelectedAccount; onRemove: () => void }) {
+  const [isXHovered, setIsXHovered] = useState(false);
   return (
     <div
       className="flex items-center gap-[8px] pl-[6px] pr-[8px] shrink-0"
@@ -71,15 +69,20 @@ function Chip({ account, onRemove }: { account: SelectedAccount; onRemove: () =>
       }}>
         {account.name}
       </span>
-      <button
-        type="button"
+      <div
         onClick={onRemove}
+        onMouseEnter={() => setIsXHovered(true)}
+        onMouseLeave={() => setIsXHovered(false)}
         aria-label={`Remove ${account.name}`}
-        className="shrink-0 flex items-center justify-center size-[12px] rounded-full transition-opacity hover:opacity-70 cursor-pointer"
-        style={{ background: 'none', border: 'none', padding: 0 }}
+        className="flex items-center justify-center p-[4px] rounded-[4px] cursor-pointer shrink-0"
+        style={{
+          opacity: isXHovered ? 1 : 0.7,
+          backgroundColor: isXHovered ? 'var(--bg-icon-hover)' : 'transparent',
+          transition: 'opacity var(--duration-default) var(--ease-standard), background-color var(--duration-default) var(--ease-standard)',
+        }}
       >
-        <X className="size-[10px]" style={{ color: 'var(--foreground)' }} strokeWidth={2.5} />
-      </button>
+        <X className="size-[12px]" style={{ color: isXHovered ? 'var(--primary)' : 'var(--foreground)' }} strokeWidth={2.5} />
+      </div>
     </div>
   );
 }
@@ -166,7 +169,7 @@ function AccessRow({ member, onRemove, isPending = false, entityName }: { member
           color: hovered ? 'var(--primary)' : 'var(--muted-foreground)', whiteSpace: 'nowrap',
         }}>Revoke</span>
       ) : (
-        <X className="size-[11px] shrink-0" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} aria-hidden="true" />
+        <X className="size-[11px] shrink-0" style={{ color: hovered ? 'var(--primary)' : 'var(--foreground)' }} strokeWidth={2} aria-hidden="true" />
       )}
     </button>
   );
@@ -199,6 +202,7 @@ export function ShareDrawer({ isOpen, onClose, entityName, entityId, onShare, cu
   const [selected, setSelected] = useState<SelectedAccount[]>([]);
   const [removedMemberIds, setRemovedMemberIds] = useState<Set<string>>(new Set());
   const [inputFocused, setInputFocused] = useState(false);
+  const [isSearchHovered, setIsSearchHovered] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const { handleTouchStart, handleTouchEnd } = useDrawerInteraction(isOpen, onClose);
@@ -299,13 +303,15 @@ export function ShareDrawer({ isOpen, onClose, entityName, entityId, onShare, cu
               <div
                 className={`flex gap-[8px] min-h-[40px] px-[10px] py-[6px] rounded-[12px] cursor-text ${selected.length > 0 ? 'items-start' : 'items-center'}`}
                 style={{
-                  border: `1px solid ${inputFocused ? 'var(--border-interactive-hover)' : 'var(--border-interactive)'}`,
+                  border: `1px solid ${inputFocused || isSearchHovered ? 'var(--border-interactive-hover)' : 'var(--border)'}`,
                   backgroundColor: 'var(--background)',
                   transition: 'border-color 150ms ease',
                 }}
                 onClick={() => inputRef.current?.focus()}
+                onMouseEnter={() => setIsSearchHovered(true)}
+                onMouseLeave={() => setIsSearchHovered(false)}
               >
-                <Search className={`size-[16px] shrink-0 pointer-events-none ${selected.length > 0 ? 'mt-[6px]' : ''}`} style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />
+                <Search className={`size-[16px] shrink-0 pointer-events-none ${selected.length > 0 ? 'mt-[6px]' : ''}`} style={{ color: inputFocused ? 'var(--foreground)' : isSearchHovered ? 'var(--icon-nav-hover)' : 'var(--muted-foreground)', transition: 'color 300ms cubic-bezier(0.2,0,0.5,1)' }} strokeWidth={2} />
                 <div className="flex flex-wrap items-center gap-[6px] flex-1 min-w-0">
                   {selected.map(acc => (
                     <Chip key={acc.id} account={acc} onRemove={() => removeChip(acc.id)} />

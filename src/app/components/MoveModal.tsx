@@ -1,10 +1,9 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { X, ChevronRight, Search, FolderOpen, File } from 'lucide-react';
+import { Modal } from './Modal';
 import { Button } from './Button';
 import { workspaces, projects } from '../data/workspaces';
 import type { RowData } from './DataTable';
-import { useFocusTrap } from '../hooks/useFocusTrap';
-import { useRestoreFocus } from '../hooks/useRestoreFocus';
 
 interface TreeNode {
   id: string;
@@ -145,11 +144,11 @@ function TreeNodeRow({ node, depth, isExpanded, isSelected, isCurrentLocation, o
 
 export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchHovered, setIsSearchHovered] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isClearHovered, setIsClearHovered] = useState(false);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(workspaces.map(w => w.id)));
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-  useFocusTrap(panelRef, isOpen);
-  useRestoreFocus(isOpen);
 
   // Reset on open
   useEffect(() => {
@@ -160,20 +159,11 @@ export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
     }
   }, [isOpen]);
 
-  // Escape to close
-  useEffect(() => {
-    if (!isOpen) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, [isOpen, onClose]);
-
   // Filtered tree based on search
   const { visibleTree, autoExpanded } = useMemo(() => {
     if (!searchQuery.trim()) return { visibleTree: FULL_TREE, autoExpanded: null };
 
     const q = searchQuery.toLowerCase();
-    // Find matching node IDs and their ancestor IDs
     const matchingIds = new Set<string>();
     const parentIds = new Set<string>();
 
@@ -184,7 +174,6 @@ export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
       }
     });
 
-    // Filter tree to only include matches and their parents
     const filtered = FULL_TREE
       .filter(ws => matchingIds.has(ws.id) || parentIds.has(ws.id))
       .map(ws => ({
@@ -205,9 +194,7 @@ export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
     });
   };
 
-  // Current location of the item (its workspace id)
   const currentWorkspaceId = row ? (row.workspace as string | undefined) : undefined;
-
   const selectedNode = selectedId ? ALL_NODES.find(n => n.id === selectedId) : null;
 
   const handleMove = () => {
@@ -215,8 +202,6 @@ export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
     onMove(row, selectedId, selectedNode.label);
     onClose();
   };
-
-  if (!isOpen || !row) return null;
 
   // Render tree nodes
   const renderNodes = (nodes: TreeNode[], depth = 0): React.ReactNode[] =>
@@ -246,146 +231,93 @@ export function MoveModal({ isOpen, row, onClose, onMove }: MoveModalProps) {
     });
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: 'var(--backdrop-color-modal)' }}
-      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div
-        ref={panelRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="move-title"
-        className="relative flex flex-col rounded-2xl shadow-lg"
-        style={{
-          width: '560px',
-          maxHeight: '80vh',
-          backgroundColor: 'var(--background)',
-          border: '1px solid var(--border)',
-        }}
-      >
-        {/* Header */}
+    <Modal isOpen={isOpen && !!row} onClose={onClose} title="Move" subtitle={row?.name ?? ''} labelledById="move-title" maxHeight="80vh">
+      {/* Search */}
+      <div className="px-[32px] pt-[16px] pb-[24px] shrink-0">
         <div
-          className="flex items-start justify-between px-[32px] pt-[24px] pb-[28px] shrink-0"
+          className="flex items-center gap-[12px] rounded-[12px] px-[12px]"
+          style={{
+            height: '40px',
+            border: `1px solid ${isSearchHovered ? 'var(--border-interactive-hover)' : 'var(--border)'}`,
+            backgroundColor: 'var(--background)',
+            transition: 'border-color var(--duration-fast) var(--ease-standard)',
+          }}
+          onMouseEnter={() => setIsSearchHovered(true)}
+          onMouseLeave={() => setIsSearchHovered(false)}
         >
-          <div className="flex flex-col gap-[8px] min-w-0 pr-[8px]">
-            <h2
-              id="move-title"
-              style={{
-                fontFamily: 'var(--font-family)',
-                fontWeight: 'var(--font-weight-semibold)',
-                fontSize: 'var(--font-size-24)',
-                lineHeight: 'var(--line-height-normal)',
-                color: 'var(--primary)',
-              }}
-            >
-              Move
-            </h2>
-            <p
-              className="truncate"
-              style={{
-                fontFamily: 'var(--font-family)',
-                fontSize: 'var(--font-size-15)',
-                color: 'var(--muted-foreground)',
-                lineHeight: '1.3',
-              }}
-            >
-              {row.name}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            className="flex items-center justify-center size-[32px] rounded-full transition-colors ml-[16px] shrink-0"
-            style={{ backgroundColor: 'transparent' }}
-            onMouseOver={e => (e.currentTarget.style.backgroundColor = 'var(--bg-icon-hover)')}
-            onMouseOut={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-          >
-            <X className="size-[20px]" style={{ color: 'var(--icon)' }} />
-          </button>
-        </div>
-
-        {/* Search */}
-        <div className="px-[32px] pt-[16px] pb-[24px] shrink-0">
-          <div
-            className="flex items-center gap-[8px] rounded-[10px] px-[10px]"
+          <Search className="size-[16px] shrink-0" style={{ color: isSearchFocused ? 'var(--foreground)' : isSearchHovered ? 'var(--icon-nav-hover)' : 'var(--muted-foreground)', transition: 'color 300ms cubic-bezier(0.2,0,0.5,1)' }} strokeWidth={2} />
+          <input
+            type="text"
+            placeholder="Search locations…"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
+            className="flex-1 min-w-0 bg-transparent placeholder:text-[var(--muted-foreground)]"
             style={{
-              height: '40px',
-              border: '1px solid var(--border-interactive)',
-              backgroundColor: 'var(--background)',
+              fontFamily: 'var(--font-family)',
+              fontWeight: 'var(--font-weight-medium)',
+              fontSize: 'var(--font-size-15)',
+              letterSpacing: 'var(--letter-spacing-body)',
+              lineHeight: 'var(--line-height-20)',
+              color: 'var(--foreground)',
+              outline: 'none',
             }}
-          >
-            <Search className="size-[16px] shrink-0" style={{ color: 'var(--muted-foreground)' }} />
-            <input
-              type="text"
-              placeholder="Search locations…"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="flex-1 min-w-0 bg-transparent"
-              style={{
-                fontFamily: 'var(--font-family)',
-                fontSize: 'var(--font-size-15)',
-                color: 'var(--foreground)',
-                lineHeight: 'var(--line-height-20)',
-              }}
-              autoFocus
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="shrink-0"
-                style={{ color: 'var(--muted-foreground)' }}
-              >
-                <X className="size-[14px]" />
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Tree */}
-        <div className="flex-1 overflow-y-auto px-[24px] pb-[24px] min-h-0" style={{ maxHeight: '280px' }}>
-          {visibleTree.length === 0 ? (
+            autoFocus
+          />
+          {searchQuery && (
             <div
-              className="flex items-center justify-center py-[32px]"
+              onClick={() => setSearchQuery('')}
+              onMouseEnter={() => setIsClearHovered(true)}
+              onMouseLeave={() => setIsClearHovered(false)}
+              className="flex items-center justify-center p-[4px] rounded-[4px] cursor-pointer shrink-0"
               style={{
-                fontFamily: 'var(--font-family)',
-                fontSize: 'var(--font-size-15)',
-                color: 'var(--muted-foreground)',
+                opacity: isClearHovered ? 1 : 0.7,
+                backgroundColor: isClearHovered ? 'var(--bg-icon-hover)' : 'transparent',
+                transition: 'opacity var(--duration-default) var(--ease-standard), background-color var(--duration-default) var(--ease-standard)',
               }}
             >
-              No locations match "{searchQuery}"
-            </div>
-          ) : (
-            <div className="flex flex-col gap-[1px]">
-              {renderNodes(visibleTree)}
+              <X className="size-[12px]" style={{ color: isClearHovered ? 'var(--primary)' : 'var(--foreground)' }} strokeWidth={2.5} />
             </div>
           )}
         </div>
+      </div>
 
-        {/* Footer */}
-        <div
-          className="flex items-center justify-between px-[32px] pt-[24px] pb-[32px] shrink-0"
-        >
-          <span
-            style={{
-              fontFamily: 'var(--font-family)',
-              fontSize: 'var(--font-size-13)',
-              color: 'var(--muted-foreground)',
-              minHeight: '20px',
-            }}
+      {/* Tree */}
+      <div className="flex-1 overflow-y-auto px-[24px] pb-[24px] min-h-0" style={{ maxHeight: '280px' }}>
+        {visibleTree.length === 0 ? (
+          <div
+            className="flex items-center justify-center py-[32px]"
+            style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-15)', color: 'var(--muted-foreground)' }}
           >
-            {selectedNode ? `Moving to: ${selectedNode.label}` : 'Select a destination'}
-          </span>
-          <div className="flex items-center gap-[12px]">
-            <Button variant="secondary" onClick={onClose} type="button">
-              Cancel
-            </Button>
-            <Button variant="primary" onClick={handleMove} type="button" disabled={!selectedId || selectedId === currentWorkspaceId}>
-              Move here
-            </Button>
+            No locations match "{searchQuery}"
           </div>
+        ) : (
+          <div className="flex flex-col gap-[1px]">
+            {renderNodes(visibleTree)}
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between px-[32px] pt-[24px] pb-[32px] shrink-0">
+        <span
+          style={{
+            fontFamily: 'var(--font-family)',
+            fontSize: 'var(--font-size-13)',
+            color: 'var(--muted-foreground)',
+            minHeight: '20px',
+          }}
+        >
+          {selectedNode ? `Moving to: ${selectedNode.label}` : 'Select a destination'}
+        </span>
+        <div className="flex items-center gap-[12px]">
+          <Button variant="secondary" onClick={onClose} type="button">Cancel</Button>
+          <Button variant="primary" onClick={handleMove} type="button" disabled={!selectedId || selectedId === currentWorkspaceId}>
+            Move here
+          </Button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

@@ -133,6 +133,7 @@ interface RenameActionDrawerProps {
 
 export function RenameActionDrawer({ isOpen, row, onClose, onConfirm }: RenameActionDrawerProps) {
   const [value, setValue] = useState('');
+  const [isXClearHovered, setIsXClearHovered] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -189,22 +190,26 @@ export function RenameActionDrawer({ isOpen, row, onClose, onConfirm }: RenameAc
                 height: '44px',
                 fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-16)',
                 color: 'var(--primary)',
-                border: '1px solid var(--border-interactive)',
+                border: '1px solid var(--border)',
                 backgroundColor: 'var(--background)',
               }}
               onFocus={e => (e.currentTarget.style.borderColor = 'var(--border-interactive-hover)')}
-              onBlur={e => (e.currentTarget.style.borderColor = 'var(--border-interactive)')}
+              onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
             />
             {value && (
               <button
                 type="button"
                 onClick={() => { setValue(''); inputRef.current?.focus(); }}
-                className="absolute right-[10px] flex items-center justify-center size-[20px] rounded-full"
-                style={{ backgroundColor: 'transparent' }}
-                onMouseOver={e => (e.currentTarget.style.backgroundColor = 'var(--bg-rollover)')}
-                onMouseOut={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                className="absolute right-[10px] flex items-center justify-center p-[4px] rounded-[4px] cursor-pointer"
+                style={{
+                  opacity: isXClearHovered ? 1 : 0.7,
+                  backgroundColor: isXClearHovered ? 'var(--bg-icon-hover)' : 'transparent',
+                  transition: 'opacity var(--duration-default) var(--ease-standard), background-color var(--duration-default) var(--ease-standard)',
+                }}
+                onMouseEnter={() => setIsXClearHovered(true)}
+                onMouseLeave={() => setIsXClearHovered(false)}
               >
-                <X className="size-[12px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2.5} />
+                <X className="size-[12px]" style={{ color: isXClearHovered ? 'var(--primary)' : 'var(--foreground)' }} strokeWidth={2.5} />
               </button>
             )}
           </div>
@@ -282,6 +287,9 @@ function SmallProjectIcon() {
 
 export function MoveActionDrawer({ isOpen, row, onClose, onConfirm }: MoveActionDrawerProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchHovered, setIsSearchHovered] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isClearHovered, setIsClearHovered] = useState(false);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set(workspaces.map(w => w.id)));
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -409,21 +417,35 @@ export function MoveActionDrawer({ isOpen, row, onClose, onConfirm }: MoveAction
     >
       {/* Search */}
       <div className="shrink-0 px-[24px] py-[24px]">
-        <div className="flex items-center gap-[8px] rounded-[10px] px-[10px]"
-          style={{ height: '40px', border: '1px solid var(--border-interactive)', backgroundColor: 'var(--background)' }}>
-          <Search className="size-[16px] shrink-0" style={{ color: 'var(--muted-foreground)' }} />
+        <div className="flex items-center gap-[12px] rounded-[12px] px-[12px]"
+          style={{ height: '40px', border: `1px solid ${isSearchHovered ? 'var(--border-interactive-hover)' : 'var(--border)'}`, backgroundColor: 'var(--background)', transition: 'border-color var(--duration-fast) var(--ease-standard)' }}
+          onMouseEnter={() => setIsSearchHovered(true)}
+          onMouseLeave={() => setIsSearchHovered(false)}>
+          <Search className="size-[16px] shrink-0" style={{ color: isSearchFocused ? 'var(--foreground)' : isSearchHovered ? 'var(--icon-nav-hover)' : 'var(--muted-foreground)', transition: 'color 300ms cubic-bezier(0.2,0,0.5,1)' }} strokeWidth={2} />
           <input
             type="text"
             placeholder="Search locations…"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="flex-1 min-w-0 bg-transparent"
-            style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--font-size-16)', color: 'var(--foreground)' }}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
+            className="flex-1 min-w-0 bg-transparent placeholder:text-[var(--muted-foreground)]"
+            style={{ fontFamily: 'var(--font-family)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-15)', letterSpacing: 'var(--letter-spacing-body)', lineHeight: 'var(--line-height-20)', color: 'var(--foreground)', outline: 'none' }}
           />
           {searchQuery && (
-            <button onClick={() => setSearchQuery('')} style={{ color: 'var(--muted-foreground)' }}>
-              <X className="size-[14px]" />
-            </button>
+            <div
+              onClick={() => setSearchQuery('')}
+              onMouseEnter={() => setIsClearHovered(true)}
+              onMouseLeave={() => setIsClearHovered(false)}
+              className="flex items-center justify-center p-[4px] rounded-[4px] cursor-pointer shrink-0"
+              style={{
+                opacity: isClearHovered ? 1 : 0.7,
+                backgroundColor: isClearHovered ? 'var(--bg-icon-hover)' : 'transparent',
+                transition: 'opacity var(--duration-default) var(--ease-standard), background-color var(--duration-default) var(--ease-standard)',
+              }}
+            >
+              <X className="size-[12px]" style={{ color: isClearHovered ? 'var(--primary)' : 'var(--foreground)' }} strokeWidth={2.5} />
+            </div>
           )}
         </div>
       </div>

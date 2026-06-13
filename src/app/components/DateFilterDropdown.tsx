@@ -23,8 +23,8 @@ function ChevronIcon({ isOpen, isActive }: { isOpen: boolean; isActive: boolean 
         viewBox="0 0 16 16"
         style={{
           transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)',
-          color: 'var(--foreground)',
-          transition: 'transform var(--duration-fast) ease',
+          color: isActive ? 'var(--foreground)' : 'var(--muted-foreground)',
+          transition: 'transform var(--duration-fast) ease, color 300ms cubic-bezier(0.2,0,0.5,1)',
         }}
       >
         <path
@@ -119,7 +119,12 @@ export function DateFilterDropdown({
   };
 
   return (
-    <div className="relative" ref={triggerRef}>
+    <div
+      className="relative"
+      ref={triggerRef}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {/* ── TRIGGER BUTTON ───────────────────────────────────────────────── */}
       <motion.button
         layout
@@ -139,14 +144,12 @@ export function DateFilterDropdown({
         transition={{
           layout: { type: 'spring', bounce: 0, duration: 0.5 },
         }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
         onClick={handleToggle}
       >
         {/* ── BUTTON CONTENT ───────────────────────────────────────────── */}
         <div
           className="flex items-center h-full"
-          style={{ paddingLeft: isActive ? '8px' : '14px', paddingRight: '12px', gap: '12px' }}
+          style={{ paddingLeft: isActive ? '6px' : '12px', paddingRight: '12px', gap: '12px' }}
         >
           {/* Middle slot: chip (active) or icon+label spacer (inactive) */}
           <AnimatePresence mode="wait" onExitComplete={onAnimationComplete}>
@@ -165,7 +168,6 @@ export function DateFilterDropdown({
                   style={{
                     height: '28px',
                     backgroundColor: 'var(--bg-selected)',
-                    border: '1px solid color-mix(in srgb, var(--border) 70%, transparent)',
                     borderRadius: 'var(--radius-8)',
                     paddingLeft: '12px',
                     paddingRight: '4px',
@@ -197,7 +199,7 @@ export function DateFilterDropdown({
                       transition: 'opacity var(--duration-default) var(--ease-standard), background-color var(--duration-default) var(--ease-standard)',
                     }}
                   >
-                    <X className="size-[12px]" style={{ color: 'var(--foreground)' }} strokeWidth={2.5} />
+                    <X className="size-[12px]" style={{ color: isChipXHovered ? 'var(--primary)' : 'var(--foreground)' }} strokeWidth={2.5} />
                   </div>
                 </div>
               </motion.div>
@@ -276,17 +278,19 @@ export function DateFilterDropdown({
             zIndex: -1,
           }}
         />
-        {/* Filter icon — animates up with the label as a nav-item-style unit */}
+        {/* Filter icon — animates up with the label as a nav-item-style unit.
+            Timing is hardcoded (not var()) so the transition shorthand parses
+            reliably — cubic-bezier() inside var() can silently fail to parse. */}
         <ListFilter
           className="shrink-0"
           style={{
-            width: isActive ? '15px' : '20px',
-            height: isActive ? '15px' : '20px',
-            marginRight: isActive ? '6px' : '12px',
-            color: isActive ? 'var(--border-interactive-hover)' : (isHovered || isOpen) ? 'var(--primary)' : 'var(--foreground)',
+            width: isActive ? '14px' : '16px',
+            height: isActive ? '14px' : '16px',
+            marginRight: isActive ? '6px' : '10px',
+            color: (isActive || isOpen) ? 'var(--foreground)' : isHovered ? 'var(--icon-nav-hover)' : 'var(--muted-foreground)',
             transition: isActive
-              ? `color var(--duration-default) var(--ease-standard), width var(--duration-default) var(--ease-standard), height var(--duration-default) var(--ease-standard), margin-right var(--duration-default) var(--ease-standard)`
-              : `color var(--duration-default) var(--ease-standard) 50ms, width var(--duration-default) var(--ease-standard) 50ms, height var(--duration-default) var(--ease-standard) 50ms, margin-right var(--duration-default) var(--ease-standard) 50ms`,
+              ? `color 300ms cubic-bezier(0.2,0,0.5,1), width 300ms cubic-bezier(0.2,0,0.5,1), height 300ms cubic-bezier(0.2,0,0.5,1), margin-right 300ms cubic-bezier(0.2,0,0.5,1)`
+              : `color 300ms cubic-bezier(0.2,0,0.5,1) 50ms, width 300ms cubic-bezier(0.2,0,0.5,1) 50ms, height 300ms cubic-bezier(0.2,0,0.5,1) 50ms, margin-right 300ms cubic-bezier(0.2,0,0.5,1) 50ms`,
           }}
           strokeWidth={2}
         />
@@ -296,15 +300,15 @@ export function DateFilterDropdown({
             position: 'relative',
             fontFamily: 'var(--font-family)',
             fontWeight: isActive ? 'var(--font-weight-regular)' : 'var(--font-weight-medium)',
-            fontSize: isActive ? '14px' : 'var(--font-size-15)',
+            fontSize: isActive ? '13px' : 'var(--font-size-15)',
             letterSpacing: 'var(--letter-spacing-body)',
             lineHeight: 'var(--line-height-20)',
             whiteSpace: 'nowrap',
             display: 'block',
-            color: isActive ? 'var(--border-interactive-hover)' : (isHovered || isOpen) ? 'var(--primary)' : 'var(--foreground)',
+            color: 'var(--foreground)',
             transition: isActive
-              ? `color var(--duration-default) var(--ease-standard), font-size var(--duration-default) var(--ease-standard), font-weight var(--duration-default) var(--ease-standard)`
-              : `color var(--duration-default) var(--ease-standard) 50ms, font-size var(--duration-default) var(--ease-standard) 50ms, font-weight var(--duration-default) var(--ease-standard) 50ms`,
+              ? `font-size 300ms cubic-bezier(0.2,0,0.5,1), font-weight 300ms cubic-bezier(0.2,0,0.5,1)`
+              : `font-size 300ms cubic-bezier(0.2,0,0.5,1) 50ms, font-weight 300ms cubic-bezier(0.2,0,0.5,1) 50ms`,
           }}
         >
           {label}
@@ -316,15 +320,12 @@ export function DateFilterDropdown({
         {isOpen && (
           <motion.div
             ref={panelRef}
-            className="pb-[8px]"
             style={{
               position: 'fixed',
               top: panelPos.top,
               left: panelPos.left,
               zIndex: 9999,
               transformOrigin: 'top center',
-              border: `1px solid var(--border)`,
-              borderRadius: 'var(--radius-16)',
             }}
             initial={{ opacity: 0, scaleY: 0 }}
             animate={{ opacity: 1, scaleY: 1 }}

@@ -85,7 +85,7 @@ export function Sidebar({
   const colorTransition = 'color var(--duration-default) var(--ease-standard)';
 
   const sidebarBody = (
-    <nav aria-label="Sidebar navigation" className="flex flex-col h-full pt-[20px] pb-[24px]">
+    <nav aria-label="Sidebar navigation" className="flex flex-col h-full pt-[12px] pb-[24px]">
 
       {/* ── HEADER ───────────────────────────────────────────────── */}
       <div className="shrink-0 w-full pl-[16px] pt-[4px]">
@@ -93,7 +93,7 @@ export function Sidebar({
         {!isDesktopOpen && (
           <div className="hidden md:flex h-[40px] items-center mb-[12px] mt-[-4px]">
             <IconButton
-              icon={<PanelLeftClose className="size-[20px]" style={{ color: 'var(--border-interactive)' }} strokeWidth={2} />}
+              icon={<PanelLeftClose className="size-[20px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
               onClick={onDesktopToggle}
               size={40}
               rounded="full"
@@ -104,7 +104,7 @@ export function Sidebar({
         )}
 
         {/* Logo row — always on mobile, only when expanded on desktop */}
-        <div className={`flex items-center justify-between pb-[24px] pl-[12px] ${!isDesktopOpen ? 'flex md:hidden' : 'flex'}`}>
+        <div className={`flex items-center justify-between pb-[8px] pl-[12px] ${!isDesktopOpen ? 'flex md:hidden' : 'flex'}`}>
           <div
             className="h-[40px] flex items-center"
             style={{ fontFamily: 'Aleo, serif', fontWeight: 700, fontSize: 'var(--font-size-22)', letterSpacing: 'var(--letter-spacing-body)', color: 'var(--primary)', whiteSpace: 'nowrap' }}
@@ -114,7 +114,7 @@ export function Sidebar({
           {/* Mobile close */}
           <IconButton
             className="md:hidden"
-            icon={<X className="size-[20px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
+            icon={<X className="size-[20px]" strokeWidth={2} />}
             onClick={onMobileClose}
             size={40}
             title="Close sidebar"
@@ -122,7 +122,7 @@ export function Sidebar({
           {/* Desktop collapse */}
           <div className="hidden md:flex items-center justify-center w-[52px] h-[40px] mt-[-4px]">
             <IconButton
-              icon={<PanelLeftClose className="size-[20px]" style={{ color: 'var(--border-interactive)' }} strokeWidth={2} />}
+              icon={<PanelLeftClose className="size-[20px]" style={{ color: 'var(--muted-foreground)' }} strokeWidth={2} />}
               onClick={onDesktopToggle}
               size={40}
               rounded="full"
@@ -144,7 +144,7 @@ export function Sidebar({
       </div>
 
       {/* ── TOP NAV (Recent / Favorites / Shared) ────────────────── */}
-      <div className="shrink-0 w-full pt-[24px] px-[16px]">
+      <div className="shrink-0 w-full pt-[16px] px-[16px]">
         <div className="flex flex-col gap-px">
           {myWorkspaceItems.map(item => (
             <button
@@ -200,7 +200,7 @@ export function Sidebar({
                 color: 'var(--muted-foreground)',
                 whiteSpace: 'nowrap',
               }}>
-                Team Workspaces
+                Workspaces
               </p>
             </div>
 
